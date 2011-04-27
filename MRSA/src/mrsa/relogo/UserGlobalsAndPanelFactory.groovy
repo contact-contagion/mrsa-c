@@ -51,7 +51,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'data/kenwood_activities_sample.csv'], 1)
+			'data/kenwood_activities_sample.csv',
+			'data/kenwood_activities_sample_small.csv'], 1)
 		
 	}
 	

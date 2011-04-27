@@ -23,7 +23,7 @@ class UserObserver extends BaseObserver {
 		// Read the people.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
-				'person', 0.5, Utility.red())
+				'person', 0.5, Utility.blue())
 		}
 		
 		// Read the places.
@@ -31,6 +31,10 @@ class UserObserver extends BaseObserver {
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
 				'square', 0.2, Utility.gray())
 		}
+		
+		// Set the default person drawing styles.
+		setDefaultPersonStyles()
+
 		
 		// Set the default place drawing styles.
 		setDefaultPlaceStyles()
@@ -86,20 +90,20 @@ class UserObserver extends BaseObserver {
 			} else {
 				goToGQ()
 			}
-/*			
+			
 			// Calculate the person's exposure risk and impact.
-			double risk = act.risk()
+//			double risk = act.risk()
 	
 			// Calculate the person's exposure impact.
-			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+//			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
 				
 				// At least one person in the area is infected.
-				if (random(4) < risk) {
-					infected = true
-				}
+//				if (random(4) < risk) {
+//					infect()
+//				}
 				
-			}
-	*/		
+//			}
+		
 		}	
 
 		// Count time.
@@ -252,7 +256,7 @@ class UserObserver extends BaseObserver {
 //			it.work_id = place?.place_id
 
 			// Set the school location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.blue())
+			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.white())
 			it.school = place
 			it.school_id = place?.place_id
 
@@ -306,7 +310,26 @@ class UserObserver extends BaseObserver {
 		
 	}
 	
-	/* This routine assigns default place drawing styles.
+   /* This routine assigns default place drawing styles.
+	*
+	* @author Michael J. North
+	*
+	*/
+   def setDefaultPersonStyles() {
+	   
+	   // Set the place style based on the type.
+	   ask(persons()) {
+		   
+		   // Check the type and assign a style.
+//		   if (infected) {
+//			   infect()
+//		   }   
+	   
+	   }
+	   
+   }
+   
+   /* This routine assigns default place drawing styles.
 	*
 	* @author Michael J. North
 	*
@@ -334,19 +357,19 @@ class UserObserver extends BaseObserver {
 			   setColor(Utility.white())
 			   setSize(0.3)
 			   setShape('circle')
-		   }   
+		   }
 	   
 	   }
 	   
    }
-   
+	
    /* This routine checks to see if a string contains an integer.
-   *
-   * @author Michael J. North
-   *
-   * @param s the string to check
-   * @return returns true if the string passes otherwise false
-   */
+    *
+    * @author Michael J. North
+    *
+    * @param s the string to check
+    * @return returns true if the string passes otherwise false
+    */
    public boolean isParsableToInteger(String s) {
 	   
 	   try {
@@ -359,11 +382,11 @@ class UserObserver extends BaseObserver {
    }
 
    /* This routine checks to see if a string contains a double.
-   *
-   * @author Michael J. North
-   *
-   * @param s the string to check
-   * @return returns true if the string passes otherwise false
+    *
+    * @author Michael J. North
+    *
+    * @param s the string to check
+    * @return returns true if the string passes otherwise false
    */
    public boolean isParsableToDouble(String s) {
 	   

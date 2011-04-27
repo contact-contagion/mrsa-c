@@ -55,10 +55,10 @@ class Person extends BaseTurtle {
 	public boolean infected = false;
 	
 	/* This routine sends the person to their household.
-	*
-	* @author Michael J. North
-	*
-	*/
+ 	 *
+	 * @author Michael J. North
+	 *
+	 */
 	def goToHH() {
 		
 		// Go to the household.
@@ -67,10 +67,10 @@ class Person extends BaseTurtle {
 	}
 
 	/* This routine sends the person to their group quarters.
-	*
-	* @author Michael J. North
-	*
-	*/
+	 *
+	 * @author Michael J. North
+	 *
+	 */
 	def goToGQ() {
 		
 		// Go to the group quarters.
@@ -79,10 +79,10 @@ class Person extends BaseTurtle {
 	}
 
 	/* This routine sends the person to work.
-	*
-	* @author Michael J. North
-	*
-	*/
+	 *
+	 * @author Michael J. North
+	 *
+	 */
 	def goToWork() {
 		
 		// Go to work.
@@ -91,15 +91,25 @@ class Person extends BaseTurtle {
 	}
 
 	/* This routine sends the person to school.
-	*
-	* @author Michael J. North
-	*
-	*/
+	 *
+	 * @author Michael J. North
+	 *
+	 */
 	def goToSchool() {
 		
 		// Go to school.
 		if (school != null) moveTo(school)
 		
+	}
+	
+	/* This routine notes an infection.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def infect() {
+		infected = true
+		setColor(Utility.red())
 	}
 
 }
