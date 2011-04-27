@@ -74,7 +74,7 @@ class UserObserver extends BaseObserver {
 			int time = (ticks() % 24)
 
 			// Find the next activity
-			Activity act = maxOneOf(myOutActivityLinks(), {
+			Activity act = maxOneOf(outActivityLinkNeighbors(), {
 					if (beginTime <= time && time <= endTime) {
 						return 1
 					} else {
@@ -326,14 +326,13 @@ class UserObserver extends BaseObserver {
 			
 			// Scan the activities for matches.
 			ask(activitys()) {
-				println tucaseid + " " + myself().tucaseid
 				if (tucaseid.equals(myself().tucaseid)) {
 					createActivityLinkFrom(myself())
 				}
 			}
 			
 			// Lack of activity is fatal!
-			if (!anyQ(myOutActivityLinks())) {
+			if (!anyQ(myOutActivityLinks()) || tucaseid.trim().equals("")) {
 				die()
 			} else {
 			    survivors++
