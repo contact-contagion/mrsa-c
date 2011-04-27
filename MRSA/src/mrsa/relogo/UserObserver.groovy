@@ -255,7 +255,7 @@ class UserObserver extends BaseObserver {
 			it.hh_id = place?.place_id
 
 			// Set the group quarters location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.brown())
+			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.gray())
 			it.gq = place
 			it.gq_id = place?.place_id
 			
@@ -265,7 +265,7 @@ class UserObserver extends BaseObserver {
 			it.work_id = place?.place_id
 
 			// Set the school location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.gray())
+			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.brown())
 			it.school = place
 			it.school_id = place?.place_id
 

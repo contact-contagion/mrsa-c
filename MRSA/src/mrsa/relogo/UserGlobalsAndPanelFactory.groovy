@@ -58,7 +58,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("maximumRisk", 4)
 		
 		// Add a global infection fraction for testing purposes.
-		addGlobal("infectionFraction", 0.1)
+		addGlobal("infectionFraction", 0.01)
 
 	}
 	
