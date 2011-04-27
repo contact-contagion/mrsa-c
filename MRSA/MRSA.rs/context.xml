@@ -6,8 +6,8 @@
     <projection id="DirectedLinks" type="network"/>
     <projection id="UndirectedLinks" type="network"/>
     <projection id="Tracking Network" type="network"/>
-    <projection id="ActivityLink" type="network"/>
     <projection id="UserLink" type="network"/>
     <projection id="PlaceLink" type="network"/>
+    <projection id="ActivityLink" type="network"/>
   </context>
 </context>

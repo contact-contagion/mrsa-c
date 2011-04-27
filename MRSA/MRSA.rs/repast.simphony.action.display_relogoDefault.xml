@@ -44,15 +44,15 @@
       <string>mrsa.style.TrackingLinkStyle</string>
     </entry>
     <entry>
-      <string>ActivityLink</string>
-      <string>mrsa.style.LinkStyle</string>
-    </entry>
-    <entry>
       <string>UserLink</string>
       <string>mrsa.style.LinkStyle</string>
     </entry>
     <entry>
       <string>PlaceLink</string>
+      <string>mrsa.style.LinkStyle</string>
+    </entry>
+    <entry>
+      <string>ActivityLink</string>
       <string>mrsa.style.LinkStyle</string>
     </entry>
   </netStyles>
@@ -70,15 +70,15 @@
       <null/>
     </entry>
     <entry>
-      <string>ActivityLink</string>
-      <null/>
-    </entry>
-    <entry>
       <string>UserLink</string>
       <null/>
     </entry>
     <entry>
       <string>PlaceLink</string>
+      <null/>
+    </entry>
+    <entry>
+      <string>ActivityLink</string>
       <null/>
     </entry>
   </editedNetStyles>
@@ -129,17 +129,17 @@
       <type>NETWORK</type>
     </repast.simphony.scenario.data.ProjectionData>
     <repast.simphony.scenario.data.ProjectionData>
-      <id>ActivityLink</id>
-      <attributes/>
-      <type>NETWORK</type>
-    </repast.simphony.scenario.data.ProjectionData>
-    <repast.simphony.scenario.data.ProjectionData>
       <id>UserLink</id>
       <attributes/>
       <type>NETWORK</type>
     </repast.simphony.scenario.data.ProjectionData>
     <repast.simphony.scenario.data.ProjectionData>
       <id>PlaceLink</id>
+      <attributes/>
+      <type>NETWORK</type>
+    </repast.simphony.scenario.data.ProjectionData>
+    <repast.simphony.scenario.data.ProjectionData>
+      <id>ActivityLink</id>
       <attributes/>
       <type>NETWORK</type>
     </repast.simphony.scenario.data.ProjectionData>
@@ -196,21 +196,21 @@
       </repast.simphony.visualization.continuous.ContinuousProjectionDescriptor>
     </entry>
     <entry>
-      <string>ActivityLink</string>
+      <string>UserLink</string>
       <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
         <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[5]"/>
         <props/>
       </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
     </entry>
     <entry>
-      <string>UserLink</string>
+      <string>PlaceLink</string>
       <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
         <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[6]"/>
         <props/>
       </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
     </entry>
     <entry>
-      <string>PlaceLink</string>
+      <string>ActivityLink</string>
       <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
         <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[7]"/>
         <props/>

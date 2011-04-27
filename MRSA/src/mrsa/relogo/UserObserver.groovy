@@ -41,9 +41,6 @@ class UserObserver extends BaseObserver {
 		// Link the people to their places.
 		linkPeopleAndPlaces()
 		
-		// Link people to their activities.
-		linkPeopleAndActivities()
-		
 		// Normalize the place coordinates.
 		normalizePlaceCoordinates()
 
@@ -52,6 +49,9 @@ class UserObserver extends BaseObserver {
 			createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
 				'square', 0.0, Utility.black())
 		}
+		
+		// Link people to their activities.
+		linkPeopleAndActivities()
 		
 		// Start the people at their household.
 		ask (persons()) {
@@ -319,26 +319,29 @@ class UserObserver extends BaseObserver {
 	 */
 	def linkPeopleAndActivities() {
 		
+		int survivors = 0
+		
 		// Link the people to their activities.
 		ask (persons()) {
 			
-			// Track matches.
-			def match = false
-		
 			// Scan the activities for matches.
 			ask(activitys()) {
-				if (tucaseid == myself().tucaseid) {
+				println tucaseid + " " + myself().tucaseid
+				if (tucaseid.equals(myself().tucaseid)) {
 					createActivityLinkFrom(myself())
-					match = true
 				}
 			}
 			
-			// Lack of activities is fatal!
-			if (!match) {
+			// Lack of activity is fatal!
+			if (!anyQ(myOutActivityLinks())) {
 				die()
+			} else {
+			    survivors++
 			}
 
 		}
+		
+		println survivors
 		
 	}
 	
@@ -408,7 +411,7 @@ class UserObserver extends BaseObserver {
 	   try {
 		   Integer.parseInt(s);
 		   return true;
-	   } catch(NumberFormatException e) {
+	   } catch (NumberFormatException e) {
 	   	   return false;
 	   }
 	   
@@ -426,7 +429,7 @@ class UserObserver extends BaseObserver {
 	   try {
 		   Double.parseDouble(s);
 		   return true;
-	   } catch(NumberFormatException e) {
+	   } catch (NumberFormatException e) {
 	   	   return false;
 	   }
 	   
