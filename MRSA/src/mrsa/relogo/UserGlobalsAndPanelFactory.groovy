@@ -52,7 +52,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
 			'data/kenwood_activities_sample.csv',
-			'data/kenwood_activities_sample_small.csv'], 1)
+			'data/kenwood_activities_sample_small.csv'], 2)
 		
 	}
 	

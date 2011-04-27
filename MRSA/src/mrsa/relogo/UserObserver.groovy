@@ -34,13 +34,15 @@ class UserObserver extends BaseObserver {
 		
 		// Set the default person drawing styles.
 		setDefaultPersonStyles()
-
 		
 		// Set the default place drawing styles.
 		setDefaultPlaceStyles()
 		
-		// Link the people to the places.
+		// Link the people to their places.
 		linkPeopleAndPlaces()
+		
+		// Link people to their activities.
+		linkPeopleAndActivities()
 		
 		// Normalize the place coordinates.
 		normalizePlaceCoordinates()
@@ -72,8 +74,8 @@ class UserObserver extends BaseObserver {
 			int time = (ticks() % 24)
 
 			// Find the next activity
-			Activity act = maxOneOf(activitys(), {
-					if (tucaseid == myself().tucaseid && beginTime <= time && time <= endTime) {
+			Activity act = maxOneOf(myOutActivityLinks(), {
+					if (beginTime <= time && time <= endTime) {
 						return 1
 					} else {
 						return 0
@@ -296,7 +298,7 @@ class UserObserver extends BaseObserver {
 			
 				// Create a link.
 				ask (person) {
-					createPlaceLinkFrom(place, {
+					createPlaceLinkTo(place, {
 							setColor(new_link_color)
 						})
 				}
@@ -309,6 +311,37 @@ class UserObserver extends BaseObserver {
 		return place
 		
 	}
+	
+	/* This routine links people to activities.
+	 * 
+	 * @author Michael J. North
+	 * 
+	 */
+	def linkPeopleAndActivities() {
+		
+		// Link the people to their activities.
+		ask (persons()) {
+			
+			// Track matches.
+			def match = false
+		
+			// Scan the activities for matches.
+			ask(activitys()) {
+				if (tucaseid == myself().tucaseid) {
+					createActivityLinkFrom(myself())
+					match = true
+				}
+			}
+			
+			// Lack of activities is fatal!
+			if (!match) {
+				die()
+			}
+
+		}
+		
+	}
+	
 	
    /* This routine assigns default place drawing styles.
 	*
