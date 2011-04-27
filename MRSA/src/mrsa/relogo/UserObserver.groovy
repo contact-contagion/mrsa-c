@@ -55,7 +55,15 @@ class UserObserver extends BaseObserver {
 		
 		// Start the people at their household.
 		ask (persons()) {
+			
+			// Go home.
 			goToHH()
+			
+			// Get infected for testing purposes.
+			if (randomFloat(1) < infectionFraction) {
+				infect()
+			}
+			
 		}
 		
 	}
@@ -94,23 +102,22 @@ class UserObserver extends BaseObserver {
 			}
 			
 			// Calculate the person's exposure risk and impact.
-//			double risk = act.risk()
+			double risk = act.risk()
 	
 			// Calculate the person's exposure impact.
-//			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
 				
 				// At least one person in the area is infected.
-//				if (random(4) < risk) {
-//					infect()
-//				}
+				if (random(maximumRisk) < risk) {
+					infect()
+				}
 				
-//			}
+			}
 		
 		}	
 
 		// Count time.
 		tick()
-		println ticks()
 		
 	}
 	
@@ -248,17 +255,17 @@ class UserObserver extends BaseObserver {
 			it.hh_id = place?.place_id
 
 			// Set the group quarters location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.red())
+			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.brown())
 			it.gq = place
 			it.gq_id = place?.place_id
 			
 			// Set the work location.
-//			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.green())
-//			it.work = place
-//			it.work_id = place?.place_id
+			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.green())
+			it.work = place
+			it.work_id = place?.place_id
 
 			// Set the school location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.white())
+			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.gray())
 			it.school = place
 			it.school_id = place?.place_id
 
@@ -292,7 +299,7 @@ class UserObserver extends BaseObserver {
 			if (place == null) {
 				
 				// Warning about missing places
-				print "Place $place_id not found for person $person.person_id."
+				//print "Place $place_id not found for person $person.person_id."
 				
 			} else {
 			
@@ -319,8 +326,6 @@ class UserObserver extends BaseObserver {
 	 */
 	def linkPeopleAndActivities() {
 		
-		int survivors = 0
-		
 		// Link the people to their activities.
 		ask (persons()) {
 			
@@ -328,19 +333,16 @@ class UserObserver extends BaseObserver {
 			ask(activitys()) {
 				if (tucaseid.equals(myself().tucaseid)) {
 					createActivityLinkFrom(myself())
+					moveTo(myself())
 				}
 			}
 			
 			// Lack of activity is fatal!
 			if (!anyQ(myOutActivityLinks()) || tucaseid.trim().equals("")) {
 				die()
-			} else {
-			    survivors++
 			}
 
 		}
-		
-		println survivors
 		
 	}
 	

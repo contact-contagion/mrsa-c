@@ -53,7 +53,13 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			['None',
 			'data/kenwood_activities_sample.csv',
 			'data/kenwood_activities_sample_small.csv'], 2)
+
+		// Add a global maximum risk variable.
+		addGlobal("maximumRisk", 4)
 		
+		// Add a global infection fraction for testing purposes.
+		addGlobal("infectionFraction", 0.1)
+
 	}
 	
 }

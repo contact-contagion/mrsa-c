@@ -110,6 +110,7 @@ class Person extends BaseTurtle {
 	def infect() {
 		infected = true
 		setColor(Utility.red())
+	    setSize(2.0)
 	}
 
 }
