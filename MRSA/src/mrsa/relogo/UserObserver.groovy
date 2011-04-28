@@ -79,7 +79,7 @@ class UserObserver extends BaseObserver {
 		ask(persons()){	
 
 			// Find the time.
-			int time = (ticks() % 24)
+			int time = (ticks() % (24 * 60))
 
 			// Find the next activity
 			Activity act = maxOneOf(outActivityLinkNeighbors(), {
@@ -101,6 +101,12 @@ class UserObserver extends BaseObserver {
 				goToGQ()
 			}
 			
+			/*********************************
+			 * 
+			 * REPLACE THE CODE BELOW.
+			 * 
+			 */
+			
 			// Calculate the person's exposure risk and impact.
 			double risk = act.risk()
 	
@@ -113,7 +119,13 @@ class UserObserver extends BaseObserver {
 				}
 				
 			}
-		
+
+			/*********************************
+			*
+			* REPLACE THE CODE ABOVE.
+			*
+			*/
+
 		}	
 
 		// Count time.
@@ -202,7 +214,7 @@ class UserObserver extends BaseObserver {
 		}
 		
 	}
-		
+
 	/* This routine normalizes the place coordinates.
 	 * 
 	 * @author Michael J. North
