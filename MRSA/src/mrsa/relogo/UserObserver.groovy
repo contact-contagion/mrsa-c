@@ -42,6 +42,7 @@ class UserObserver extends BaseObserver {
 		linkPeopleAndPlaces()
 		
 		// Normalize the place coordinates.
+		//TODO: Exit if no places here.
 		normalizePlaceCoordinates()
 
 		// Read the activities.
@@ -57,9 +58,11 @@ class UserObserver extends BaseObserver {
 		ask (persons()) {
 			
 			// Go home.
+			//TODO: Goto group quarters if that is defined and there is no HH.
 			goToHH()
 			
 			// Get infected for testing purposes.
+			//TODO: Update or remove this once the infection process is updated.
 			if (randomFloat(1) < infectionFraction) {
 				infect()
 			}
@@ -83,7 +86,7 @@ class UserObserver extends BaseObserver {
 
 			// Find the next activity
 			Activity act = maxOneOf(outActivityLinkNeighbors(), {
-					if (beginTime <= time && time <= endTime) {
+					if (beginTime <= time && time < endTime) {
 						return 1
 					} else {
 						return 0
@@ -91,6 +94,7 @@ class UserObserver extends BaseObserver {
 				})
 
 			// Go to the place for the activity.
+			//TODO: Make HH the default if there is a HH else go to GQ.
 			if (act.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
 			} else if (act.place_type.equalsIgnoreCase("Work")) {
@@ -101,11 +105,7 @@ class UserObserver extends BaseObserver {
 				goToGQ()
 			}
 			
-			/*********************************
-			 * 
-			 * REPLACE THE CODE BELOW.
-			 * 
-			 */
+			//TODO: REPLACE THE CODE BELOW USING A STRATEGY DESIGN PATTERN WITH A PLUGGABLE USER INTERFACE.
 			
 			// Calculate the person's exposure risk and impact.
 			double risk = act.risk()
@@ -119,12 +119,6 @@ class UserObserver extends BaseObserver {
 				}
 				
 			}
-
-			/*********************************
-			*
-			* REPLACE THE CODE ABOVE.
-			*
-			*/
 
 		}	
 
@@ -222,6 +216,8 @@ class UserObserver extends BaseObserver {
 	 */
 	def normalizePlaceCoordinates() {
 
+		//TODO: Add to ReLogo infrastructure.
+		
 		// Find the bounds.
 		def minX = places().min({it.longitude}).longitude
 		def maxX = places().max({it.longitude}).longitude
@@ -261,6 +257,7 @@ class UserObserver extends BaseObserver {
 		// Link the people to places.
 		ask (persons()) {
 		
+			//TODO: Set the link color to the same value as the place color.
 			// Set the household location.
 			Place place = safeCreatePlaceLinkFrom(it, placesMap, hh_id, Utility.yellow())
 			it.hh = place

@@ -35,6 +35,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		
 		// Add a go toggle button.
 		addToggleButtonWL('go', 'Go')
+		
+		//TODO: Change Kenwood to 60615.
 
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',

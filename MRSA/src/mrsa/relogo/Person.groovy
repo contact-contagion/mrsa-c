@@ -15,7 +15,7 @@ class Person extends BaseTurtle {
 	// The person's identifier.
 	public String person_id = ""
 	
-	// The person's relate value.
+	// The person's relationship to the head of the household.
 	public int relate = 0
 	
 	// The person's gender.
@@ -51,7 +51,7 @@ class Person extends BaseTurtle {
 	// The person's activity type identifier.
 	public String tucaseid = ""
 	
-	// THe person's infection status.
+	// The person's infection status.
 	public boolean infected = false;
 	
 	/* This routine sends the person to their household.
