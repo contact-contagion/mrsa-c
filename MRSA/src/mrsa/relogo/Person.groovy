@@ -66,7 +66,7 @@ class Person extends BaseTurtle {
 	def goToHH() {
 		
 		// Go to the household.
-		if (hh != null) changeLocation(hh)
+		if (hh != null) changePlace(hh)
 		
 	}
 	
@@ -78,7 +78,7 @@ class Person extends BaseTurtle {
 	def goToGQ() {
 		
 		// Go to the group quarters.
-		if (gq != null) changeLocation(gq)
+		if (gq != null) changePlace(gq)
 		
 	}
 	
@@ -91,10 +91,10 @@ class Person extends BaseTurtle {
 		
 		// Go to the household.
 		if (hh != null) {
-			changeLocation(hh)
+			changePlace(hh)
 			// Go to the group quarters.
 		} else if (gq != null) {
-			changeLocation(gq)
+			changePlace(gq)
 		}
 	}
 	
@@ -106,7 +106,7 @@ class Person extends BaseTurtle {
 	def goToWork() {
 		
 		// Go to work.
-		if (work != null) changeLocation(work)
+		if (work != null) changePlace(work)
 		
 	}
 	
@@ -118,7 +118,7 @@ class Person extends BaseTurtle {
 	def goToSchool() {
 		
 		// Go to school.
-		if (school != null) changeLocation(school)
+		if (school != null) changePlace(school)
 		
 	}
 	
