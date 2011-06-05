@@ -18,13 +18,19 @@ class Place extends BaseTurtle {
 	// The type of location.
 	public String type = ""
 	
-	// The number of persons typically found here.
-	public int persons = 0
-	
 	// The latitude. This is normalized to a Y coordinate.
 	public double latitude = 0
 	
 	// The longitude. This is normalized to an X coordinate.
 	public double longitude = 0
 	
+	// The number of uncolonized people currently here.
+	int uncolonized = 0;
+
+	// The number of colonized people currently here.
+	int colonized = 0;
+	
+	// The number of infected people currently here.
+	int infected = 0;
+
 }

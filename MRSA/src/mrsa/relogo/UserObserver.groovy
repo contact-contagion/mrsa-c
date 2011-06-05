@@ -41,34 +41,31 @@ class UserObserver extends BaseObserver {
 		// Link the people to their places.
 		linkPeopleAndPlaces()
 		
-		// Normalize the place coordinates.
-		//TODO: Exit if no places here.
-		normalizePlaceCoordinates()
+		// Check for places.
+		if (places().size() > 0) {
 
-		// Read the activities.
-		if (!activitiesInputFile.equalsIgnoreCase('None')) {
-			createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
-				'square', 0.0, Utility.black())
-		}
-		
-		// Link people to their activities.
-		linkPeopleAndActivities()
-		
-		// Start the people at their household.
-		ask (persons()) {
-			
-			// Go home.
-			//TODO: Goto group quarters if that is defined and there is no HH.
-			goToHH()
-			
-			// Get infected for testing purposes.
-			//TODO: Update or remove this once the infection process is updated.
-			if (randomFloat(1) < infectionFraction) {
-				infect()
+			// Normalize the place coordinates.
+			normalizePlaceCoordinates()
+	
+			// Read the activities.
+			if (!activitiesInputFile.equalsIgnoreCase('None')) {
+				createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
+					'square', 0.0, Utility.black())
 			}
 			
+			// Link people to their activities.
+			linkPeopleAndActivities()
+			
+			// Start the people at their household.
+			ask (persons()) {
+				
+				// Go home.
+				goToHHorGQ()
+				
+			}
+
 		}
-		
+				
 	}
 		
 	/* This routine executes the model.
@@ -81,7 +78,7 @@ class UserObserver extends BaseObserver {
 		// Ask the people to execute their activities.
 		ask(persons()){	
 
-			// Find the time.
+			// Find the time in minutes since the start of the current day.
 			int time = (ticks() % (24 * 60))
 
 			// Find the next activity
@@ -94,36 +91,32 @@ class UserObserver extends BaseObserver {
 				})
 
 			// Go to the place for the activity.
-			//TODO: Make HH the default if there is a HH else go to GQ.
 			if (act.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
 			} else if (act.place_type.equalsIgnoreCase("Work")) {
 			    goToWork()
 			} else if (act.place_type.equalsIgnoreCase("School")) {
 				goToSchool()
-			} else {
+			} else if (act.place_type.equalsIgnoreCase("Group Quarters")) {
 				goToGQ()
+			} else {
+				goToHH()
 			}
 			
-			//TODO: REPLACE THE CODE BELOW USING A STRATEGY DESIGN PATTERN WITH A PLUGGABLE USER INTERFACE.
-			
-			// Calculate the person's exposure risk and impact.
-			double risk = act.risk()
-	
-			// Calculate the person's exposure impact.
-			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
-				
-				// At least one person in the area is infected.
-				if (random(maximumRisk) < risk) {
-					infect()
-				}
-				
+			// Activate a transition.
+			if (transitionRule.equalsIgnoreCase('None')) {
+			} else if (transitionRule.equalsIgnoreCase('Simple')) {
+				activateSimpleTransition()
+			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
+				activateDetailedTransition()
 			}
-
+			
 		}	
 
-		// Count time.
-		tick()
+		// Count by minute to the next hour.
+		for (int i = 0; i++; i < 60) {
+			tick()
+		}
 		
 	}
 	
@@ -216,8 +209,6 @@ class UserObserver extends BaseObserver {
 	 */
 	def normalizePlaceCoordinates() {
 
-		//TODO: Add to ReLogo infrastructure.
-		
 		// Find the bounds.
 		def minX = places().min({it.longitude}).longitude
 		def maxX = places().max({it.longitude}).longitude
@@ -257,24 +248,23 @@ class UserObserver extends BaseObserver {
 		// Link the people to places.
 		ask (persons()) {
 		
-			//TODO: Set the link color to the same value as the place color.
 			// Set the household location.
-			Place place = safeCreatePlaceLinkFrom(it, placesMap, hh_id, Utility.yellow())
+			Place place = safeCreatePlaceLinkFrom(it, placesMap, hh_id, Utility.gray())
 			it.hh = place
 			it.hh_id = place?.place_id
 
 			// Set the group quarters location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.gray())
+			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.white())
 			it.gq = place
 			it.gq_id = place?.place_id
 			
 			// Set the work location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.green())
+			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.blue())
 			it.work = place
 			it.work_id = place?.place_id
 
 			// Set the school location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.brown())
+			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.orange())
 			it.school = place
 			it.school_id = place?.place_id
 
@@ -367,9 +357,13 @@ class UserObserver extends BaseObserver {
 	   ask(persons()) {
 		   
 		   // Check the type and assign a style.
-//		   if (infected) {
-//			   infect()
-//		   }   
+		   if (status == PersonStatus.UNCOLONIZED) {
+			   decolonize()
+		   } else if (status == PersonStatus.COLONIZED) {
+			   colonize()
+		   } else if (status == PersonStatus.INFECTED) {
+			   infect()
+		   }   
 	   
 	   }
 	   
@@ -395,11 +389,11 @@ class UserObserver extends BaseObserver {
 			   setSize(0.3)
 			   setShape('circle')
 		   } else if (type.equalsIgnoreCase("Household")) {
-		   } else if (type.equalsIgnoreCase("Group Quarters")) {
-			   setColor(Utility.white())
+		   } else if (type.equalsIgnoreCase("Work")) {
+			   setColor(Utility.blue())
 			   setSize(0.3)
-			   setShape('circle')
-		   } else if (type.equalsIgnoreCase("Nursing Home")) {
+			   setShape('triangle')
+		   } else if (type.equalsIgnoreCase("Group Quarters")) {
 			   setColor(Utility.white())
 			   setSize(0.3)
 			   setShape('circle')

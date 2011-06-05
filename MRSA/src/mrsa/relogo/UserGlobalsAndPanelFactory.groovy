@@ -36,31 +36,50 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a go toggle button.
 		addToggleButtonWL('go', 'Go')
 		
-		//TODO: Change Kenwood to 60615.
+		// Add a chooser for place input files.
+		addChooserWL('transitionRule', 'Transition Rule:',
+			['None',
+			'Simple ',
+			'Detailed'], 2)
 
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'data/kenwood_persons_sample.csv',
-			'data/kenwood_persons.csv'], 1)
+			'data/60615_persons_sample.csv',
+			'data/60615_persons.csv'], 1)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'data/kenwood_places_sample.csv',
-			'data/kenwood_places.csv'], 1)
+			'data/60615_places_sample.csv',
+			'data/60615_places.csv'], 1)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'data/kenwood_activities_sample.csv',
-			'data/kenwood_activities_sample_small.csv'], 2)
+			'data/60615_activities_sample.csv',
+			'data/60615_activities_sample_small.csv'], 2)
 
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
 		
 		// Add a global infection fraction for testing purposes.
 		addGlobal("infectionFraction", 0.01)
+
+		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
+		addSliderWL("A", "A", 0, 0.01, 1.0, 0.01)
+		
+		// B will use simple, time-independent exponential decline with 38% of C moving to I after 10 weeks.
+		addSliderWL("B", "B", 0, 0.01, 1.0, 0.05)
+
+		// C is a simple exponential function of the time the agent has been infected such that 21% are infected at 3 weeks.
+		addSliderWL("C", "C", 0, 0.01, 1.0, 0.05)
+
+		// For D we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
+		addSliderWL("D", "D", 0, 0.01, 1.0, 0.05)
+
+		// For E we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
+		addSliderWL("E", "E", 0, 0.01, 1.0, 0.05)
 
 	}
 	
