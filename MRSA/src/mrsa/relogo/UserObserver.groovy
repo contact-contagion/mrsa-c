@@ -97,7 +97,7 @@ class UserObserver extends BaseObserver {
 			Activity nextActivity = null
 			for (Activity tempActivity in activityList) {
 				if (tempActivity.start_time <= time && time < tempActivity.stop_time) {
-					nextActivity = activity
+					nextActivity = tempActivity
 				}
 			}
 			
@@ -303,7 +303,7 @@ class UserObserver extends BaseObserver {
 		println("    Completed Sorting the People")
 		
 		// Prepare to match people with activities.
-		println("    Started Matching the " + sortedPersons.size() +
+		println("    Started Matching " + sortedPersons.size() +
 			" People to Activities")
 		int scanCounter = 0
 		int matchCounter = 0
@@ -346,7 +346,9 @@ class UserObserver extends BaseObserver {
 			}
 
 		}	
-		println("    Completed Matching the People to Activities")
+		println("    Completed Matching " + matchCounter +
+			" of " + sortedPersons.size() + " People to " +
+			scanCounter + " Activities")
 		
 	}
 	
@@ -396,69 +398,24 @@ class UserObserver extends BaseObserver {
 		ask (persons()) {
 			
 			// Set the household location.
-			Place place = safeCreatePlaceLinkFrom(it, placesMap, hh_id, Utility.gray())
 			it.hh = place
 			it.hh_id = place?.place_id
 			
 			// Set the group quarters location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.white())
 			it.gq = place
 			it.gq_id = place?.place_id
 			
 			// Set the work location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.blue())
 			it.work = place
 			it.work_id = place?.place_id
 			
 			// Set the school location.
-			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.orange())
 			it.school = place
 			it.school_id = place?.place_id
 			
 		}
 	}
 	
-	
-	/* This routine safely links people and places.
-	 * 
-	 * @author Michael J. North
-	 * 
-	 * @param person the person to link from
-	 * @param placesMap the map of places
-	 * @param place_id the place to link to
-	 * @param new_link_color the color for the new link
-	 * 
-	 */
-	Place safeCreatePlaceLinkFrom(Person person, def placesMap, String place_id, new_link_color) {
-		
-		// Declare the return value.
-		Place place = null;
-		
-		// Check the place identifier.
-		if ((place_id != null) && (!place_id.trim().equals(''))) {
-			
-			// Find the designated place.
-			place = placesMap.getAt(place_id)
-			
-			// Check the place.
-			if (place == null) {
-				
-				// Warning about missing places
-				//print "Place $place_id not found for person $person.person_id."
-				
-			} else {
-				
-				// Create a link.
-				ask (person) {
-					createPlaceLinkTo(place, { setColor(new_link_color) })
-				}
-			}
-		}
-		
-		// Return the results.
-		return place
-		
-	}
 	
 	/* This routine assigns default place drawing styles.
 	 *

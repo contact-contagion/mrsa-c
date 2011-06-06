@@ -7,6 +7,5 @@
     <projection id="UndirectedLinks" type="network"/>
     <projection id="Tracking Network" type="network"/>
     <projection id="UserLink" type="network"/>
-    <projection id="PlaceLink" type="network"/>
   </context>
 </context>
