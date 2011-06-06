@@ -398,25 +398,46 @@ class UserObserver extends BaseObserver {
 		ask (persons()) {
 			
 			// Set the household location.
-			it.hh = place
-			it.hh_id = place?.place_id
+			it.hh = safePlaceLookup(placesMap, it.hh_id)
 			
 			// Set the group quarters location.
-			it.gq = place
-			it.gq_id = place?.place_id
+			it.gq = safePlaceLookup(placesMap, it.gq_id)
 			
 			// Set the work location.
-			it.work = place
-			it.work_id = place?.place_id
+			it.work = safePlaceLookup(placesMap, it.work_id)
 			
 			// Set the school location.
-			it.school = place
-			it.school_id = place?.place_id
+			it.school = safePlaceLookup(placesMap, it.school_id)
 			
 		}
 	}
 	
-	
+	/* This routine safely looks up places.
+	*
+	* @author Michael J. North
+	*
+	* @param placesMap the map of places
+	* @param place_id the place to link to
+	*
+	*/
+   Place safePlaceLookup(def placesMap, String place_id) {
+	   
+	   // Declare the return value.
+	   Place place = null;
+	   
+	   // Check the place identifier.
+	   if ((place_id != null) && (!place_id.trim().equals(''))) {
+		   
+		   // Find the designated place.
+		   place = placesMap.getAt(place_id)
+		  
+	   }
+	   
+	   // Return the results.
+	   return place
+		   
+	}
+		
 	/* This routine assigns default place drawing styles.
 	 *
 	 * @author Michael J. North
