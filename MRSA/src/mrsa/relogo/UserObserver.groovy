@@ -22,14 +22,18 @@ class UserObserver extends BaseObserver {
 		
 		// Read the people.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
+			println("Started Reading Persons")
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
 					'person', 0.5, Utility.blue())
+			println("Completed Reading Persons")
 		}
 		
 		// Read the places.
 		if (!placesInputFile.equalsIgnoreCase('None')) {
+			println("Started Reading Places")
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
 					'square', 0.2, Utility.gray())
+			println("Completed Reading Places")
 		}
 		
 		// Set the default person drawing styles.
@@ -39,31 +43,43 @@ class UserObserver extends BaseObserver {
 		setDefaultPlaceStyles()
 		
 		// Link the people to their places.
+		println("Starting Linking Persons and Places")
 		linkPeopleAndPlaces()
+		println("Completed Linking Persons and Places")
 		
 		// Check for places.
 		if (places().size() > 0) {
 			
 			// Normalize the place coordinates.
+			println("Started Normalizing Place Locations")
 			normalizePlaceCoordinates()
+			println("Completed Normalizing Place Locations")
 			
 			// Read the activities and convert their times to hours.
 			if (!activitiesInputFile.equalsIgnoreCase('None')) {
+				println("Started Reading Activities")
 				createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
 						'square', 0.0, Utility.black())
+				println("Completed Reading Activities")
+				println("Started Converting Activity Times")
 				convertActivityTimes()
+				println("Completed Converting Activity Times")
 			}
 			
 			// Link people to their activities.
+			println("Starting Linking Persons and Activities")
 			linkPeopleAndActivities()
+			println("Completed Linking Persons and Activities")
 			
 			// Start the people at their household.
+			println("Asking Persons to Go Home")
 			ask (persons()) {
 				
 				// Go home.
 				goToHHorGQ()
 				
 			}
+			println("Ready to Run...")
 		}
 	}
 	

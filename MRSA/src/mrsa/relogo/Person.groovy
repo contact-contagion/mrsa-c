@@ -204,6 +204,9 @@ class Person extends BaseTurtle {
 	 */
 	public void activateDetailedTransition() {
 
+		// Calculate the person's exposure risk and impact.
+		double risk = act.risk()
+		
 		// Find the next state.
 		PersonStatus other = PersonStatus.UNCOLONIZED
 		if (currentPlace != null) {
@@ -214,7 +217,7 @@ class Person extends BaseTurtle {
 		}
 		
 		// Transition.
-		PersonStatus nextStatus = nextState(status, other)
+		PersonStatus nextStatus = nextState(status, other, risk)
 		if (nextStatus != status) {
 			if (nextStatus == PersonState.UNCOLONIZED) {
 				decolonize()
@@ -314,7 +317,7 @@ class Person extends BaseTurtle {
 	*
 	* @author Michael J. North
 	*/
-   public PersonStatus nextState(PersonStatus startStatus, PersonStatus otherStatus) {
+   public PersonStatus nextState(PersonStatus startStatus, PersonStatus otherStatus, double risk) {
 	   
 	   // Find the next state.
 	   switch (startStatus) {
@@ -322,39 +325,39 @@ class Person extends BaseTurtle {
 	   case PersonStatus.UNCOLONIZED:
 		   switch (otherStatus) {
 		   case PersonStatus.UNCOLONIZED:
-			   return chooseOne(1, 0, 0)
+			   return chooseOne(1, 0, 0, risk)
 			   break
 		   case PersonStatus.COLONIZED:
-			   return chooseOne(E, 1-B-E, B)
+			   return chooseOne(E, 1-B-E, B, risk)
 			   break
 		   case PersonStatus.INFECTED:
-			   return chooseOne(D, C, 1-C-D)
+			   return chooseOne(D, C, 1-C-D, risk)
 			   break
 		   }
 		   
 	   case PersonStatus.COLONIZED:
 		   switch (otherStatus) {
 		   case PersonStatus.UNCOLONIZED:
-			   return chooseOne(1-A, A, 0)
+			   return chooseOne(1-A, A, 0, risk)
 			   break
 		   case PersonStatus.COLONIZED:
-			   return chooseOne(E, 1-B-E, B)
+			   return chooseOne(E, 1-B-E, B, risk)
 			   break
 		   case PersonStatus.INFECTED:
-			   return chooseOne(D, C, 1-C-D)
+			   return chooseOne(D, C, 1-C-D, risk)
 			   break
 		   }
 
 	   case PersonStatus.INFECTED:
 		   switch (otherStatus) {
 		   case PersonStatus.UNCOLONIZED:
-			   return chooseOne(1-2*A, 2*A, 0)
+			   return chooseOne(1-2*A, 2*A, 0, risk)
 			   break
 		   case PersonStatus.COLONIZED:
-			   return chooseOne(E, 1-B-E, B)
+			   return chooseOne(E, 1-B-E, B, risk)
 			   break
 		   case PersonStatus.INFECTED:
-			   return chooseOne(D, C, 1-C-D)
+			   return chooseOne(D, C, 1-C-D, risk)
 			   break
 		   }
 	   
@@ -368,16 +371,16 @@ class Person extends BaseTurtle {
 	*
 	* @author Michael J. North
 	*/
-   public PersonStatus chooseOne(double p1, double p2, double p3) {
+   public PersonStatus chooseOne(double p1, double p2, double p3, double risk) {
 	   
 	   // Select the next state.
 	   double draw = randomFloat(1)
-	   if (draw <= p1) {
-		   return PersonStatus.UNCOLONIZED
-	   } else if (draw <= p2) {
+	   if (draw <= (risk * p3)) {
+		   return PersonStatus.INFECTED
+	   } else if (draw <= (risk * (p2 + p3))) {
 		   return PersonStatus.COLONIZED
 	   } else {
-		   return PersonStatus.INFECTED
+		   return PersonStatus.UNCOLONIZED
 	   }
 	   
    }
