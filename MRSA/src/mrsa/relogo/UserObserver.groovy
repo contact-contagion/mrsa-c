@@ -416,35 +416,5 @@ class UserObserver extends BaseObserver {
 			return false;
 		}
 	}
-	
-	/* This routine returns the total number of uncolonized people.
-	 *
-	 * @author Michael J. North
-	 *
-	 * @return returns the count
-	 */
-	int getTotalUnolonized() {
-		return totalUncolonized
-	}
-	
-	/* This routine returns the total number of colonized people.
-	 *
-	 * @author Michael J. North
-	 *
-	 * @return returns the count
-	 */
-	int getTotalColonized() {
-		return totalColonized
-	}
-	
-	/* This routine returns the total number of infected people.
-	 *
-	 * @author Michael J. North
-	 *
-	 * @return returns the count
-	 */
-	int getTotalInfect() {
-		return totalInfected
-	}
 
 }
