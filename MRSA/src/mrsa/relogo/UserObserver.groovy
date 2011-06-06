@@ -47,10 +47,11 @@ class UserObserver extends BaseObserver {
 			// Normalize the place coordinates.
 			normalizePlaceCoordinates()
 			
-			// Read the activities.
+			// Read the activities and convert their times to hours.
 			if (!activitiesInputFile.equalsIgnoreCase('None')) {
 				createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
 						'square', 0.0, Utility.black())
+				convertActivityTimes()
 			}
 			
 			// Link people to their activities.
@@ -77,11 +78,11 @@ class UserObserver extends BaseObserver {
 		ask(persons()){	
 			
 			// Find the time in minutes since the start of the current day.
-			int time = (ticks() % (24 * 60))
+			int time = (ticks() % 24)
 			
 			// Find the next activity
 			Activity act = maxOneOf(outActivityLinkNeighbors(), {
-				if (beginTime <= time && time < endTime) {
+				if (start_time <= time && time < stop_time) {
 					return 1
 				} else {
 					return 0
@@ -110,10 +111,9 @@ class UserObserver extends BaseObserver {
 			}
 		}	
 		
-		// Count by minute to the next hour.
-		for (int i = 0; i++; i < 60) {
-			tick()
-		}
+		// Move to next hour.
+		tick()
+
 	}
 	
 	
@@ -128,7 +128,7 @@ class UserObserver extends BaseObserver {
 	 * 
 	 */
 	def createTurtlesFromCSVFile(String fileName, Class turtleType,
-	String defaultShape, double defaultSize, double defaultColor) {
+		String defaultShape, double defaultSize, double defaultColor) {
 		
 		// Read the data file.
 		List<String[]> rows = new CSVReader(
@@ -149,6 +149,7 @@ class UserObserver extends BaseObserver {
 				fullFieldList = (List) row
 				matchedFieldList = (List) turtleType.fields.collect({it.getName()}).
 				intersect((List) row)
+				
 			} else {
 				
 				// Define an index tracker.
@@ -175,6 +176,7 @@ class UserObserver extends BaseObserver {
 						} else {
 							it."$field" = row[index]
 						}
+						
 					}
 					
 					// Set the shape.
@@ -188,10 +190,28 @@ class UserObserver extends BaseObserver {
 					
 					// Set the default color.
 					setColor(defaultColor)
-					
+				
 				}, turtleType.getSimpleName())
+
 			}
+
 		}
+
+	}
+	
+	/* This routine converts activity times.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def convertActivityTimes() {
+		
+		// Scan the activities.
+		ask (activitys()) {
+			start_time = start_time / 60
+			stop_time = stop_time / 60
+		}
+		
 	}
 	
 	/* This routine normalizes the place coordinates.
@@ -315,7 +335,7 @@ class UserObserver extends BaseObserver {
 		ask (persons()) {
 			
 			// Scan the activities for matches.
-			ask(activitys()) {
+			ask (activitys()) {
 				if (tucaseid.equals(myself().tucaseid)) {
 					createActivityLinkFrom(myself())
 					moveTo(myself())
@@ -416,5 +436,4 @@ class UserObserver extends BaseObserver {
 			return false;
 		}
 	}
-
 }

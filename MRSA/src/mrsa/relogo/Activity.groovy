@@ -19,10 +19,10 @@ class Activity extends BaseTurtle {
 	public String place_type = ""
 	
 	// The activity's beginning time.
-	public String start_time = ""
+	public int start_time = 0
 	
 	// The activity's ending time.
-	public String stop_time = ""
+	public int stop_time = 0
 	
 	// The activity's code.
 	public String activity_code = ""
@@ -38,22 +38,6 @@ class Activity extends BaseTurtle {
 		
 		// Return the results.
 		return (activity_risk + place_risk)
-		
-	}
-
-	// Parse the activity's start time.
-	double getBeginTime() {
-		
-		// Return the results.
-		return (Double.valueOf(start_time.split(':')[0]))
-		
-	}
-
-	// Parse the activity's start time.
-	double getEndTime() {
-		
-		// Return the results.
-		return (Double.valueOf(stop_time.split(':')[0]))
 		
 	}
 
