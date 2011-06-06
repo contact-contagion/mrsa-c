@@ -45,20 +45,20 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'data/60615_persons_sample.csv',
-			'data/60615_persons.csv'], 1)
+			'../Prototype_Model_Inputs/sample_60615_persons.csv',
+			'../Prototype_Model_Inputs/all_60615_persons.csv'], 1)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'data/60615_places_sample.csv',
-			'data/60615_places.csv'], 1)
+			'../Prototype_Model_Inputs/sample_60615_places.csv',
+			'../Prototype_Model_Inputs/all_60615_places.csv'], 1)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'data/60615_activities_sample.csv',
-			'data/60615_activities_sample_small.csv'], 2)
+			'../Prototype_Model_Inputs/sample_60615_activities.csv',
+			'../Prototype_Model_Inputs/all_60615_activities.csv'], 1)
 
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
