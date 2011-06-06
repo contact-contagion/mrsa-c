@@ -42,7 +42,6 @@ class Activity extends BaseTurtle {
 	}
 
 	// Parse the activity's start time.
-	//TODO: Upgrade to the new minutes-based input file once Brian updates the files.
 	double getBeginTime() {
 		
 		// Return the results.
@@ -51,7 +50,6 @@ class Activity extends BaseTurtle {
 	}
 
 	// Parse the activity's start time.
-	//TODO: Upgrade to the new minutes-based input file once Brian updates the files.
 	double getEndTime() {
 		
 		// Return the results.
