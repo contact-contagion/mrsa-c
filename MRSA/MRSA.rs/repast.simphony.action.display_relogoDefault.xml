@@ -4,12 +4,12 @@
   <type>TWO_D</type>
   <styles>
     <entry>
-      <string>repast.simphony.relogo.WayPoint</string>
-      <string>mrsa.style.WayPointStyle</string>
-    </entry>
-    <entry>
       <string>repast.simphony.relogo.BaseTurtle</string>
       <string>mrsa.style.TurtleStyle</string>
+    </entry>
+    <entry>
+      <string>repast.simphony.relogo.WayPoint</string>
+      <string>mrsa.style.WayPointStyle</string>
     </entry>
     <entry>
       <string>repast.simphony.relogo.BasePatch</string>
@@ -18,11 +18,11 @@
   </styles>
   <editedStyles>
     <entry>
-      <string>repast.simphony.relogo.WayPoint</string>
+      <string>repast.simphony.relogo.BaseTurtle</string>
       <null/>
     </entry>
     <entry>
-      <string>repast.simphony.relogo.BaseTurtle</string>
+      <string>repast.simphony.relogo.WayPoint</string>
       <null/>
     </entry>
     <entry>
@@ -95,16 +95,16 @@
   <layoutInterval>0</layoutInterval>
   <layerOrder>
     <entry>
+      <string>repast.simphony.relogo.BaseTurtle</string>
+      <int>2</int>
+    </entry>
+    <entry>
       <string>repast.simphony.relogo.WayPoint</string>
       <int>0</int>
     </entry>
     <entry>
       <string>repast.simphony.relogo.BasePatch</string>
       <int>1</int>
-    </entry>
-    <entry>
-      <string>repast.simphony.relogo.BaseTurtle</string>
-      <int>2</int>
     </entry>
   </layerOrder>
   <projections>
