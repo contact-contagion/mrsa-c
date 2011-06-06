@@ -9,7 +9,7 @@ import repast.simphony.relogo.UtilityG;
 import au.com.bytecode.opencsv.CSVReader;
 
 class UserObserver extends BaseObserver {
-	
+
 	/* This routine configures the model.
 	 * 
 	 * @author Michael J. North
@@ -57,28 +57,20 @@ class UserObserver extends BaseObserver {
 			
 			// Read the activities and convert their times to hours.
 			if (!activitiesInputFile.equalsIgnoreCase('None')) {
-				println("Started Reading Activities")
-				createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
-						'square', 0.0, Utility.black())
-				println("Completed Reading Activities")
-				println("Started Converting Activity Times")
-				convertActivityTimes()
-				println("Completed Converting Activity Times")
+				println("Started Creating Activities")
+				createActivitiesFromCSVFile(activitiesInputFile)
+				println("Completed Creating Activities")
 			}
 			
-			// Link people to their activities.
-			println("Starting Linking Persons and Activities")
-			linkPeopleAndActivities()
-			println("Completed Linking Persons and Activities")
-			
 			// Start the people at their household.
-			println("Asking Persons to Go Home")
+			println("Started Asking Persons to Go Home")
 			ask (persons()) {
 				
 				// Go home.
 				goToHHorGQ()
 				
 			}
+			println("Completed Asking Persons to Go Home")
 			println("Ready to Run...")
 		}
 	}
@@ -96,17 +88,18 @@ class UserObserver extends BaseObserver {
 			// Find the time in minutes since the start of the current day.
 			int time = (ticks() % 24)
 			
-			// Find the next activity
-			Activity act = maxOneOf(outActivityLinkNeighbors(), {
-				if (start_time <= time && time < stop_time) {
-					return 1
-				} else {
-					return 0
+			// Find the next activity.
+			Activity act = null
+			for (Activity activity in activityList) {
+				if (activity.start_time <= time && time < activity.stop_time) {
+					act = activity
 				}
-			})
+			}
 			
 			// Go to the place for the activity.
-			if (act.place_type.equalsIgnoreCase("Household")) {
+			if (act == null) {
+				goToHH()
+			} else if (act.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
 			} else if (act.place_type.equalsIgnoreCase("Work")) {
 				goToWork()
@@ -129,7 +122,7 @@ class UserObserver extends BaseObserver {
 		
 		// Move to next hour.
 		tick()
-
+		
 	}
 	
 	
@@ -144,7 +137,7 @@ class UserObserver extends BaseObserver {
 	 * 
 	 */
 	def createTurtlesFromCSVFile(String fileName, Class turtleType,
-		String defaultShape, double defaultSize, double defaultColor) {
+	String defaultShape, double defaultSize, double defaultColor) {
 		
 		// Read the data file.
 		List<String[]> rows = new CSVReader(
@@ -165,7 +158,6 @@ class UserObserver extends BaseObserver {
 				fullFieldList = (List) row
 				matchedFieldList = (List) turtleType.fields.collect({it.getName()}).
 				intersect((List) row)
-				
 			} else {
 				
 				// Define an index tracker.
@@ -192,7 +184,6 @@ class UserObserver extends BaseObserver {
 						} else {
 							it."$field" = row[index]
 						}
-						
 					}
 					
 					// Set the shape.
@@ -206,27 +197,128 @@ class UserObserver extends BaseObserver {
 					
 					// Set the default color.
 					setColor(defaultColor)
-				
+					
 				}, turtleType.getSimpleName())
-
 			}
-
 		}
-
 	}
 	
-	/* This routine converts activity times.
+	/* This routine is a file reader that creates activities from CSV files.
 	 *
 	 * @author Michael J. North
 	 *
+	 * @param fileName the path from the default system directory
+	 *
 	 */
-	def convertActivityTimes() {
+	def createActivitiesFromCSVFile(String fileName) {
 		
-		// Scan the activities.
-		ask (activitys()) {
-			start_time = start_time / 60
-			stop_time = stop_time / 60
+		// Read the data file.
+		List<String[]> rows = new CSVReader(
+				new InputStreamReader(new FileInputStream(fileName)))
+				.readAll()
+				
+		// Prepare the temporary master list of activity lists.
+		ArrayList<ActivityList> masterListOfActivityLists = new ActivityList()
+		
+		// Prepare the temporary activity list.
+		ActivityList tempActivityList = new ActivityList()
+				
+		// Define the fields lists.
+		List fullFieldList
+		List matchedFieldList
+		
+		// Create the activities.
+		println("    Started Allocating the Activities")
+		for (row in rows) {
+			
+			// Check the fields list.
+			if (fullFieldList == null) {
+				
+				// Fill in the field lists.
+				fullFieldList = (List) row
+				matchedFieldList = (List) Activity.class.fields.collect({it.getName()}).
+				intersect((List) row)
+			} else {
+				
+				// Define an index tracker.
+				int index
+				
+				// Create the next agent.
+				Activity newActivity = new Activity()
+				
+				// Assign properties from the file.
+				for (field in matchedFieldList) {
+					index = fullFieldList.indexOf(field)
+					if (newActivity."$field" instanceof Integer) {
+						if (isParsableToInteger(row[index])) {
+							newActivity."$field" = (row[index] as Integer)
+						} else {
+							newActivity."$field" = 0
+						}
+					} else if (newActivity."$field" instanceof Double) {
+						if (isParsableToDouble(row[index])) {
+							newActivity."$field" = (row[index] as Double)
+						} else {
+							newActivity."$field" = 0d
+						}
+					} else {
+						newActivity."$field" = row[index]
+					}
+				}
+	
+				// Convert the times from minutes to hours.
+				newActivity.start_time = newActivity.start_time / 60
+				newActivity.stop_time = newActivity.stop_time / 60
+				
+				// Progressively update the master list of lists.
+				if ((tempActivityList.getTucaseid() == null) ||
+					(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
+					tempActivityList.add(newActivity)
+				} else {
+					masterListOfActivityLists.add(tempActivityList)
+					tempActivityList = new ActivityList()
+					tempActivityList.add(newActivity)
+				}
+				
+			}
 		}
+		
+		// Note the last activity list.
+		masterListOfActivityLists.add(tempActivityList)
+		println("    Completed Allocating the Activities")
+		
+		// Sort the master list of lists.
+		println("    Started Sorting the Activities")
+		Collections.sort(masterListOfActivityLists)
+		println("    Completed Sorting the Activities")
+		
+		// Sort the list of people.
+		println("    Started Sorting the People")
+		List sortedPersons = Utility.sort(persons())
+		println("    Completed Sorting the People")
+		
+		// Match people with activities.
+		println("    Started Matching the " + sortedPersons.size() +
+			" People to Activities")
+		int scanCounter = 0
+		int matchCounter = 0
+		Iterator personIterator = sortedPersons.iterator()
+		Person tempPerson = personIterator.next()
+		for (nextActivityList in masterListOfActivityLists) {
+			while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
+				tempPerson.activityList = nextActivityList
+				tempPerson = personIterator.next()
+				matchCounter++
+			}
+			scanCounter++
+			if (scanCounter % 100 == 0) {
+				println(
+					"        Scanned " + scanCounter +
+					" Activities and Matched" +
+					matchCounter + " People")
+			}
+		}		
+		println("    Completed Matching the People to Activities")
 		
 	}
 	
@@ -339,32 +431,6 @@ class UserObserver extends BaseObserver {
 		return place
 		
 	}
-	
-	/* This routine links people to activities.
-	 * 
-	 * @author Michael J. North
-	 * 
-	 */
-	def linkPeopleAndActivities() {
-		
-		// Link the people to their activities.
-		ask (persons()) {
-			
-			// Scan the activities for matches.
-			ask (activitys()) {
-				if (tucaseid.equals(myself().tucaseid)) {
-					createActivityLinkFrom(myself())
-					moveTo(myself())
-				}
-			}
-			
-			// Lack of activity is fatal!
-			if (!anyQ(myOutActivityLinks()) || tucaseid.trim().equals("")) {
-				die()
-			}
-		}
-	}
-	
 	
 	/* This routine assigns default place drawing styles.
 	 *

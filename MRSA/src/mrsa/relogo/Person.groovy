@@ -41,10 +41,10 @@ class Person extends BaseTurtle {
 	// The person's group quarters' identifier.
 	public String gq_id = ""
 	
-	// The person's workplace.
+	// The person's work place.
 	public Place work = null
 	
-	// The person's workplace.
+	// The person's work place.
 	public String work_id = ""
 	
 	// The person's school.
@@ -58,6 +58,9 @@ class Person extends BaseTurtle {
 	
 	// The person's infection status.
 	public PersonStatus status = PersonStatus.UNCOLONIZED
+	
+	// The person's activities.
+	ActivityList activityList = new ActivityList()
 	
 	/* This routine sends the person to their household.
 	 *

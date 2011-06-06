@@ -51,10 +51,6 @@
       <string>PlaceLink</string>
       <string>mrsa.style.LinkStyle</string>
     </entry>
-    <entry>
-      <string>ActivityLink</string>
-      <string>mrsa.style.LinkStyle</string>
-    </entry>
   </netStyles>
   <editedNetStyles>
     <entry>
@@ -75,10 +71,6 @@
     </entry>
     <entry>
       <string>PlaceLink</string>
-      <null/>
-    </entry>
-    <entry>
-      <string>ActivityLink</string>
       <null/>
     </entry>
   </editedNetStyles>
@@ -135,11 +127,6 @@
     </repast.simphony.scenario.data.ProjectionData>
     <repast.simphony.scenario.data.ProjectionData>
       <id>PlaceLink</id>
-      <attributes/>
-      <type>NETWORK</type>
-    </repast.simphony.scenario.data.ProjectionData>
-    <repast.simphony.scenario.data.ProjectionData>
-      <id>ActivityLink</id>
       <attributes/>
       <type>NETWORK</type>
     </repast.simphony.scenario.data.ProjectionData>
@@ -206,13 +193,6 @@
       <string>PlaceLink</string>
       <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
         <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[6]"/>
-        <props/>
-      </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
-    </entry>
-    <entry>
-      <string>ActivityLink</string>
-      <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
-        <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[7]"/>
         <props/>
       </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
     </entry>

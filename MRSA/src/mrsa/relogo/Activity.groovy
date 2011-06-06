@@ -10,7 +10,7 @@ import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 
 // The activity class.
-class Activity extends BaseTurtle {
+class Activity {
 	
 	// The activity's type identifier.
 	public String tucaseid = ""

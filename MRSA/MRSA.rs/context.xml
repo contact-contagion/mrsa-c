@@ -8,6 +8,5 @@
     <projection id="Tracking Network" type="network"/>
     <projection id="UserLink" type="network"/>
     <projection id="PlaceLink" type="network"/>
-    <projection id="ActivityLink" type="network"/>
   </context>
 </context>
