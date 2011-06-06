@@ -1,4 +1,5 @@
 package mrsa.relogo
+import PersonStatus;
 import bsh.This;
 
 import static repast.simphony.relogo.Utility.*;
@@ -136,12 +137,15 @@ class Person extends BaseTurtle {
 			switch (status) {
 			case PersonStatus.UNCOLONIZED:
 				currentPlace.uncolonized--
+				totalUncolonized--
 				break
 			case PersonStatus.COLONIZED:
 				currentPlace.colonized--
+				totalColonized--
 				break
 			case PersonStatus.INFECTED:
 				currentPlace.infected--
+				totalInfected--
 				break
 			}
 			
@@ -157,12 +161,15 @@ class Person extends BaseTurtle {
 			switch (status) {
 			case PersonStatus.UNCOLONIZED:
 				currentPlace.uncolonized++
+				totalUncolonized--
 				break
 			case PersonStatus.COLONIZED:
 				currentPlace.colonized++
+				totalColonized--
 				break
 			case PersonStatus.INFECTED:
 				currentPlace.infected++
+				totalInfected--
 				break
 			}
 			
@@ -207,7 +214,7 @@ class Person extends BaseTurtle {
 		}
 		
 		// Transition.
-		PersonStatus nextStatus = TransitionMatrix.next(status, other)
+		PersonStatus nextStatus = nextState(status, other)
 		if (nextStatus != status) {
 			if (nextStatus == PersonState.UNCOLONIZED) {
 				decolonize()
@@ -231,10 +238,13 @@ class Person extends BaseTurtle {
 	   if (currentPlace != null) {
 		   if (status == PersonState.COLONIZED) {
 			   	currentPlace.colonized--
+				totalColonized--
 		   } else if (status == PersonState.INFECTED) {
 			   	currentPlace.infected--
+				totalInfected--
 		   }
 		   currentPlace.uncolonized++
+		   totalUncolonized--
 	   }
 
 	   // Update the person's status.	   
@@ -255,10 +265,13 @@ class Person extends BaseTurtle {
 	   if (currentPlace != null) {
 		   if (status == PersonState.DECOLONIZED) {
 			   	currentPlace.uncolonized--
+				totalUncolonized--
 		   } else if (status == PersonState.INFECTED) {
 			   	currentPlace.infected--
+				totalInfected--
 		   }
 		   currentPlace.colonized++
+		   totalColonized--
 	   }
 
 	   // Update the person's status.	   
@@ -280,10 +293,13 @@ class Person extends BaseTurtle {
 	   if (currentPlace != null) {
 		   if (status == PersonState.UNCOLONIZED) {
 			   	currentPlace.uncolonized--
+				totalUncolonized--
 		   } else if (status == PersonState.COLONIZED) {
 			   	currentPlace.colonized--
+				totalColonized--
 		   }
 		   currentPlace.infected++
+		   totalInfected--
 	   }
 
 	   // Update the person's status.	   
@@ -292,5 +308,78 @@ class Person extends BaseTurtle {
 		setSize(1.75)
 		
 	}
+	
+	/*
+	* This routine finds the next state.
+	*
+	* @author Michael J. North
+	*/
+   public PersonStatus nextState(PersonStatus startStatus, PersonStatus otherStatus) {
+	   
+	   // Find the next state.
+	   switch (startStatus) {
+
+	   case PersonStatus.UNCOLONIZED:
+		   switch (otherStatus) {
+		   case PersonStatus.UNCOLONIZED:
+			   return chooseOne(1, 0, 0)
+			   break
+		   case PersonStatus.COLONIZED:
+			   return chooseOne(E, 1-B-E, B)
+			   break
+		   case PersonStatus.INFECTED:
+			   return chooseOne(D, C, 1-C-D)
+			   break
+		   }
+		   
+	   case PersonStatus.COLONIZED:
+		   switch (otherStatus) {
+		   case PersonStatus.UNCOLONIZED:
+			   return chooseOne(1-A, A, 0)
+			   break
+		   case PersonStatus.COLONIZED:
+			   return chooseOne(E, 1-B-E, B)
+			   break
+		   case PersonStatus.INFECTED:
+			   return chooseOne(D, C, 1-C-D)
+			   break
+		   }
+
+	   case PersonStatus.INFECTED:
+		   switch (otherStatus) {
+		   case PersonStatus.UNCOLONIZED:
+			   return chooseOne(1-2*A, 2*A, 0)
+			   break
+		   case PersonStatus.COLONIZED:
+			   return chooseOne(E, 1-B-E, B)
+			   break
+		   case PersonStatus.INFECTED:
+			   return chooseOne(D, C, 1-C-D)
+			   break
+		   }
+	   
+	   }
+	   
+	   return PersonStatus.UNCOLONIZED
+   }
+
+   /*
+	* This routine chooses the next state.
+	*
+	* @author Michael J. North
+	*/
+   public PersonStatus chooseOne(double p1, double p2, double p3) {
+	   
+	   // Select the next state.
+	   double draw = randomFloat(1)
+	   if (draw <= p1) {
+		   return PersonStatus.UNCOLONIZED
+	   } else if (draw <= p2) {
+		   return PersonStatus.COLONIZED
+	   } else {
+		   return PersonStatus.INFECTED
+	   }
+	   
+   }
 	
 }

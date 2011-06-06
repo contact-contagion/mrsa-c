@@ -23,13 +23,13 @@ class UserObserver extends BaseObserver {
 		// Read the people.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
-				'person', 0.5, Utility.blue())
+					'person', 0.5, Utility.blue())
 		}
 		
 		// Read the places.
 		if (!placesInputFile.equalsIgnoreCase('None')) {
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
-				'square', 0.2, Utility.gray())
+					'square', 0.2, Utility.gray())
 		}
 		
 		// Set the default person drawing styles.
@@ -43,14 +43,14 @@ class UserObserver extends BaseObserver {
 		
 		// Check for places.
 		if (places().size() > 0) {
-
+			
 			// Normalize the place coordinates.
 			normalizePlaceCoordinates()
-	
+			
 			// Read the activities.
 			if (!activitiesInputFile.equalsIgnoreCase('None')) {
 				createTurtlesFromCSVFile(activitiesInputFile, Activity.class,
-					'square', 0.0, Utility.black())
+						'square', 0.0, Utility.black())
 			}
 			
 			// Link people to their activities.
@@ -63,11 +63,9 @@ class UserObserver extends BaseObserver {
 				goToHHorGQ()
 				
 			}
-
 		}
-				
 	}
-		
+	
 	/* This routine executes the model.
 	 * 
 	 * @author Michael J. North
@@ -77,24 +75,24 @@ class UserObserver extends BaseObserver {
 		
 		// Ask the people to execute their activities.
 		ask(persons()){	
-
+			
 			// Find the time in minutes since the start of the current day.
 			int time = (ticks() % (24 * 60))
-
+			
 			// Find the next activity
 			Activity act = maxOneOf(outActivityLinkNeighbors(), {
-					if (beginTime <= time && time < endTime) {
-						return 1
-					} else {
-						return 0
-					}
-				})
-
+				if (beginTime <= time && time < endTime) {
+					return 1
+				} else {
+					return 0
+				}
+			})
+			
 			// Go to the place for the activity.
 			if (act.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
 			} else if (act.place_type.equalsIgnoreCase("Work")) {
-			    goToWork()
+				goToWork()
 			} else if (act.place_type.equalsIgnoreCase("School")) {
 				goToSchool()
 			} else if (act.place_type.equalsIgnoreCase("Group Quarters")) {
@@ -110,14 +108,12 @@ class UserObserver extends BaseObserver {
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
 				activateDetailedTransition()
 			}
-			
 		}	
-
+		
 		// Count by minute to the next hour.
 		for (int i = 0; i++; i < 60) {
 			tick()
 		}
-		
 	}
 	
 	
@@ -132,11 +128,11 @@ class UserObserver extends BaseObserver {
 	 * 
 	 */
 	def createTurtlesFromCSVFile(String fileName, Class turtleType,
-		String defaultShape, double defaultSize, double defaultColor) {
+	String defaultShape, double defaultSize, double defaultColor) {
 		
 		// Read the data file.
 		List<String[]> rows = new CSVReader(
-			new InputStreamReader(new FileInputStream(fileName)))
+				new InputStreamReader(new FileInputStream(fileName)))
 				.readAll()
 		
 		// Define the fields lists.
@@ -152,16 +148,15 @@ class UserObserver extends BaseObserver {
 				// Fill in the field lists.
 				fullFieldList = (List) row
 				matchedFieldList = (List) turtleType.fields.collect({it.getName()}).
-					intersect((List) row)
-				
+				intersect((List) row)
 			} else {
-			
+				
 				// Define an index tracker.
 				int index
-
+				
 				// Create the next agent.
 				createTurtles(1, {
-				
+					
 					// Assign properties from the file.
 					for (field in matchedFieldList) {
 						index = fullFieldList.indexOf(field)
@@ -184,7 +179,7 @@ class UserObserver extends BaseObserver {
 					
 					// Set the shape.
 					setShape(defaultShape)
-		
+					
 					// Set the size.
 					setSize(defaultSize)
 					
@@ -193,28 +188,25 @@ class UserObserver extends BaseObserver {
 					
 					// Set the default color.
 					setColor(defaultColor)
-				
+					
 				}, turtleType.getSimpleName())
-				
 			}
-						 
 		}
-		
 	}
-
+	
 	/* This routine normalizes the place coordinates.
 	 * 
 	 * @author Michael J. North
 	 * 
 	 */
 	def normalizePlaceCoordinates() {
-
+		
 		// Find the bounds.
 		def minX = places().min({it.longitude}).longitude
 		def maxX = places().max({it.longitude}).longitude
 		def minY = places().min({it.latitude}).latitude
 		def maxY = places().max({it.latitude}).latitude
-
+		
 		// Calculate the normalization factors.
 		def xRange = maxX - minX
 		def yRange = maxY - minY
@@ -229,7 +221,6 @@ class UserObserver extends BaseObserver {
 			setXcor(scale * (longitude - centerX))
 			setYcor(scale * (latitude - centerY))
 		}
-
 	}
 	
 	/* This routine links people to places.
@@ -244,15 +235,15 @@ class UserObserver extends BaseObserver {
 		ask (places()) {
 			placesMap.putAt(place_id, it)
 		}
-	
+		
 		// Link the people to places.
 		ask (persons()) {
-		
+			
 			// Set the household location.
 			Place place = safeCreatePlaceLinkFrom(it, placesMap, hh_id, Utility.gray())
 			it.hh = place
 			it.hh_id = place?.place_id
-
+			
 			// Set the group quarters location.
 			place = safeCreatePlaceLinkFrom(it, placesMap, gq_id, Utility.white())
 			it.gq = place
@@ -262,14 +253,13 @@ class UserObserver extends BaseObserver {
 			place = safeCreatePlaceLinkFrom(it, placesMap, work_id, Utility.blue())
 			it.work = place
 			it.work_id = place?.place_id
-
+			
 			// Set the school location.
 			place = safeCreatePlaceLinkFrom(it, placesMap, school_id, Utility.orange())
 			it.school = place
 			it.school_id = place?.place_id
-
+			
 		}
-		
 	}
 	
 	
@@ -290,7 +280,7 @@ class UserObserver extends BaseObserver {
 		
 		// Check the place identifier.
 		if ((place_id != null) && (!place_id.trim().equals(''))) {
-		
+			
 			// Find the designated place.
 			place = placesMap.getAt(place_id)
 			
@@ -301,16 +291,12 @@ class UserObserver extends BaseObserver {
 				//print "Place $place_id not found for person $person.person_id."
 				
 			} else {
-			
+				
 				// Create a link.
 				ask (person) {
-					createPlaceLinkTo(place, {
-							setColor(new_link_color)
-						})
+					createPlaceLinkTo(place, { setColor(new_link_color) })
 				}
-				
 			}
-			
 		}
 		
 		// Return the results.
@@ -340,104 +326,125 @@ class UserObserver extends BaseObserver {
 			if (!anyQ(myOutActivityLinks()) || tucaseid.trim().equals("")) {
 				die()
 			}
-
 		}
-		
 	}
 	
 	
-   /* This routine assigns default place drawing styles.
-	*
-	* @author Michael J. North
-	*
-	*/
-   def setDefaultPersonStyles() {
-	   
-	   // Set the place style based on the type.
-	   ask(persons()) {
-		   
-		   // Check the type and assign a style.
-		   if (status == PersonStatus.UNCOLONIZED) {
-			   decolonize()
-		   } else if (status == PersonStatus.COLONIZED) {
-			   colonize()
-		   } else if (status == PersonStatus.INFECTED) {
-			   infect()
-		   }   
-	   
-	   }
-	   
-   }
-   
-   /* This routine assigns default place drawing styles.
-	*
-	* @author Michael J. North
-	*
-	*/
-   def setDefaultPlaceStyles() {
-	   
-	   // Set the place style based on the type.
-	   ask(places()) {
-		   
-		   // Check the type and assign a style.
-		   if (type.equalsIgnoreCase("College")) {
-			   setColor(Utility.yellow())
-			   setSize(0.3)
-			   setShape('circle')
-		   } else if (type.equalsIgnoreCase("School")) {
-			   setColor(Utility.orange())
-			   setSize(0.3)
-			   setShape('circle')
-		   } else if (type.equalsIgnoreCase("Household")) {
-		   } else if (type.equalsIgnoreCase("Work")) {
-			   setColor(Utility.blue())
-			   setSize(0.3)
-			   setShape('triangle')
-		   } else if (type.equalsIgnoreCase("Group Quarters")) {
-			   setColor(Utility.white())
-			   setSize(0.3)
-			   setShape('circle')
-		   }
-	   
-	   }
-	   
-   }
+	/* This routine assigns default place drawing styles.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def setDefaultPersonStyles() {
+		
+		// Set the place style based on the type.
+		ask(persons()) {
+			
+			// Check the type and assign a style.
+			if (status == PersonStatus.UNCOLONIZED) {
+				decolonize()
+			} else if (status == PersonStatus.COLONIZED) {
+				colonize()
+			} else if (status == PersonStatus.INFECTED) {
+				infect()
+			}
+		}
+	}
 	
-   /* This routine checks to see if a string contains an integer.
-    *
-    * @author Michael J. North
-    *
-    * @param s the string to check
-    * @return returns true if the string passes otherwise false
-    */
-   public boolean isParsableToInteger(String s) {
-	   
-	   try {
-		   Integer.parseInt(s);
-		   return true;
-	   } catch (NumberFormatException e) {
-	   	   return false;
-	   }
-	   
-   }
+	/* This routine assigns default place drawing styles.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def setDefaultPlaceStyles() {
+		
+		// Set the place style based on the type.
+		ask(places()) {
+			
+			// Check the type and assign a style.
+			if (type.equalsIgnoreCase("College")) {
+				setColor(Utility.yellow())
+				setSize(0.3)
+				setShape('circle')
+			} else if (type.equalsIgnoreCase("School")) {
+				setColor(Utility.orange())
+				setSize(0.3)
+				setShape('circle')
+			} else if (type.equalsIgnoreCase("Household")) {
+			} else if (type.equalsIgnoreCase("Work")) {
+				setColor(Utility.blue())
+				setSize(0.3)
+				setShape('triangle')
+			} else if (type.equalsIgnoreCase("Group Quarters")) {
+				setColor(Utility.white())
+				setSize(0.3)
+				setShape('circle')
+			}
+		}
+	}
+	
+	/* This routine checks to see if a string contains an integer.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @param s the string to check
+	 * @return returns true if the string passes otherwise false
+	 */
+	public boolean isParsableToInteger(String s) {
+		
+		try {
+			Integer.parseInt(s);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	/* This routine checks to see if a string contains a double.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @param s the string to check
+	 * @return returns true if the string passes otherwise false
+	 */
+	public boolean isParsableToDouble(String s) {
+		
+		try {
+			Double.parseDouble(s);
+			return true;
+		} catch (NumberFormatException e) {
+			return false;
+		}
+	}
+	
+	/* This routine returns the total number of uncolonized people.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @return returns the count
+	 */
+	int getTotalUnolonized() {
+		return totalUncolonized
+	}
+	
+	/* This routine returns the total number of colonized people.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @return returns the count
+	 */
+	int getTotalColonized() {
+		return totalColonized
+	}
+	
+	/* This routine returns the total number of infected people.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @return returns the count
+	 */
+	int getTotalInfect() {
+		return totalInfected
+	}
 
-   /* This routine checks to see if a string contains a double.
-    *
-    * @author Michael J. North
-    *
-    * @param s the string to check
-    * @return returns true if the string passes otherwise false
-   */
-   public boolean isParsableToDouble(String s) {
-	   
-	   try {
-		   Double.parseDouble(s);
-		   return true;
-	   } catch (NumberFormatException e) {
-	   	   return false;
-	   }
-	   
-   }
-
-   
 }

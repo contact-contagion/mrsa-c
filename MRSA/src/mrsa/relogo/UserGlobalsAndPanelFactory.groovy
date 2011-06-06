@@ -63,9 +63,6 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
 		
-		// Add a global infection fraction for testing purposes.
-		addGlobal("infectionFraction", 0.01)
-
 		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
 		addSliderWL("A", "A", 0, 0.01, 1.0, 0.01)
 		
@@ -80,6 +77,15 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 
 		// For E we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
 		addSliderWL("E", "E", 0, 0.01, 1.0, 0.05)
+		
+		// The total number of people who are currently uncolonized.
+		addGlobal("totalUncolonized")
+
+		// The total number of people who are currently colonized.
+		addGlobal("totalColonized")
+
+		// The total number of people who are currently infected.
+		addGlobal("totalInfected")
 
 	}
 	
