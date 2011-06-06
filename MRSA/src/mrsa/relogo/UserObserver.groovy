@@ -9,6 +9,11 @@ import repast.simphony.relogo.UtilityG;
 import au.com.bytecode.opencsv.CSVReader;
 
 class UserObserver extends BaseObserver {
+	
+	//TODO Initialize 5 people with MRSA infection (this number should remain stable throughout the regular runs)
+	//TODO Initialize 3% of the people with MRSA colonization (" ")
+	//TODO For differential run 1 cut C and D in half for 50% of the people such that people in the same HH have the same C and D
+	//TODO For differential run 2 cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
 
 	/* This routine configures the model.
 	 * 
@@ -89,10 +94,10 @@ class UserObserver extends BaseObserver {
 			int time = (ticks() % 24)
 			
 			// Find the next activity.
-			Activity act = null
-			for (Activity activity in activityList) {
-				if (activity.start_time <= time && time < activity.stop_time) {
-					act = activity
+			Activity nextActivity = null
+			for (Activity tempActivity in activityList) {
+				if (tempActivity.start_time <= time && time < tempActivity.stop_time) {
+					nextActivity = activity
 				}
 			}
 			
@@ -116,7 +121,7 @@ class UserObserver extends BaseObserver {
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
 				activateSimpleTransition()
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
-				activateDetailedTransition()
+				activateDetailedTransition(nextActivity)
 			}
 		}	
 		
@@ -314,7 +319,7 @@ class UserObserver extends BaseObserver {
 			if (scanCounter % 100 == 0) {
 				println(
 					"        Scanned " + scanCounter +
-					" Activities and Matched" +
+					" Activities and Matched " +
 					matchCounter + " People")
 			}
 		}		

@@ -205,32 +205,36 @@ class Person extends BaseTurtle {
 	 * @author Michael J. North
 	 *
 	 */
-	public void activateDetailedTransition() {
+	public void activateDetailedTransition(Activity activity) {
 
-		// Calculate the person's exposure risk and impact.
-		double risk = act.risk()
-		
-		// Find the next state.
-		PersonStatus other = PersonStatus.UNCOLONIZED
-		if (currentPlace != null) {
-			if (currentPlace.infected > 0) {
-				other = PersonStatus.INFECTED 
-			} else if (currentPlace.colonized >0)
-				other = PersonStatus.COLONIZED
-		}
-		
-		// Transition.
-		PersonStatus nextStatus = nextState(status, other, risk)
-		if (nextStatus != status) {
-			if (nextStatus == PersonState.UNCOLONIZED) {
-				decolonize()
-			} else if (nextStatus == PersonState.COLONIZED) {
-				colonize()
-			} else if (nextStatus == PersonState.INFECTED) {
-				infect()
+		// Calculate the person's exposure risk and impact, if needed.
+		if (nextActivity != null) {
+			
+			double risk = activity.risk()
+			
+			// Find the next state.
+			PersonStatus other = PersonStatus.UNCOLONIZED
+			if (currentPlace != null) {
+				if (currentPlace.infected > 0) {
+					other = PersonStatus.INFECTED 
+				} else if (currentPlace.colonized >0)
+					other = PersonStatus.COLONIZED
 			}
-		}
+			
+			// Transition.
+			PersonStatus nextStatus = nextState(status, other, risk)
+			if (nextStatus != status) {
+				if (nextStatus == PersonState.UNCOLONIZED) {
+					decolonize()
+				} else if (nextStatus == PersonState.COLONIZED) {
+					colonize()
+				} else if (nextStatus == PersonState.INFECTED) {
+					infect()
+				}
+			}
 
+		}
+		
 	}
 	
 	/* This routine notes a decolonization.
