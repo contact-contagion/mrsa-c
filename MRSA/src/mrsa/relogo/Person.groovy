@@ -12,7 +12,7 @@ import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 
 // The person class.
-class Person extends BaseTurtle {
+class Person extends BaseTurtle implements Comparable {
 	
 	// The person's identifier.
 	public String person_id = ""
@@ -185,17 +185,21 @@ class Person extends BaseTurtle {
 	 * @author Michael J. North
 	 *
 	 */
-	public void activateSimpleTransition() {
+	public void activateSimpleTransition(Activity activity) {
 		
-		// Calculate the person's exposure risk and impact.
-		double risk = act.risk()
-		
-		// Calculate the person's exposure impact.
-		if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+		// Calculate the person's exposure risk and impact, if needed.
+		if (activity != null) {
 			
-			// At least one person in the area is infected.
-			if (random(maximumRisk) < risk) {
-				infect()
+			// Calculate the person's exposure risk and impact.
+			double risk = activity.risk()
+			
+			// Calculate the person's exposure impact.
+			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+				
+				// At least one person in the area is infected.
+				if (random(maximumRisk) < risk) {
+					infect()
+				}
 			}
 		}
 	}
@@ -208,7 +212,7 @@ class Person extends BaseTurtle {
 	public void activateDetailedTransition(Activity activity) {
 
 		// Calculate the person's exposure risk and impact, if needed.
-		if (nextActivity != null) {
+		if (activity != null) {
 			
 			double risk = activity.risk()
 			
@@ -390,6 +394,19 @@ class Person extends BaseTurtle {
 		   return PersonStatus.UNCOLONIZED
 	   }
 	   
+   }
+   
+   // The comparator
+   @Override
+   public int compareTo(Object obj) {
+	   
+	   // Check the object.
+	   if ((this.tucaseid != null) && (obj instanceof Person)) {
+		   Person otherPerson = (Person) obj;
+		   return this.tucaseid.compareTo(otherPerson.tucaseid);
+	   } else {
+		   return 0;
+	   }
    }
 	
 }

@@ -102,15 +102,15 @@ class UserObserver extends BaseObserver {
 			}
 			
 			// Go to the place for the activity.
-			if (act == null) {
+			if (nextActivity == null) {
 				goToHH()
-			} else if (act.place_type.equalsIgnoreCase("Household")) {
+			} else if (nextActivity.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
-			} else if (act.place_type.equalsIgnoreCase("Work")) {
+			} else if (nextActivity.place_type.equalsIgnoreCase("Work")) {
 				goToWork()
-			} else if (act.place_type.equalsIgnoreCase("School")) {
+			} else if (nextActivity.place_type.equalsIgnoreCase("School")) {
 				goToSchool()
-			} else if (act.place_type.equalsIgnoreCase("Group Quarters")) {
+			} else if (nextActivity.place_type.equalsIgnoreCase("Group Quarters")) {
 				goToGQ()
 			} else {
 				goToHH()
@@ -119,7 +119,7 @@ class UserObserver extends BaseObserver {
 			// Activate a transition.
 			if (transitionRule.equalsIgnoreCase('None')) {
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
-				activateSimpleTransition()
+				activateSimpleTransition(nextActivity)
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
 				activateDetailedTransition(nextActivity)
 			}
@@ -302,27 +302,50 @@ class UserObserver extends BaseObserver {
 		List sortedPersons = Utility.sort(persons())
 		println("    Completed Sorting the People")
 		
-		// Match people with activities.
+		// Prepare to match people with activities.
 		println("    Started Matching the " + sortedPersons.size() +
 			" People to Activities")
 		int scanCounter = 0
 		int matchCounter = 0
 		Iterator personIterator = sortedPersons.iterator()
-		Person tempPerson = personIterator.next()
-		for (nextActivityList in masterListOfActivityLists) {
-			while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
-				tempPerson.activityList = nextActivityList
-				tempPerson = personIterator.next()
-				matchCounter++
+		if (personIterator.hasNext()) {
+						
+			// Match people with activities.
+			Person tempPerson = personIterator.next()
+			for (ActivityList nextActivityList in masterListOfActivityLists) {
+				
+				// Ignore people who do not match.
+				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid) > 0) &&
+					(personIterator.hasNext())) {
+					ask (tempPerson) {
+						die()
+					}
+					tempPerson = personIterator.next()
+				}
+							
+				// Match a person with an activity.
+				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
+					tempPerson.activityList = nextActivityList
+					if (personIterator.hasNext()) {
+						tempPerson = personIterator.next()
+					} else {
+						break
+					}
+					matchCounter++
+				}
+				scanCounter++
+				
+				// Report on progress.
+				if (scanCounter % 100 == 0) {
+					println(
+						"        Scanned " + scanCounter +
+						" Activities and Matched " +
+						matchCounter + " People")
+				}
+				
 			}
-			scanCounter++
-			if (scanCounter % 100 == 0) {
-				println(
-					"        Scanned " + scanCounter +
-					" Activities and Matched " +
-					matchCounter + " People")
-			}
-		}		
+
+		}	
 		println("    Completed Matching the People to Activities")
 		
 	}

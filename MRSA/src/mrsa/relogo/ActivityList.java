@@ -19,7 +19,7 @@ public class ActivityList extends ArrayList<Activity> implements Comparable {
 	public int compareTo(Object obj) {
 		
 		// Check the object.
-		if (obj instanceof ActivityList) {
+		if ((this.getTucaseid() != null) && (obj instanceof ActivityList)) {
 			ActivityList otherActivity = (ActivityList) obj;
 			return this.getTucaseid().compareTo(otherActivity.getTucaseid());
 		} else {
