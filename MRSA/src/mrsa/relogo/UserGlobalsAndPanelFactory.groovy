@@ -64,19 +64,19 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("maximumRisk", 4)
 		
 		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
-		addSliderWL("A", "A", 0, 0.01, 1.0, 0.01)
+		addSliderWL("A", "A", 0, 0.0000001, 1.0, 0.0000137058)
 		
 		// B will use simple, time-independent exponential decline with 38% of C moving to I after 10 weeks.
-		addSliderWL("B", "B", 0, 0.01, 1.0, 0.05)
+		addSliderWL("B", "B", 0, 0.0000001, 1.0, 0.000284505)
 
 		// C is a simple exponential function of the time the agent has been infected such that 21% are infected at 3 weeks.
-		addSliderWL("C", "C", 0, 0.01, 1.0, 0.05)
+		addSliderWL("C", "C", 0, 0.0000001, 1.0, 0.00309173)
 
 		// For D we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
-		addSliderWL("D", "D", 0, 0.01, 1.0, 0.05)
+		addSliderWL("D", "D", 0, 0.0000001, 1.0, 0.000451166)
 
 		// For E we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
-		addSliderWL("E", "E", 0, 0.01, 1.0, 0.05)
+		addSliderWL("E", "E", 0, 0.0000001, 1.0, 0.000111936)
 		
 		// The total number of people who are currently uncolonized.
 		addGlobal("totalUncolonized")
