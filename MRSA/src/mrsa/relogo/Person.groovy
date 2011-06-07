@@ -91,14 +91,20 @@ class Person extends BaseTurtle implements Comparable {
 	 * @author Michael J. North
 	 *
 	 */
-	def goToHHorGQ() {
+	def goToHome() {
 		
 		// Go to the household.
 		if (hh != null) {
 			changePlace(hh)
-			// Go to the group quarters.
+		// Go to the group quarters.
 		} else if (gq != null) {
 			changePlace(gq)
+		// Go to work.
+		} else if (work != null) {
+			changePlace(work)
+		// Go to school.
+		} else if (school != null) {
+			changePlace(school)
 		}
 	}
 	
@@ -156,6 +162,7 @@ class Person extends BaseTurtle implements Comparable {
 		
 		// Update the place marker.
 		currentPlace = newPlace
+		moveTo(currentPlace)
 		
 		// Update the old place, if it is defined.
 		if (currentPlace != null) {

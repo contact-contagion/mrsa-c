@@ -72,7 +72,7 @@ class UserObserver extends BaseObserver {
 			ask (persons()) {
 				
 				// Go home.
-				goToHHorGQ()
+				goToHome()
 				
 			}
 			println("Completed Asking Persons to Go Home")
@@ -91,6 +91,7 @@ class UserObserver extends BaseObserver {
 		ask(persons()){	
 			
 			// Find the time in minutes since the start of the current day.
+			//TODO: Decide how to differentiate weekdays and weekends in the file and model.
 			int time = (ticks() % 24)
 			
 			// Find the next activity.
@@ -395,6 +396,7 @@ class UserObserver extends BaseObserver {
 		}
 		
 		// Link the people to places.
+		int counter = 0
 		ask (persons()) {
 			
 			// Set the household location.
@@ -408,6 +410,9 @@ class UserObserver extends BaseObserver {
 			
 			// Set the school location.
 			it.school = safePlaceLookup(placesMap, it.school_id)
+			
+			// Remove assigned people.
+			if ((it.hh == null) && (it.gq == null) && (it.work == null) && (it.school == null)) die()
 			
 		}
 	}
