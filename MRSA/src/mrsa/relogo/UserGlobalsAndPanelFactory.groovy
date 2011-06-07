@@ -61,10 +61,10 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../Prototype_Model_Inputs/60615/all_60615_activities.csv'], 2)
 
 		// The initial infected count.
-		addSliderWL("Initial Infected Count", "initialInfectedCount", 0, 1, 1000, 5)
+		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 5)
 
 		// The initial colonization percentage.
-		addSliderWL("Initial Colonization Percentage", "initialColonizationPercentage", 0, 1, 100, 3)
+		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
 				
 		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
 		addSliderWL("A", "A", 0, 0.0000001, 1.0, 0.0000137058)

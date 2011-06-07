@@ -12,11 +12,11 @@ import au.com.bytecode.opencsv.CSVReader;
 
 class UserObserver extends BaseObserver {
 	
-	//TODO Initialize 5 people with MRSA infection (this number should remain stable throughout the regular runs)
-	//TODO Initialize 3% of the people with MRSA colonization (" ")
-	//TODO For differential run 1 cut C and D in half for 50% of the people such that people in the same HH have the same C and D
-	//TODO For differential run 2 cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
-
+	//TODO: Initialize 5 people with MRSA infection (this number should remain stable throughout the regular runs)
+	//TODO: Initialize 3% of the people with MRSA colonization (" ")
+	//TODO: For differential run 1 cut C and D in half for 50% of the people such that people in the same HH have the same C and D
+	//TODO: For differential run 2 cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
+	
 	/* This routine configures the model.
 	 * 
 	 * @author Michael J. North
@@ -46,43 +46,43 @@ class UserObserver extends BaseObserver {
 			println("Completed Reading Places")
 		}
 		
+		// Link the people to their places.
+		println("Starting Matching Persons and Places")
+		linkPeopleAndPlaces()
+		println("Completed Matching Persons and Places")
+		
 		// Set the default person drawing styles.
+		println("Started Setting the Default Person Style")
 		setDefaultPersonStyles()
+		println("Completed Setting the Default Person Style")
 		
 		// Set the default place drawing styles.
+		println("Started Setting the Default Place Style")
 		setDefaultPlaceStyles()
+		println("Completed Setting the Default Place Style")
 		
-		// Link the people to their places.
-		println("Starting Linking Persons and Places")
-		linkPeopleAndPlaces()
-		println("Completed Linking Persons and Places")
+		// Normalize the place coordinates.
+		println("Started Normalizing Place Locations")
+		normalizePlaceCoordinates()
+		println("Completed Normalizing Place Locations")
 		
-		// Check for places.
-		if (places().size() > 0) {
-			
-			// Normalize the place coordinates.
-			println("Started Normalizing Place Locations")
-			normalizePlaceCoordinates()
-			println("Completed Normalizing Place Locations")
-			
-			// Read the activities and convert their times to hours.
-			if (!activitiesInputFile.equalsIgnoreCase('None')) {
-				println("Started Creating Activities")
-				createActivitiesFromCSVFile(activitiesInputFile)
-				println("Completed Creating Activities")
-			}
-			
-			// Start the people at their household.
-			println("Started Asking Persons to Go Home")
-			ask (persons()) {
-				
-				// Go home.
-				goToHome()
-				
-			}
-			println("Completed Asking Persons to Go Home")
-			println("Ready to Run...")
+		// Read the activities and convert their times to hours.
+		if (!activitiesInputFile.equalsIgnoreCase('None')) {
+			println("Started Creating Activities")
+			createActivitiesFromCSVFile(activitiesInputFile)
+			println("Completed Creating Activities")
 		}
+		
+		// Start the people at their household.
+		println("Started Asking Persons to Go Home")
+		ask (persons()) {
+			
+			// Go home.
+			goToHome()
+			
+		}
+		println("Completed Asking Persons to Go Home")
+		println("Ready to Run...")
 	}
 	
 	/* This routine executes the model.
@@ -132,6 +132,7 @@ class UserObserver extends BaseObserver {
 		}	
 		
 		// Move to next hour.
+		println("    " + ticks() + " " + totalInfected + " " + totalColonized + " " + totalUncolonized)
 		tick()
 		
 	}
@@ -214,7 +215,7 @@ class UserObserver extends BaseObserver {
 		}
 	}
 	
-
+	
 	/* This routine is a initializes the disease status.
 	 *
 	 * @author Michael J. North
@@ -259,13 +260,13 @@ class UserObserver extends BaseObserver {
 		List<String[]> rows = new CSVReader(
 				new InputStreamReader(new FileInputStream(fileName)))
 				.readAll()
-				
+		
 		// Prepare the temporary master list of activity lists.
 		ArrayList<ActivityList> masterListOfActivityLists = new ActivityList()
 		
 		// Prepare the temporary activity list.
 		ActivityList tempActivityList = new ActivityList()
-				
+		
 		// Define the fields lists.
 		List fullFieldList
 		List matchedFieldList
@@ -308,21 +309,20 @@ class UserObserver extends BaseObserver {
 						newActivity."$field" = row[index]
 					}
 				}
-	
+				
 				// Convert the times from minutes to hours.
 				newActivity.start_time = newActivity.start_time / 60
 				newActivity.stop_time = newActivity.stop_time / 60
 				
 				// Progressively update the master list of lists.
 				if ((tempActivityList.getTucaseid() == null) ||
-					(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
+				(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
 					tempActivityList.add(newActivity)
 				} else {
 					masterListOfActivityLists.add(tempActivityList)
 					tempActivityList = new ActivityList()
 					tempActivityList.add(newActivity)
 				}
-				
 			}
 		}
 		
@@ -342,25 +342,23 @@ class UserObserver extends BaseObserver {
 		
 		// Prepare to match people with activities.
 		println("    Started Matching " + sortedPersons.size() +
-			" People to Activities")
+				" People to Activities")
 		int scanCounter = 0
 		int matchCounter = 0
 		Iterator personIterator = sortedPersons.iterator()
 		if (personIterator.hasNext()) {
-						
+			
 			// Match people with activities.
 			Person tempPerson = personIterator.next()
 			for (ActivityList nextActivityList in masterListOfActivityLists) {
 				
 				// Ignore people who do not match.
 				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid) > 0) &&
-					(personIterator.hasNext())) {
-					ask (tempPerson) {
-						die()
-					}
+				(personIterator.hasNext())) {
+					ask (tempPerson) { die() }
 					tempPerson = personIterator.next()
 				}
-							
+				
 				// Match a person with an activity.
 				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
 					tempPerson.activityList = nextActivityList
@@ -376,18 +374,15 @@ class UserObserver extends BaseObserver {
 				// Report on progress.
 				if (scanCounter % 100 == 0) {
 					println(
-						"        Scanned " + scanCounter +
-						" Activities and Matched " +
-						matchCounter + " People")
+							"        Scanned " + scanCounter +
+							" Activities and Matched " +
+							matchCounter + " People")
 				}
-				
 			}
-
 		}	
 		println("    Completed Matching " + matchCounter +
-			" of " + sortedPersons.size() + " People to " +
-			scanCounter + " Activities")
-		
+				" of " + sortedPersons.size() + " People to " +
+				scanCounter + " Activities")
 	}
 	
 	/* This routine normalizes the place coordinates.
@@ -397,25 +392,29 @@ class UserObserver extends BaseObserver {
 	 */
 	def normalizePlaceCoordinates() {
 		
-		// Find the bounds.
-		def minX = places().min({it.longitude}).longitude
-		def maxX = places().max({it.longitude}).longitude
-		def minY = places().min({it.latitude}).latitude
-		def maxY = places().max({it.latitude}).latitude
-		
-		// Calculate the normalization factors.
-		def xRange = maxX - minX
-		def yRange = maxY - minY
-		def centerX = (xRange / 2.0) + minX
-		def centerY = (yRange / 2.0) + minY
-		def xScale = (getMaxPxcor() - getMinPxcor()) / xRange
-		def yScale = (getMaxPycor() - getMinPycor()) / yRange
-		def scale = Math.min(xScale, yScale)
-		
-		// Normalize the place coordinates.
-		ask (places()) {
-			setXcor(scale * (longitude - centerX))
-			setYcor(scale * (latitude - centerY))
+		// Check for places.
+		if (places().size() > 0) {
+			
+			// Find the bounds.
+			def minX = places().min({it.longitude}).longitude
+			def maxX = places().max({it.longitude}).longitude
+			def minY = places().min({it.latitude}).latitude
+			def maxY = places().max({it.latitude}).latitude
+			
+			// Calculate the normalization factors.
+			def xRange = maxX - minX
+			def yRange = maxY - minY
+			def centerX = (xRange / 2.0) + minX
+			def centerY = (yRange / 2.0) + minY
+			def xScale = (getMaxPxcor() - getMinPxcor()) / xRange
+			def yScale = (getMaxPycor() - getMinPycor()) / yRange
+			def scale = Math.min(xScale, yScale)
+			
+			// Normalize the place coordinates.
+			ask (places()) {
+				setXcor(scale * (longitude - centerX))
+				setYcor(scale * (latitude - centerY))
+			}
 		}
 	}
 	
@@ -449,37 +448,37 @@ class UserObserver extends BaseObserver {
 			it.school = safePlaceLookup(placesMap, it.school_id)
 			
 			// Remove assigned people.
-			if ((it.hh == null) && (it.gq == null) && (it.work == null) && (it.school == null)) die()
+			//@@if ((it.hh == null) && (it.gq == null) && (it.work == null) && (it.school == null)) die()
 			
 		}
 	}
 	
 	/* This routine safely looks up places.
-	*
-	* @author Michael J. North
-	*
-	* @param placesMap the map of places
-	* @param place_id the place to link to
-	*
-	*/
-   Place safePlaceLookup(def placesMap, String place_id) {
-	   
-	   // Declare the return value.
-	   Place place = null;
-	   
-	   // Check the place identifier.
-	   if ((place_id != null) && (!place_id.trim().equals(''))) {
-		   
-		   // Find the designated place.
-		   place = placesMap.getAt(place_id)
-		  
-	   }
-	   
-	   // Return the results.
-	   return place
-		   
-	}
+	 *
+	 * @author Michael J. North
+	 *
+	 * @param placesMap the map of places
+	 * @param place_id the place to link to
+	 *
+	 */
+	Place safePlaceLookup(def placesMap, String place_id) {
 		
+		// Declare the return value.
+		Place place = null;
+		
+		// Check the place identifier.
+		if ((place_id != null) && (!place_id.trim().equals(''))) {
+			
+			// Find the designated place.
+			place = placesMap.getAt(place_id)
+			
+		}
+		
+		// Return the results.
+		return place
+		
+	}
+	
 	/* This routine assigns default place drawing styles.
 	 *
 	 * @author Michael J. North
@@ -492,7 +491,7 @@ class UserObserver extends BaseObserver {
 			
 			// Check the current place.
 			if (currentPlace != null) {
-			
+				
 				// Check the type and assign a style.
 				if (status == PersonStatus.UNCOLONIZED) {
 					currentPlace.uncolonized++
@@ -512,7 +511,7 @@ class UserObserver extends BaseObserver {
 				}
 			} else {
 				// Everyone needs a place.
-				die()
+				//@@die()
 			}
 		}
 	}

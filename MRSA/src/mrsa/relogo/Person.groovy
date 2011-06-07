@@ -235,11 +235,11 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Transition.
 			PersonStatus nextStatus = nextState(status, other, risk)
-			if (nextStatus == PersonState.UNCOLONIZED) {
+			if (nextStatus == PersonStatus.UNCOLONIZED) {
 				decolonize()
-			} else if (nextStatus == PersonState.COLONIZED) {
+			} else if (nextStatus == PersonStatus.COLONIZED) {
 				colonize()
-			} else if (nextStatus == PersonState.INFECTED) {
+			} else if (nextStatus == PersonStatus.INFECTED) {
 				infect()
 			}
 		}
@@ -253,14 +253,14 @@ class Person extends BaseTurtle implements Comparable {
 	def decolonize() {
 		
 		// Check the status.
-		if (status != PersonState.UNCOLONIZED) {
+		if (status != PersonStatus.UNCOLONIZED) {
 			
 			// Update the counts.
 			if (currentPlace != null) {
-				if (status == PersonState.COLONIZED) {
+				if (status == PersonStatus.COLONIZED) {
 					currentPlace.colonized--
 					totalColonized--
-				} else if (status == PersonState.INFECTED) {
+				} else if (status == PersonStatus.INFECTED) {
 					currentPlace.infected--
 					totalInfected--
 				}
@@ -283,14 +283,14 @@ class Person extends BaseTurtle implements Comparable {
 	def colonize() {
 		
 		// Check the status.
-		if (status != PersonState.COLONIZED) {
+		if (status != PersonStatus.COLONIZED) {
 			
 			// Update the counts.
 			if (currentPlace != null) {
-				if (status == PersonState.DECOLONIZED) {
+				if (status == PersonStatus.DECOLONIZED) {
 					currentPlace.uncolonized--
 					totalUncolonized--
-				} else if (status == PersonState.INFECTED) {
+				} else if (status == PersonStatus.INFECTED) {
 					currentPlace.infected--
 					totalInfected--
 				}
@@ -314,13 +314,13 @@ class Person extends BaseTurtle implements Comparable {
 	def infect() {
 		
 		// Check the status.
-		if (status != PersonState.INFECTED) {
+		if (status != PersonStatus.INFECTED) {
 			// Update the counts.
 			if (currentPlace != null) {
-				if (status == PersonState.UNCOLONIZED) {
+				if (status == PersonStatus.UNCOLONIZED) {
 					currentPlace.uncolonized--
 					totalUncolonized--
-				} else if (status == PersonState.COLONIZED) {
+				} else if (status == PersonStatus.COLONIZED) {
 					currentPlace.colonized--
 					totalColonized--
 				}
