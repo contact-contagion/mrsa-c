@@ -60,9 +60,12 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../Prototype_Model_Inputs/60615/sample_60615_activities.csv',
 			'../Prototype_Model_Inputs/60615/all_60615_activities.csv'], 2)
 
-		// Add a global maximum risk variable.
-		addGlobal("maximumRisk", 4)
-		
+		// The initial infected count.
+		addSliderWL("Initial Infected Count", "initialInfectedCount", 0, 1, 1000, 5)
+
+		// The initial colonization percentage.
+		addSliderWL("Initial Colonization Percentage", "initialColonizationPercentage", 0, 1, 100, 3)
+				
 		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
 		addSliderWL("A", "A", 0, 0.0000001, 1.0, 0.0000137058)
 		
@@ -78,6 +81,9 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// For E we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
 		addSliderWL("E", "E", 0, 0.0000001, 1.0, 0.000111936)
 		
+		// Add a global maximum risk variable.
+		addGlobal("maximumRisk", 4)
+				
 		// The total number of people who are currently uncolonized.
 		addGlobal("totalUncolonized")
 

@@ -220,29 +220,27 @@ class Person extends BaseTurtle implements Comparable {
 	public void activateDetailedTransition(Activity activity) {
 		
 		// Calculate the person's exposure risk and impact, if needed.
-		if (activity != null) {
+		if ((activity != null) && (currentPlace != null)) {
 			
+			// Find the risk.
 			double risk = activity.risk()
 			
 			// Find the next state.
 			PersonStatus other = PersonStatus.UNCOLONIZED
-			if (currentPlace != null) {
-				if (currentPlace.infected > 0) {
-					other = PersonStatus.INFECTED
-				} else if (currentPlace.colonized >0)
-					other = PersonStatus.COLONIZED
+			if (currentPlace.infected > 0) {
+				other = PersonStatus.INFECTED
+			} else if (currentPlace.colonized > 0) {
+				other = PersonStatus.COLONIZED
 			}
 			
 			// Transition.
 			PersonStatus nextStatus = nextState(status, other, risk)
-			if (nextStatus != status) {
-				if (nextStatus == PersonState.UNCOLONIZED) {
-					decolonize()
-				} else if (nextStatus == PersonState.COLONIZED) {
-					colonize()
-				} else if (nextStatus == PersonState.INFECTED) {
-					infect()
-				}
+			if (nextStatus == PersonState.UNCOLONIZED) {
+				decolonize()
+			} else if (nextStatus == PersonState.COLONIZED) {
+				colonize()
+			} else if (nextStatus == PersonState.INFECTED) {
+				infect()
 			}
 		}
 	}
@@ -254,24 +252,27 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	def decolonize() {
 		
-		// Update the counts.
-		if (currentPlace != null) {
-			if (status == PersonState.COLONIZED) {
-				currentPlace.colonized--
-				totalColonized--
-			} else if (status == PersonState.INFECTED) {
-				currentPlace.infected--
-				totalInfected--
+		// Check the status.
+		if (status != PersonState.UNCOLONIZED) {
+			
+			// Update the counts.
+			if (currentPlace != null) {
+				if (status == PersonState.COLONIZED) {
+					currentPlace.colonized--
+					totalColonized--
+				} else if (status == PersonState.INFECTED) {
+					currentPlace.infected--
+					totalInfected--
+				}
+				currentPlace.uncolonized++
+				totalUncolonized--
 			}
-			currentPlace.uncolonized++
-			totalUncolonized--
+			
+			// Update the person's status and appearance.	   
+			status = PersonStatus.UNCOLONIZED
+			setColor(Utility.blue())
+			setSize(0.1)
 		}
-		
-		// Update the person's status.	   
-		status = PersonStatus.UNCOLONIZED
-		setColor(Utility.orange())
-		setSize(1.00)
-		
 	}
 	
 	/* This routine notes a colonization.
@@ -281,24 +282,27 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	def colonize() {
 		
-		// Update the counts.
-		if (currentPlace != null) {
-			if (status == PersonState.DECOLONIZED) {
-				currentPlace.uncolonized--
-				totalUncolonized--
-			} else if (status == PersonState.INFECTED) {
-				currentPlace.infected--
-				totalInfected--
+		// Check the status.
+		if (status != PersonState.COLONIZED) {
+			
+			// Update the counts.
+			if (currentPlace != null) {
+				if (status == PersonState.DECOLONIZED) {
+					currentPlace.uncolonized--
+					totalUncolonized--
+				} else if (status == PersonState.INFECTED) {
+					currentPlace.infected--
+					totalInfected--
+				}
+				currentPlace.colonized++
+				totalColonized--
 			}
-			currentPlace.colonized++
-			totalColonized--
+			
+			// Update the person's status and appearance.	   
+			status = PersonStatus.COLONIZED
+			setColor(Utility.orange())
+			setSize(0.5)
 		}
-		
-		// Update the person's status.	   
-		status = PersonStatus.COLONIZED
-		setColor(Utility.orange())
-		setSize(1.25)
-		
 	}
 	
 	
@@ -309,24 +313,26 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	def infect() {
 		
-		// Update the counts.
-		if (currentPlace != null) {
-			if (status == PersonState.UNCOLONIZED) {
-				currentPlace.uncolonized--
-				totalUncolonized--
-			} else if (status == PersonState.COLONIZED) {
-				currentPlace.colonized--
-				totalColonized--
+		// Check the status.
+		if (status != PersonState.INFECTED) {
+			// Update the counts.
+			if (currentPlace != null) {
+				if (status == PersonState.UNCOLONIZED) {
+					currentPlace.uncolonized--
+					totalUncolonized--
+				} else if (status == PersonState.COLONIZED) {
+					currentPlace.colonized--
+					totalColonized--
+				}
+				currentPlace.infected++
+				totalInfected--
 			}
-			currentPlace.infected++
-			totalInfected--
+			
+			// Update the person's status and appearance.	   
+			status = PersonStatus.INFECTED
+			setColor(Utility.red())
+			setSize(1.0)
 		}
-		
-		// Update the person's status.	   
-		status = PersonStatus.INFECTED
-		setColor(Utility.red())
-		setSize(1.75)
-		
 	}
 	
 	/*

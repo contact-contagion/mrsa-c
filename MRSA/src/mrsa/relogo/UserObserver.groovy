@@ -1,5 +1,7 @@
 package mrsa.relogo
 
+import com.sun.tools.jdi.JDWP.ReferenceType.Status;
+
 import static repast.simphony.relogo.Utility.*;
 import static repast.simphony.relogo.UtilityG.*;
 import repast.simphony.relogo.BaseObserver;
@@ -25,12 +27,15 @@ class UserObserver extends BaseObserver {
 		// Clear any current configuration.
 		clearAll()
 		
-		// Read the people.
+		// Read the people and initialize their disease status.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
 			println("Started Reading Persons")
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
-					'person', 0.5, Utility.blue())
+					'person', 0.1, Utility.blue())
 			println("Completed Reading Persons")
+			println("Started Initializing the Disease Status")
+			initializeDiseaseStatus()
+			println("Completed Initializing the Disease Status")
 		}
 		
 		// Read the places.
@@ -207,6 +212,38 @@ class UserObserver extends BaseObserver {
 				}, turtleType.getSimpleName())
 			}
 		}
+	}
+	
+
+	/* This routine is a initializes the disease status.
+	 *
+	 * @author Michael J. North
+	 *
+	 *
+	 */
+	def initializeDiseaseStatus() {
+		
+		// Initialize colonization.
+		ask (persons()) {
+			if (random(100) < initialColonizationPercentage) {
+				status = PersonStatus.COLONIZED
+				totalColonized++
+			}
+		}
+		
+		// Initialize infection (there is a small nonzero probability of
+		// overlap which will be ignored).
+		int totalCount = persons().size()
+		for (int i = 0; i < initialInfectedCount; i++) {
+			int nextIndex = random(totalCount)
+			Person nextPerson = persons().get(nextIndex)
+			nextPerson.status = PersonStatus.INFECTED
+			totalInfected++
+		}
+		
+		// Note the total uncolonized count.
+		totalUncolonized = totalCount - totalColonized - totalInfected
+		
 	}
 	
 	/* This routine is a file reader that creates activities from CSV files.
@@ -453,13 +490,29 @@ class UserObserver extends BaseObserver {
 		// Set the place style based on the type.
 		ask(persons()) {
 			
-			// Check the type and assign a style.
-			if (status == PersonStatus.UNCOLONIZED) {
-				decolonize()
-			} else if (status == PersonStatus.COLONIZED) {
-				colonize()
-			} else if (status == PersonStatus.INFECTED) {
-				infect()
+			// Check the current place.
+			if (currentPlace != null) {
+			
+				// Check the type and assign a style.
+				if (status == PersonStatus.UNCOLONIZED) {
+					currentPlace.uncolonized++
+					totalUncolonized++
+					setColor(Utility.blue())
+					setSize(0.1)
+				} else if (status == PersonStatus.COLONIZED) {
+					currentPlace.colonized++
+					totalColonized++
+					setColor(Utility.orange())
+					setSize(0.5)
+				} else if (status == PersonStatus.INFECTED) {
+					currentPlace.infected++
+					totalInfected++
+					setColor(Utility.red())
+					setSize(1.0)
+				}
+			} else {
+				// Everyone needs a place.
+				die()
 			}
 		}
 	}
@@ -480,18 +533,21 @@ class UserObserver extends BaseObserver {
 				setSize(0.3)
 				setShape('circle')
 			} else if (type.equalsIgnoreCase("School")) {
-				setColor(Utility.orange())
-				setSize(0.3)
+				setColor(Utility.yellow())
+				setSize(0.2)
 				setShape('circle')
 			} else if (type.equalsIgnoreCase("Household")) {
-			} else if (type.equalsIgnoreCase("Work")) {
-				setColor(Utility.blue())
-				setSize(0.3)
-				setShape('triangle')
+				setColor(Utility.gray())
+				setSize(0.2)
+				setShape('square')
 			} else if (type.equalsIgnoreCase("Group Quarters")) {
 				setColor(Utility.white())
-				setSize(0.3)
-				setShape('circle')
+				setSize(0.2)
+				setShape('square')
+			} else if (type.equalsIgnoreCase("Work")) {
+				setColor(Utility.green())
+				setSize(0.2)
+				setShape('triangle')
 			}
 		}
 	}
