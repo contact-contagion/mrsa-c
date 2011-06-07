@@ -48,7 +48,7 @@ class UserObserver extends BaseObserver {
 		
 		// Link the people to their places.
 		println("Starting Matching Persons and Places")
-		linkPeopleAndPlaces()
+		matchPeopleAndPlaces()
 		println("Completed Matching Persons and Places")
 		
 		// Set the default person drawing styles.
@@ -131,8 +131,9 @@ class UserObserver extends BaseObserver {
 			}
 		}	
 		
-		// Move to next hour.
-		println("    " + ticks() + " " + totalInfected + " " + totalColonized + " " + totalUncolonized)
+		// Move to the next hour.
+		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected")
+		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " + totalColonized + ", " + totalInfected)
 		tick()
 		
 	}
@@ -418,12 +419,12 @@ class UserObserver extends BaseObserver {
 		}
 	}
 	
-	/* This routine links people to places.
+	/* This routine matches people to places.
 	 * 
 	 * @author Michael J. North
 	 * 
 	 */
-	def linkPeopleAndPlaces() {
+	def matchPeopleAndPlaces() {
 		
 		// Setup the place map.
 		def placesMap = [:]
@@ -432,23 +433,24 @@ class UserObserver extends BaseObserver {
 		}
 		
 		// Link the people to places.
-		int counter = 0
 		ask (persons()) {
 			
 			// Set the household location.
-			it.hh = safePlaceLookup(placesMap, it.hh_id)
+			hh = safePlaceLookup(placesMap, hh_id)
 			
 			// Set the group quarters location.
-			it.gq = safePlaceLookup(placesMap, it.gq_id)
+			gq = safePlaceLookup(placesMap, gq_id)
 			
 			// Set the work location.
-			it.work = safePlaceLookup(placesMap, it.work_id)
+			work = safePlaceLookup(placesMap, work_id)
 			
 			// Set the school location.
-			it.school = safePlaceLookup(placesMap, it.school_id)
+			school = safePlaceLookup(placesMap, school_id)
 			
-			// Remove assigned people.
-			//@@if ((it.hh == null) && (it.gq == null) && (it.work == null) && (it.school == null)) die()
+			// Eliminate unassigned people.
+			if ((hh == null) && (gq == null) && (work == null) && (school == null)) {
+				die()
+			}
 			
 		}
 	}
@@ -509,9 +511,6 @@ class UserObserver extends BaseObserver {
 					setColor(Utility.red())
 					setSize(1.0)
 				}
-			} else {
-				// Everyone needs a place.
-				//@@die()
 			}
 		}
 	}

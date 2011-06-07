@@ -287,7 +287,7 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Update the counts.
 			if (currentPlace != null) {
-				if (status == PersonStatus.DECOLONIZED) {
+				if (status == PersonStatus.UNCOLONIZED) {
 					currentPlace.uncolonized--
 					totalUncolonized--
 				} else if (status == PersonStatus.INFECTED) {
@@ -351,36 +351,36 @@ class Person extends BaseTurtle implements Comparable {
 					return chooseOne(1, 0, 0, risk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(E, 1-B-E, B, risk)
+					return chooseOne(e, 1-b-e, b, risk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(D, C, 1-C-D, risk)
+					return chooseOne(d, c, 1-c-d, risk)
 					break
 				}
 			
 			case PersonStatus.COLONIZED:
 				switch (otherStatus) {
 					case PersonStatus.UNCOLONIZED:
-					return chooseOne(1-A, A, 0, risk)
+					return chooseOne(1-a, a, 0, risk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(E, 1-B-E, B, risk)
+					return chooseOne(e, 1-b-e, b, risk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(D, C, 1-C-D, risk)
+					return chooseOne(d, c, 1-c-d, risk)
 					break
 				}
 			
 			case PersonStatus.INFECTED:
 				switch (otherStatus) {
 					case PersonStatus.UNCOLONIZED:
-					return chooseOne(1-2*A, 2*A, 0, risk)
+					return chooseOne(1-2*a, 2*a, 0, risk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(E, 1-B-E, B, risk)
+					return chooseOne(e, 1-b-e, b, risk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(D, C, 1-C-D, risk)
+					return chooseOne(d, c, 1-c-d, risk)
 					break
 				}
 		}

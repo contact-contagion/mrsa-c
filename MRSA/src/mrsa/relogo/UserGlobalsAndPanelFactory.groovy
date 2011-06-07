@@ -40,7 +40,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('transitionRule', 'Transition Rule:',
 			['None',
 			'Simple ',
-			'Detailed'], 2)
+			'Detailed'], 1)
 		
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
@@ -66,20 +66,20 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// The initial colonization percentage.
 		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
 				
-		// A means that 1,000 weeks of exposure yields p(infection)=1 and we will use a simple, time-independent exponential increase function for interpolation.
-		addSliderWL("A", "A", 0, 0.0000001, 1.0, 0.0000137058)
+		// A.
+		addSliderWL("a", "a", 0, 0.0000001, 1.0, 0.0000137058)
 		
-		// B will use simple, time-independent exponential decline with 38% of C moving to I after 10 weeks.
-		addSliderWL("B", "B", 0, 0.0000001, 1.0, 0.000284505)
+		// B.
+		addSliderWL("b", "b", 0, 0.0000001, 1.0, 0.000284505)
 
-		// C is a simple exponential function of the time the agent has been infected such that 21% are infected at 3 weeks.
-		addSliderWL("C", "C", 0, 0.0000001, 1.0, 0.00309173)
+		// C.
+		addSliderWL("c", "c", 0, 0.0000001, 1.0, 0.00309173)
 
-		// For D we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
-		addSliderWL("D", "D", 0, 0.0000001, 1.0, 0.000451166)
+		// D.
+		addSliderWL("d", "d", 0, 0.0000001, 1.0, 0.000451166)
 
-		// For E we assume everyone gets antibiotics that work as follows (Kaplan–Meier Survival Function) (We Will Only Use the Median for Now):
-		addSliderWL("E", "E", 0, 0.0000001, 1.0, 0.000111936)
+		// E.
+		addSliderWL("e", "e", 0, 0.0000001, 1.0, 0.000111936)
 		
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
