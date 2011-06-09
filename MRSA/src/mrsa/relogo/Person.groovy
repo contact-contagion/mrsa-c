@@ -159,13 +159,8 @@ class Person extends BaseTurtle implements Comparable {
 	 *
 	 */
 	def decolonize() {
-		
-		// Check the status.
-		if (status != PersonStatus.UNCOLONIZED) {
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.UNCOLONIZED
-		}
+		// Update the person's status and appearance.	   
+		status = PersonStatus.UNCOLONIZED
 	}
 	
 	/* This routine notes a colonization.
@@ -174,13 +169,8 @@ class Person extends BaseTurtle implements Comparable {
 	 *
 	 */
 	def colonize() {
-		
-		// Check the status.
-		if (status != PersonStatus.COLONIZED) {
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.COLONIZED
-		}
+		// Update the person's status and appearance.	   
+		status = PersonStatus.COLONIZED
 	}	
 	
 	/* This routine notes an infection.
@@ -189,13 +179,8 @@ class Person extends BaseTurtle implements Comparable {
 	 *
 	 */
 	def infect() {
-		
-		// Check the status.
-		if (status != PersonStatus.INFECTED) {
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.INFECTED
-		}
+		// Update the person's status and appearance.	   
+		status = PersonStatus.INFECTED
 	}
 	
 	/* This routine performs a simple transition.
@@ -229,34 +214,37 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	public void activateDetailedTransition(Activity activity) {
 		
-		// Calculate the person's exposure risk and impact, if needed.
-		if ((activity != null) && (currentPlace != null)) {
-			
-			// Find the response rate.
-			boolean fasterResponse = false
-			if ((hh != null) && (hh.fasterResponse)) {
-				fasterResponse = true
-				println("fasterResponse for " + person_id + " in " + hh_id)
-			}
-			
-			// Find the next state.
-			PersonStatus other = PersonStatus.UNCOLONIZED
-			if (currentPlace.infected > 0) {
+		// Find out about other currently people at this place.
+		PersonStatus other = PersonStatus.UNCOLONIZED
+		if (currentPlace != null) {
+			if(currentPlace.infected > 0) {
 				other = PersonStatus.INFECTED
 			} else if (currentPlace.colonized > 0) {
 				other = PersonStatus.COLONIZED
 			}
-			
-			// Transition.
-			PersonStatus nextStatus = nextState(status, other,
-					activity.risk(), fasterResponse)
-			if (nextStatus == PersonStatus.UNCOLONIZED) {
-				decolonize()
-			} else if (nextStatus == PersonStatus.COLONIZED) {
-				colonize()
-			} else if (nextStatus == PersonStatus.INFECTED) {
-				infect()
-			}
+		}
+		
+		// Find the activity risk.
+		double activityRisk = 0
+		if (activity != null) {
+			activityRisk = activity.risk()
+		}
+		
+		// Find the response rate.
+		boolean fasterResponse = false
+		if ((hh != null) && (hh.fasterResponse)) {
+			fasterResponse = true
+		}
+		
+		// Transition.
+		PersonStatus nextStatus = nextState(status, other,
+				activityRisk, fasterResponse)
+		if (nextStatus == PersonStatus.UNCOLONIZED) {
+			decolonize()
+		} else if (nextStatus == PersonStatus.COLONIZED) {
+			colonize()
+		} else if (nextStatus == PersonStatus.INFECTED) {
+			infect()
 		}
 	}
 	
@@ -266,7 +254,7 @@ class Person extends BaseTurtle implements Comparable {
 	 * @author Michael J. North
 	 */
 	public PersonStatus nextState(PersonStatus startStatus,
-		PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
+	PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
 		
 		// Find the next state.
 		switch (startStatus) {
@@ -310,9 +298,9 @@ class Person extends BaseTurtle implements Comparable {
 		
 		// Select the next state.
 		double draw = randomFloat(1.0)
-		if (draw <= (risk * p3)) {
+		if (draw < (risk * p3)) {
 			return PersonStatus.INFECTED
-		} else if (draw <= (risk * (p2 + p3))) {
+		} else if (draw < (risk * (p2 + p3))) {
 			return PersonStatus.COLONIZED
 		} else {
 			return PersonStatus.UNCOLONIZED

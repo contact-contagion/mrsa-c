@@ -101,7 +101,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("e", 0.000111936)
 		
 		// The C and D scaling factor for faster infection response.
-		addGlobal("fasterResponseScalingFactor", 100.0)
+		addGlobal("fasterResponseScalingFactor", 2.0)
 
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)

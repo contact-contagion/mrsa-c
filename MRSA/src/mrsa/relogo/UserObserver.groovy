@@ -39,7 +39,7 @@ class UserObserver extends BaseObserver {
 		if (!placesInputFile.equalsIgnoreCase('None')) {
 			println("Started Reading Places")
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
-					'square', 0.0, Utility.black())
+					'square', 0.1, Utility.white())
 			println("Completed Reading Places")
 		}
 		
@@ -161,16 +161,24 @@ class UserObserver extends BaseObserver {
 		totalColonized = 0
 		totalInfected = 0
 		ask (places()) {
+			if (getColor() != Utility.white()) {
+				setColor(Utility.white())
+			}
+			if (getSize() != 0.1) {
+				setSize(0.1)
+			}
 			uncolonized = 0
 			colonized = 0
 			infected = 0
 		}
-		ask(patches()) {
-			uncolonized = 0
-			colonized = 0
-			infected = 0
+		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+			ask(patches()) {
+				uncolonized = 0
+				colonized = 0
+				infected = 0
+			}
 		}
-		
+				
 		// Update the counters.
 		ask (persons()) {
 			if (status == PersonStatus.UNCOLONIZED) {
@@ -196,12 +204,22 @@ class UserObserver extends BaseObserver {
 		
 		// Update the map, if needed.
 		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
-			int maxUncolonized = maxOneOf(patches(), { uncolonized }).uncolonized
 			int maxColonized = maxOneOf(patches(), { colonized }).colonized
-			int maxInfected = maxOneOf(patches(), { infected }).infected
 			ask (patches()) {
-				setPcolor(scaleColor(red(), 100*infected + 10*colonized + uncolonized,
-					0.0, 100*maxInfected + 10*maxColonized + maxUncolonized))
+				if (infected > 0) {
+					setPcolor(Utility.orange())
+				} else if (colonized > 0) {
+					setPcolor(scaleColor(orange(), colonized, 0, 2 * maxColonized))
+				}
+			}
+			ask (places()) {
+				if (infected > 0) {
+					setPcolor(Utility.red())
+					setSize(0.5)
+				} else if (colonized > 0) {
+					setPcolor(Utility.yellow())
+				}
+
 			}
 		}
 		
@@ -337,13 +355,10 @@ class UserObserver extends BaseObserver {
 			ask (places()) {
 				
 				// Set the initial status, as required.	
-				if (type.equalsIgnoreCase("Household")) {
+				if (place_type.equalsIgnoreCase("Household")) {
 					if (behaviorRule.equalsIgnoreCase('Clustered by HH')) {
 						if (randomFloat(1.0) <= fasterResponseFraction) {
 							fasterResponse = true
-							println("HH faster response *********************")
-						} else {
-							println("HH regular response")
 						}				
 					} else if (behaviorRule.equalsIgnoreCase('Cluster by HH and Address')) {
 						if (getPycor() > centerLine) {

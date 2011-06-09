@@ -16,7 +16,7 @@ class Place extends BaseTurtle {
 	public String place_id = ""
 	
 	// The type of location.
-	public String type = ""
+	public String place_type = ""
 	
 	// The latitude. This is normalized to a Y coordinate.
 	public double latitude = 0
