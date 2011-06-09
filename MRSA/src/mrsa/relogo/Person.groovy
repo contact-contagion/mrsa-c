@@ -268,7 +268,7 @@ class Person extends BaseTurtle implements Comparable {
 	 * @author Michael J. North
 	 */
 	public PersonStatus nextState(PersonStatus startStatus,
-	PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
+		PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
 		
 		// Find the next state.
 		switch (startStatus) {
@@ -290,7 +290,12 @@ class Person extends BaseTurtle implements Comparable {
 				return chooseOne(e, 1-b-e, b, 1)
 			
 			case PersonStatus.INFECTED:
-				return chooseOne(d, c, 1-c-d, 1)
+				if (fasterResponse) {
+					double s = fasterResponseScalingFactor
+					return chooseOne(s*d, s*c, 1-s*(c+d), 1)
+				} else {
+					return chooseOne(d, c, 1-c-d, 1)
+				}
 				break
 		}
 		

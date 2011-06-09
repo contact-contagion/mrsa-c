@@ -88,7 +88,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// 0.0001      Slight infection growth (~10 people after 7 days)
 		// 0.00009      Slight infection growth
 		// 0.00007      Slight infection growth
-		addGlobal("b", 0.00005)
+		// 0.00005      Slight infection growth (~7 people after 9 days)
+		addGlobal("b", 0.000045)
 
 		// C.
 		addGlobal("c", 0.00309173)
@@ -99,6 +100,9 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// E.
 		addGlobal("e", 0.000111936)
 		
+		// The C and D scaling factor for faster infection response.
+		addGlobal("fasterResponseScalingFactor", 2)
+
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
 				
