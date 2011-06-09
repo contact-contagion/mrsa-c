@@ -202,29 +202,29 @@ class Person extends BaseTurtle implements Comparable {
 	}
 	
 	/* This routine performs a simple transition.
-	*
-	* @author Michael J. North
-	*
-	*/
-   public void activateSimpleTransition(Activity activity) {
-	   
-	   // Calculate the person's exposure risk and impact, if needed.
-	   if (activity != null) {
-		   
-		   // Calculate the person's exposure risk and impact.
-		   double risk = activity.risk()
-		   
-		   // Calculate the person's exposure impact.
-		   if (!allQ(inRadius(persons(), 0.1), { !infected })) {
-			   
-			   // At least one person in the area is infected.
-			   if (random(maximumRisk) < risk) {
-				   infect()
-			   }
-		   }
-	   }
-   }
-   	
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	public void activateSimpleTransition(Activity activity) {
+		
+		// Calculate the person's exposure risk and impact, if needed.
+		if (activity != null) {
+			
+			// Calculate the person's exposure risk and impact.
+			double risk = activity.risk()
+			
+			// Calculate the person's exposure impact.
+			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+				
+				// At least one person in the area is infected.
+				if (random(maximumRisk) < risk) {
+					infect()
+				}
+			}
+		}
+	}
+	
 	/* This routine performs a detailed transition.
 	 *
 	 * @author Michael J. North
@@ -235,10 +235,10 @@ class Person extends BaseTurtle implements Comparable {
 		// Calculate the person's exposure risk and impact, if needed.
 		if ((activity != null) && (currentPlace != null)) {
 			
-			// Find the risk.
-			double risk = activity.risk()
+			// Find the response rate.
+			boolean fasterResponse = false
 			if ((hh != null) && (hh.fasterResponse)) {
-				risk = risk / 2
+				fasterResponse = true
 			}
 			
 			// Find the next state.
@@ -250,7 +250,8 @@ class Person extends BaseTurtle implements Comparable {
 			}
 			
 			// Transition.
-			PersonStatus nextStatus = nextState(status, other, risk)
+			PersonStatus nextStatus = nextState(status, other,
+					activity.risk(), fasterResponse)
 			if (nextStatus == PersonStatus.UNCOLONIZED) {
 				decolonize()
 			} else if (nextStatus == PersonStatus.COLONIZED) {
@@ -266,7 +267,8 @@ class Person extends BaseTurtle implements Comparable {
 	 *
 	 * @author Michael J. North
 	 */
-	public PersonStatus nextState(PersonStatus startStatus, PersonStatus otherStatus, double risk) {
+	public PersonStatus nextState(PersonStatus startStatus,
+	PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
 		
 		// Find the next state.
 		switch (startStatus) {
@@ -274,43 +276,25 @@ class Person extends BaseTurtle implements Comparable {
 			case PersonStatus.UNCOLONIZED:
 				switch (otherStatus) {
 					case PersonStatus.UNCOLONIZED:
-					return chooseOne(1, 0, 0, risk)
+					return chooseOne(1, 0, 0, activityRisk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(1-a, a, 0, risk)
+					return chooseOne(1-a, a, 0, activityRisk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(1-2*a, 2*a, 0, risk)
+					return chooseOne(1-2*a, 2*a, 0, activityRisk)
 					break
 				}
 			
 			case PersonStatus.COLONIZED:
-				switch (otherStatus) {
-					case PersonStatus.UNCOLONIZED:
-					return chooseOne(e, 1-b-e, b, risk)
-					break
-					case PersonStatus.COLONIZED:
-					return chooseOne(e, 1-b-e, b, risk)
-					break
-					case PersonStatus.INFECTED:
-					return chooseOne(e, 1-b-e, b, risk)
-					break
-				}
+				return chooseOne(e, 1-b-e, b, 1)
 			
 			case PersonStatus.INFECTED:
-				switch (otherStatus) {
-					case PersonStatus.UNCOLONIZED:
-					return chooseOne(d, c, 1-c-d, risk)
-					break
-					case PersonStatus.COLONIZED:
-					return chooseOne(d, c, 1-c-d, risk)
-					break
-					case PersonStatus.INFECTED:
-					return chooseOne(d, c, 1-c-d, risk)
-					break
-				}
+				return chooseOne(d, c, 1-c-d, 1)
+				break
 		}
 		
+		// Return the default if no other matches are found.
 		return PersonStatus.UNCOLONIZED
 	}
 	

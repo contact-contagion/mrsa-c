@@ -86,7 +86,9 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// B.
 		// 0.000284505 Original value, rapid infection growth (~30 people after 7 days)
 		// 0.0001      Slight infection growth (~10 people after 7 days)
-		addGlobal("b", 0.00009)
+		// 0.00009      Slight infection growth
+		// 0.00007      Slight infection growth
+		addGlobal("b", 0.00005)
 
 		// C.
 		addGlobal("c", 0.00309173)
