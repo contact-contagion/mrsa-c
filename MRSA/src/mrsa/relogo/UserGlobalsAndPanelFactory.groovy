@@ -40,7 +40,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('behaviorRule', 'Behavior Rule:',
 			['Uniform',
 			'Clustered by HH',
-			'Cluster by HH and Address'], 1)
+			'Cluster by HH and Address'], 0)
 	
 		// The behavior rule threshold.
 		addSliderWL("fasterResponsePercentage", "Faster Response Percentage (>CL)", 0, 1, 100, 50)

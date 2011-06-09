@@ -207,17 +207,17 @@ class UserObserver extends BaseObserver {
 			int maxColonized = maxOneOf(patches(), { colonized }).colonized
 			ask (patches()) {
 				if (infected > 0) {
-					setPcolor(Utility.orange())
-				} else if (colonized > 0) {
-					setPcolor(scaleColor(orange(), colonized, 0, 2 * maxColonized))
+					setPcolor(Utility.yellow())
+				} else {
+					setPcolor(scaleColor(yellow(), colonized, 0, maxColonized))
 				}
 			}
 			ask (places()) {
 				if (infected > 0) {
-					setPcolor(Utility.red())
+					setColor(Utility.red())
 					setSize(0.5)
 				} else if (colonized > 0) {
-					setPcolor(Utility.yellow())
+					setColor(Utility.orange())
 				}
 
 			}
