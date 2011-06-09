@@ -60,7 +60,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
 			['Yes',
-			'No'], 1)
+			'No'], 0)
 				
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
@@ -101,7 +101,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("e", 0.000111936)
 		
 		// The C and D scaling factor for faster infection response.
-		addGlobal("fasterResponseScalingFactor", 4.0)
+		addGlobal("fasterResponseScalingFactor", 100.0)
 
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)

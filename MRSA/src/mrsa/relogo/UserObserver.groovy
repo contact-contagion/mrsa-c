@@ -31,7 +31,7 @@ class UserObserver extends BaseObserver {
 		if (!personsInputFile.equalsIgnoreCase('None')) {
 			println("Started Reading Persons")
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
-					'person', 0.1, Utility.blue())
+					'square', 0, Utility.black())
 			println("Completed Reading Persons")
 		}
 		
@@ -39,7 +39,7 @@ class UserObserver extends BaseObserver {
 		if (!placesInputFile.equalsIgnoreCase('None')) {
 			println("Started Reading Places")
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
-					'square', 0.2, Utility.gray())
+					'square', 0.0, Utility.black())
 			println("Completed Reading Places")
 		}
 		
@@ -47,11 +47,6 @@ class UserObserver extends BaseObserver {
 		println("Starting Matching Persons and Places")
 		matchPeopleAndPlaces()
 		println("Completed Matching Persons and Places")
-		
-		// Set the default place drawing styles.
-		println("Started Setting the Default Place Style")
-		setDefaultPlaceStyles()
-		println("Completed Setting the Default Place Style")
 		
 		// Normalize the place coordinates.
 		println("Started Normalizing Place Locations")
@@ -170,18 +165,26 @@ class UserObserver extends BaseObserver {
 			colonized = 0
 			infected = 0
 		}
+		ask(patches()) {
+			uncolonized = 0
+			colonized = 0
+			infected = 0
+		}
 		
 		// Update the counters.
 		ask (persons()) {
 			if (status == PersonStatus.UNCOLONIZED) {
 				totalUncolonized++
 				if (currentPlace != null) currentPlace.uncolonized++
+				patchHere().uncolonized++
 			} else if (status == PersonStatus.COLONIZED) {
 				totalColonized++
 				if (currentPlace != null) currentPlace.colonized++
+				patchHere().colonized++
 			} else if (status == PersonStatus.INFECTED) {
 				totalInfected++
 				if (currentPlace != null) currentPlace.infected++
+				patchHere().infected++
 			}
 		}
 		
@@ -190,6 +193,17 @@ class UserObserver extends BaseObserver {
 		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
 				totalColonized + ", " + totalInfected + ", " +
 				(totalUncolonized + totalColonized + totalInfected))
+		
+		// Update the map, if needed.
+		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+			int maxUncolonized = maxOneOf(patches(), { uncolonized }).uncolonized
+			int maxColonized = maxOneOf(patches(), { colonized }).colonized
+			int maxInfected = maxOneOf(patches(), { infected }).infected
+			ask (patches()) {
+				setPcolor(scaleColor(red(), 100*infected + 10*colonized + uncolonized,
+					0.0, 100*maxInfected + 10*maxColonized + maxUncolonized))
+			}
+		}
 		
 	}
 	
@@ -205,7 +219,7 @@ class UserObserver extends BaseObserver {
 	 * 
 	 */
 	def createTurtlesFromCSVFile(String fileName, Class turtleType,
-	String defaultShape, double defaultSize, double defaultColor) {
+		String defaultShape, double defaultSize, double defaultColor) {
 		
 		// Read the data file.
 		List<String[]> rows = new CSVReader(
@@ -289,12 +303,8 @@ class UserObserver extends BaseObserver {
 			// Set the initial status.
 			if (randomFloat(1.0) <= initialColonizationFraction) {
 				status = PersonStatus.COLONIZED
-				setColor(Utility.orange())
-				setSize(0.5)
 			} else {
 				status = PersonStatus.UNCOLONIZED
-				setColor(Utility.blue())
-				setSize(0.1)
 			}
 		}
 		println("    persons.size() == " + persons().size())
@@ -302,8 +312,6 @@ class UserObserver extends BaseObserver {
 		// Initialize infection.
 		ask (nOf(initialInfectedCount, persons())) {
 			status = PersonStatus.INFECTED
-			setColor(Utility.red())
-			setSize(1.0)
 		}
 	}
 	
@@ -333,7 +341,10 @@ class UserObserver extends BaseObserver {
 					if (behaviorRule.equalsIgnoreCase('Clustered by HH')) {
 						if (randomFloat(1.0) <= fasterResponseFraction) {
 							fasterResponse = true
-						}
+							println("HH faster response *********************")
+						} else {
+							println("HH regular response")
+						}				
 					} else if (behaviorRule.equalsIgnoreCase('Cluster by HH and Address')) {
 						if (getPycor() > centerLine) {
 							if (randomFloat(1.0) <= fasterResponseFraction) {
@@ -580,43 +591,8 @@ class UserObserver extends BaseObserver {
 		// Return the results.
 		return place
 		
-	}
-	
-	/* This routine assigns default place drawing styles.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def setDefaultPlaceStyles() {
-		
-		// Set the place style based on the type.
-		ask(places()) {
-			
-			// Check the type and assign a style.
-			if (type.equalsIgnoreCase("College")) {
-				setColor(Utility.yellow())
-				setSize(0.3)
-				setShape('circle')
-			} else if (type.equalsIgnoreCase("School")) {
-				setColor(Utility.yellow())
-				setSize(0.2)
-				setShape('circle')
-			} else if (type.equalsIgnoreCase("Household")) {
-				setColor(Utility.gray())
-				setSize(0.2)
-				setShape('square')
-			} else if (type.equalsIgnoreCase("Group Quarters")) {
-				setColor(Utility.white())
-				setSize(0.2)
-				setShape('square')
-			} else if (type.equalsIgnoreCase("Work")) {
-				setColor(Utility.green())
-				setSize(0.2)
-				setShape('triangle')
-			}
-		}
-	}
-	
+	}	
+
 	/* This routine checks to see if a string contains an integer.
 	 *
 	 * @author Michael J. North

@@ -165,8 +165,6 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Update the person's status and appearance.	   
 			status = PersonStatus.UNCOLONIZED
-			setColor(Utility.blue())
-			setSize(0.1)
 		}
 	}
 	
@@ -182,8 +180,6 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Update the person's status and appearance.	   
 			status = PersonStatus.COLONIZED
-			setColor(Utility.orange())
-			setSize(0.5)
 		}
 	}	
 	
@@ -199,8 +195,6 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Update the person's status and appearance.	   
 			status = PersonStatus.INFECTED
-			setColor(Utility.red())
-			setSize(1.0)
 		}
 	}
 	
@@ -242,6 +236,7 @@ class Person extends BaseTurtle implements Comparable {
 			boolean fasterResponse = false
 			if ((hh != null) && (hh.fasterResponse)) {
 				fasterResponse = true
+				println("fasterResponse for " + person_id + " in " + hh_id)
 			}
 			
 			// Find the next state.
