@@ -132,17 +132,23 @@ class UserObserver extends BaseObserver {
 				goToHH()
 			}
 			
-			// Activate a transition.
+		}
+		
+		// Count again.
+		countPersonsAndPlaces()
+		
+		// Expose people to disease transmission risk.
+		ask(persons()){
+			
+			// Activate a transition as requested.
 			if (transitionRule.equalsIgnoreCase('None')) {
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
 				activateSimpleTransition(nextActivity)
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
 				activateDetailedTransition(nextActivity)
 			}
+			
 		}
-		
-		// Count again.
-		countPersonsAndPlaces()
 		
 		// Move to the next hour.
 		tick()

@@ -40,7 +40,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('behaviorRule', 'Behavior Rule:',
 			['Uniform',
 			'Clustered by HH',
-			'Cluster by HH and Address'], 0)
+			'Cluster by HH and Address'], 1)
 	
 		// The behavior rule threshold.
 		addSliderWL("fasterResponsePercentage", "Faster Response Percentage (>CL)", 0, 1, 100, 50)
@@ -101,7 +101,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("e", 0.000111936)
 		
 		// The C and D scaling factor for faster infection response.
-		addGlobal("fasterResponseScalingFactor", 2)
+		addGlobal("fasterResponseScalingFactor", 4.0)
 
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
