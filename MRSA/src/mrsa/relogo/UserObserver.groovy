@@ -14,8 +14,8 @@ class UserObserver extends BaseObserver {
 	
 	//TODO: Initialize 5 people with MRSA infection (this number should remain stable throughout the regular runs)
 	//TODO: Initialize 3% of the people with MRSA colonization (" ")
-	//TODO: For differential run 1 cut C and D in half for 50% of the people such that people in the same HH have the same C and D
-	//TODO: For differential run 2 cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
+	//TODO: For differential run 1 (infected people get medical help faster) cut C and D in half for 50% of the people such that people in the same HH have the same C and D
+	//TODO: For differential run 2 (infected people get medical help faster) cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
 	
 	/* This routine configures the model.
 	 * 
@@ -33,9 +33,6 @@ class UserObserver extends BaseObserver {
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
 					'person', 0.1, Utility.blue())
 			println("Completed Reading Persons")
-			println("Started Initializing the Disease Status")
-			initializeDiseaseStatus()
-			println("Completed Initializing the Disease Status")
 		}
 		
 		// Read the places.
@@ -46,15 +43,10 @@ class UserObserver extends BaseObserver {
 			println("Completed Reading Places")
 		}
 		
-		// Link the people to their places.
+		// Match the people with their places.
 		println("Starting Matching Persons and Places")
 		matchPeopleAndPlaces()
 		println("Completed Matching Persons and Places")
-		
-		// Set the default person drawing styles.
-		println("Started Setting the Default Person Style")
-		setDefaultPersonStyles()
-		println("Completed Setting the Default Person Style")
 		
 		// Set the default place drawing styles.
 		println("Started Setting the Default Place Style")
@@ -66,6 +58,26 @@ class UserObserver extends BaseObserver {
 		normalizePlaceCoordinates()
 		println("Completed Normalizing Place Locations")
 		
+		// Start the people at their household.
+		println("Started Asking Persons to Begin at Home")
+		ask (persons()) {
+			
+			// Start home.
+			goToHome()
+			
+		}
+		println("Completed Asking Persons to Begin at Home")
+		
+		// Initialize the disease status.
+		println("Started Initializing the Person's Disease Status")
+		initializePersonDiseaseStatus()
+		println("Completed Initializing the Disease Status")
+		
+		// Initialize the household behavior status.
+		println("Started Initializing the Household Behavior Status")
+		initializeHHBehaviorStatus()
+		println("Completed Initializing the Household Behavior Status")
+		
 		// Read the activities and convert their times to hours.
 		if (!activitiesInputFile.equalsIgnoreCase('None')) {
 			println("Started Creating Activities")
@@ -73,16 +85,14 @@ class UserObserver extends BaseObserver {
 			println("Completed Creating Activities")
 		}
 		
-		// Start the people at their household.
-		println("Started Asking Persons to Go Home")
-		ask (persons()) {
-			
-			// Go home.
-			goToHome()
-			
-		}
-		println("Completed Asking Persons to Go Home")
+		// Show the initial status
+		println("Started Counting People and Places")
+		countPersonsAndPlaces()
+		println("Completed Counting People and Places")
+		
 		println("Ready to Run...")
+		
+		
 	}
 	
 	/* This routine executes the model.
@@ -129,12 +139,53 @@ class UserObserver extends BaseObserver {
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
 				activateDetailedTransition(nextActivity)
 			}
-		}	
+		}
+		
+		// Count again.
+		countPersonsAndPlaces()
 		
 		// Move to the next hour.
-		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected")
-		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " + totalColonized + ", " + totalInfected)
 		tick()
+		
+	}
+	
+	/* This routine updates the counters.
+	 * 
+	 * @author Michael J. North
+	 * 
+	 * 
+	 */
+	def countPersonsAndPlaces() {
+		
+		// Reset the counters.
+		totalUncolonized = 0
+		totalColonized = 0
+		totalInfected = 0
+		ask (places()) {
+			uncolonized = 0
+			colonized = 0
+			infected = 0
+		}
+		
+		// Update the counters.
+		ask (persons()) {
+			if (status == PersonStatus.UNCOLONIZED) {
+				totalUncolonized++
+				if (currentPlace != null) currentPlace.uncolonized++
+			} else if (status == PersonStatus.COLONIZED) {
+				totalColonized++
+				if (currentPlace != null) currentPlace.colonized++
+			} else if (status == PersonStatus.INFECTED) {
+				totalInfected++
+				if (currentPlace != null) currentPlace.infected++
+			}
+		}
+		
+		// Report the results.
+		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected, Total")
+		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
+				totalColonized + ", " + totalInfected + ", " +
+				(totalUncolonized + totalColonized + totalInfected))
 		
 	}
 	
@@ -169,7 +220,7 @@ class UserObserver extends BaseObserver {
 				
 				// Fill in the field lists.
 				fullFieldList = (List) row
-				matchedFieldList = (List) turtleType.fields.collect({it.getName()}).
+				matchedFieldList = (List) turtleType.fields.collect({it.getName() }).
 				intersect((List) row)
 			} else {
 				
@@ -223,29 +274,84 @@ class UserObserver extends BaseObserver {
 	 *
 	 *
 	 */
-	def initializeDiseaseStatus() {
+	def initializePersonDiseaseStatus() {
+		
+		// Convert the colonization percentage to a fraction.
+		double initialColonizationFraction = initialColonizationPercentage / 100.0
 		
 		// Initialize colonization.
+		println("    persons.size() == " + persons().size())
 		ask (persons()) {
-			if (random(100) < initialColonizationPercentage) {
+			// Set the initial status.
+			if (randomFloat(1.0) <= initialColonizationFraction) {
 				status = PersonStatus.COLONIZED
-				totalColonized++
+				setColor(Utility.orange())
+				setSize(0.5)
+			} else {
+				status = PersonStatus.UNCOLONIZED
+				setColor(Utility.blue())
+				setSize(0.1)
 			}
 		}
+		println("    persons.size() == " + persons().size())
 		
-		// Initialize infection (there is a small nonzero probability of
-		// overlap which will be ignored).
+		// Initialize infection. Please note that we are choosing with replacement
+		// instead of without it so there is a small nonzero probability of
+		// collisions. These will be ignored.
 		int totalCount = persons().size()
-		for (int i = 0; i < initialInfectedCount; i++) {
+		int maximumInfectablePersons = Math.min(persons().size(), initialInfectedCount)
+		for (int i = 0; i < maximumInfectablePersons; i++) {
 			int nextIndex = random(totalCount)
 			Person nextPerson = persons().get(nextIndex)
-			nextPerson.status = PersonStatus.INFECTED
-			totalInfected++
+			ask (nextPerson) {
+				nextPerson.status = PersonStatus.INFECTED
+				setColor(Utility.red())
+				setSize(1.0)
+			}
 		}
+	}
+	
+	/* This routine is a initializes the HH status.
+	 *
+	 * @author Michael J. North
+	 *
+	 *
+	 */
+	def initializeHHBehaviorStatus() {
 		
-		// Note the total uncolonized count.
-		totalUncolonized = totalCount - totalColonized - totalInfected
+		// Convert the percentage to a fraction.
+		double fasterResponseFraction = fasterResponsePercentage / 100.0
 		
+		// Initialize the behavior, if needed.
+		if (!behaviorRule.equalsIgnoreCase('Uniform')) {
+			
+			// Note the north/south axis dividing line.
+			int centerLine = (int) (getMinPycor() + worldHeight() / 2.0)
+			
+			// Scan the places.
+			println("    places.size() == " + persons().size())
+			ask (places()) {
+				
+				// Set the initial status, as required.	
+				if (type.equalsIgnoreCase("Household")) {
+					if (behaviorRule.equalsIgnoreCase('Clustered by HH')) {
+						if (randomFloat(1.0) <= fasterResponseFraction) {
+							fasterResponse = true
+						}
+					} else if (behaviorRule.equalsIgnoreCase('Cluster by HH and Address')) {
+						if (getPycor() > centerLine) {
+							if (randomFloat(1.0) <= fasterResponseFraction) {
+								fasterResponse = true
+							}
+						} else {
+							if (randomFloat(1.0) <= (1.0 - fasterResponseFraction)) {
+								fasterResponse = true
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	/* This routine is a file reader that creates activities from CSV files.
@@ -281,7 +387,7 @@ class UserObserver extends BaseObserver {
 				
 				// Fill in the field lists.
 				fullFieldList = (List) row
-				matchedFieldList = (List) Activity.class.fields.collect({it.getName()}).
+				matchedFieldList = (List) Activity.class.fields.collect({it.getName() }).
 				intersect((List) row)
 			} else {
 				
@@ -363,12 +469,12 @@ class UserObserver extends BaseObserver {
 				// Match a person with an activity.
 				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
 					tempPerson.activityList = nextActivityList
+					matchCounter++
 					if (personIterator.hasNext()) {
 						tempPerson = personIterator.next()
 					} else {
 						break
 					}
-					matchCounter++
 				}
 				scanCounter++
 				
@@ -397,10 +503,10 @@ class UserObserver extends BaseObserver {
 		if (places().size() > 0) {
 			
 			// Find the bounds.
-			def minX = places().min({it.longitude}).longitude
-			def maxX = places().max({it.longitude}).longitude
-			def minY = places().min({it.latitude}).latitude
-			def maxY = places().max({it.latitude}).latitude
+			def minX = places().min({it.longitude }).longitude
+			def maxX = places().max({it.longitude }).longitude
+			def minY = places().min({it.latitude }).latitude
+			def maxY = places().max({it.latitude }).latitude
 			
 			// Calculate the normalization factors.
 			def xRange = maxX - minX
@@ -451,7 +557,6 @@ class UserObserver extends BaseObserver {
 			if ((hh == null) && (gq == null) && (work == null) && (school == null)) {
 				die()
 			}
-			
 		}
 	}
 	
@@ -479,40 +584,6 @@ class UserObserver extends BaseObserver {
 		// Return the results.
 		return place
 		
-	}
-	
-	/* This routine assigns default place drawing styles.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def setDefaultPersonStyles() {
-		
-		// Set the place style based on the type.
-		ask(persons()) {
-			
-			// Check the current place.
-			if (currentPlace != null) {
-				
-				// Check the type and assign a style.
-				if (status == PersonStatus.UNCOLONIZED) {
-					currentPlace.uncolonized++
-					totalUncolonized++
-					setColor(Utility.blue())
-					setSize(0.1)
-				} else if (status == PersonStatus.COLONIZED) {
-					currentPlace.colonized++
-					totalColonized++
-					setColor(Utility.orange())
-					setSize(0.5)
-				} else if (status == PersonStatus.INFECTED) {
-					currentPlace.infected++
-					totalInfected++
-					setColor(Utility.red())
-					setSize(1.0)
-				}
-			}
-		}
 	}
 	
 	/* This routine assigns default place drawing styles.

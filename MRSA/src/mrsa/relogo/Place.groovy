@@ -32,5 +32,8 @@ class Place extends BaseTurtle {
 	
 	// The number of infected people currently here.
 	int infected = 0;
+	
+	// The behavior type for homes.
+	boolean fasterResponse = false
 
 }

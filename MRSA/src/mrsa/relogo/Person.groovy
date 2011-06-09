@@ -86,28 +86,6 @@ class Person extends BaseTurtle implements Comparable {
 		
 	}
 	
-	/* This routine sends the person to their home.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def goToHome() {
-		
-		// Go to the household.
-		if (hh != null) {
-			changePlace(hh)
-			// Go to the group quarters.
-		} else if (gq != null) {
-			changePlace(gq)
-			// Go to work.
-		} else if (work != null) {
-			changePlace(work)
-			// Go to school.
-		} else if (school != null) {
-			changePlace(school)
-		}
-	}
-	
 	/* This routine sends the person to work.
 	 *
 	 * @author Michael J. North
@@ -132,6 +110,28 @@ class Person extends BaseTurtle implements Comparable {
 		
 	}
 	
+	/* This routine sends the person to their home.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def goToHome() {
+		
+		// Go to the household.
+		if (hh != null) {
+			changePlace(hh)
+			// Go to the group quarters.
+		} else if (gq != null) {
+			changePlace(gq)
+			// Go to work.
+		} else if (work != null) {
+			changePlace(work)
+			// Go to school.
+		} else if (school != null) {
+			changePlace(school)
+		}
+	}
+	
 	/* This routine changes the person's place.
 	 *
 	 * @author Michael J. North
@@ -142,76 +142,89 @@ class Person extends BaseTurtle implements Comparable {
 		// Check for changes.
 		if (newPlace != currentPlace) {
 			
-			// Update the old place, if it is defined.
-			if (currentPlace != null) {
-				
-				// Update the old place.
-				switch (status) {
-					case PersonStatus.UNCOLONIZED:
-						currentPlace.uncolonized--
-						totalUncolonized--
-						break
-					case PersonStatus.COLONIZED:
-						currentPlace.colonized--
-						totalColonized--
-						break
-					case PersonStatus.INFECTED:
-						currentPlace.infected--
-						totalInfected--
-						break
-				}
-			}
-			
 			// Update the place marker.
 			currentPlace = newPlace
-			moveTo(currentPlace)
-			
-			// Update the old place, if it is defined.
-			if (currentPlace != null) {
-				
-				// Update the new place.
-				switch (status) {
-					case PersonStatus.UNCOLONIZED:
-						currentPlace.uncolonized++
-						totalUncolonized--
-						break
-					case PersonStatus.COLONIZED:
-						currentPlace.colonized++
-						totalColonized--
-						break
-					case PersonStatus.INFECTED:
-						currentPlace.infected++
-						totalInfected--
-						break
-				}
+			if ((showPersonMovement.equalsIgnoreCase('Yes')) || (ticks() == 0)) {
+				moveTo(currentPlace)
 			}
 		}
 	}
 	
-	/* This routine performs a simple transition.
+	/* This routine notes decolonization.
 	 *
 	 * @author Michael J. North
 	 *
 	 */
-	public void activateSimpleTransition(Activity activity) {
+	def decolonize() {
 		
-		// Calculate the person's exposure risk and impact, if needed.
-		if (activity != null) {
+		// Check the status.
+		if (status != PersonStatus.UNCOLONIZED) {
 			
-			// Calculate the person's exposure risk and impact.
-			double risk = activity.risk()
-			
-			// Calculate the person's exposure impact.
-			if (!allQ(inRadius(persons(), 0.1), { !infected })) {
-				
-				// At least one person in the area is infected.
-				if (random(maximumRisk) < risk) {
-					infect()
-				}
-			}
+			// Update the person's status and appearance.	   
+			status = PersonStatus.UNCOLONIZED
+			setColor(Utility.blue())
+			setSize(0.1)
 		}
 	}
 	
+	/* This routine notes a colonization.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def colonize() {
+		
+		// Check the status.
+		if (status != PersonStatus.COLONIZED) {
+			
+			// Update the person's status and appearance.	   
+			status = PersonStatus.COLONIZED
+			setColor(Utility.orange())
+			setSize(0.5)
+		}
+	}	
+	
+	/* This routine notes an infection.
+	 *
+	 * @author Michael J. North
+	 *
+	 */
+	def infect() {
+		
+		// Check the status.
+		if (status != PersonStatus.INFECTED) {
+			
+			// Update the person's status and appearance.	   
+			status = PersonStatus.INFECTED
+			setColor(Utility.red())
+			setSize(1.0)
+		}
+	}
+	
+	/* This routine performs a simple transition.
+	*
+	* @author Michael J. North
+	*
+	*/
+   public void activateSimpleTransition(Activity activity) {
+	   
+	   // Calculate the person's exposure risk and impact, if needed.
+	   if (activity != null) {
+		   
+		   // Calculate the person's exposure risk and impact.
+		   double risk = activity.risk()
+		   
+		   // Calculate the person's exposure impact.
+		   if (!allQ(inRadius(persons(), 0.1), { !infected })) {
+			   
+			   // At least one person in the area is infected.
+			   if (random(maximumRisk) < risk) {
+				   infect()
+			   }
+		   }
+	   }
+   }
+   	
 	/* This routine performs a detailed transition.
 	 *
 	 * @author Michael J. North
@@ -224,6 +237,9 @@ class Person extends BaseTurtle implements Comparable {
 			
 			// Find the risk.
 			double risk = activity.risk()
+			if ((hh != null) && (hh.fasterResponse)) {
+				risk = risk / 2
+			}
 			
 			// Find the next state.
 			PersonStatus other = PersonStatus.UNCOLONIZED
@@ -245,96 +261,6 @@ class Person extends BaseTurtle implements Comparable {
 		}
 	}
 	
-	/* This routine notes a decolonization.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def decolonize() {
-		
-		// Check the status.
-		if (status != PersonStatus.UNCOLONIZED) {
-			
-			// Update the counts.
-			if (currentPlace != null) {
-				if (status == PersonStatus.COLONIZED) {
-					currentPlace.colonized--
-					totalColonized--
-				} else if (status == PersonStatus.INFECTED) {
-					currentPlace.infected--
-					totalInfected--
-				}
-				currentPlace.uncolonized++
-				totalUncolonized--
-			}
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.UNCOLONIZED
-			setColor(Utility.blue())
-			setSize(0.1)
-		}
-	}
-	
-	/* This routine notes a colonization.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def colonize() {
-		
-		// Check the status.
-		if (status != PersonStatus.COLONIZED) {
-			
-			// Update the counts.
-			if (currentPlace != null) {
-				if (status == PersonStatus.UNCOLONIZED) {
-					currentPlace.uncolonized--
-					totalUncolonized--
-				} else if (status == PersonStatus.INFECTED) {
-					currentPlace.infected--
-					totalInfected--
-				}
-				currentPlace.colonized++
-				totalColonized--
-			}
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.COLONIZED
-			setColor(Utility.orange())
-			setSize(0.5)
-		}
-	}
-	
-	
-	/* This routine notes an infection.
-	 *
-	 * @author Michael J. North
-	 *
-	 */
-	def infect() {
-		
-		// Check the status.
-		if (status != PersonStatus.INFECTED) {
-			// Update the counts.
-			if (currentPlace != null) {
-				if (status == PersonStatus.UNCOLONIZED) {
-					currentPlace.uncolonized--
-					totalUncolonized--
-				} else if (status == PersonStatus.COLONIZED) {
-					currentPlace.colonized--
-					totalColonized--
-				}
-				currentPlace.infected++
-				totalInfected--
-			}
-			
-			// Update the person's status and appearance.	   
-			status = PersonStatus.INFECTED
-			setColor(Utility.red())
-			setSize(1.0)
-		}
-	}
-	
 	/*
 	 * This routine finds the next state.
 	 *
@@ -351,33 +277,33 @@ class Person extends BaseTurtle implements Comparable {
 					return chooseOne(1, 0, 0, risk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(e, 1-b-e, b, risk)
+					return chooseOne(1-a, a, 0, risk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(d, c, 1-c-d, risk)
+					return chooseOne(1-2*a, 2*a, 0, risk)
 					break
 				}
 			
 			case PersonStatus.COLONIZED:
 				switch (otherStatus) {
 					case PersonStatus.UNCOLONIZED:
-					return chooseOne(1-a, a, 0, risk)
+					return chooseOne(e, 1-b-e, b, risk)
 					break
 					case PersonStatus.COLONIZED:
 					return chooseOne(e, 1-b-e, b, risk)
 					break
 					case PersonStatus.INFECTED:
-					return chooseOne(d, c, 1-c-d, risk)
+					return chooseOne(e, 1-b-e, b, risk)
 					break
 				}
 			
 			case PersonStatus.INFECTED:
 				switch (otherStatus) {
 					case PersonStatus.UNCOLONIZED:
-					return chooseOne(1-2*a, 2*a, 0, risk)
+					return chooseOne(d, c, 1-c-d, risk)
 					break
 					case PersonStatus.COLONIZED:
-					return chooseOne(e, 1-b-e, b, risk)
+					return chooseOne(d, c, 1-c-d, risk)
 					break
 					case PersonStatus.INFECTED:
 					return chooseOne(d, c, 1-c-d, risk)
@@ -396,7 +322,7 @@ class Person extends BaseTurtle implements Comparable {
 	public PersonStatus chooseOne(double p1, double p2, double p3, double risk) {
 		
 		// Select the next state.
-		double draw = randomFloat(1)
+		double draw = randomFloat(1.0)
 		if (draw <= (risk * p3)) {
 			return PersonStatus.INFECTED
 		} else if (draw <= (risk * (p2 + p3))) {

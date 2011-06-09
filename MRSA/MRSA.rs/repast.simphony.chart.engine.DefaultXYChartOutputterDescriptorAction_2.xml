@@ -34,12 +34,6 @@
     </repast.simphony.chart.Series>
     <repast.simphony.chart.Series>
       <seriesID>Tick</seriesID>
-      <valueColumn>TotalUncolonized</valueColumn>
-      <hashCode>-734505876</hashCode>
-      <proxy>false</proxy>
-    </repast.simphony.chart.Series>
-    <repast.simphony.chart.Series>
-      <seriesID>Tick</seriesID>
       <valueColumn>TotalInfected</valueColumn>
       <hashCode>1091046898</hashCode>
       <proxy>false</proxy>

@@ -36,12 +36,32 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a go toggle button.
 		addToggleButtonWL('go', 'Go')
 		
-		// Add a chooser for place input files.
+		// Add a chooser for changing behavior rules.
+		addChooserWL('behaviorRule', 'Behavior Rule:',
+			['Uniform',
+			'Clustered by HH',
+			'Cluster by HH and Address'], 0)
+	
+		// The behavior rule threshold.
+		addSliderWL("fasterResponsePercentage", "Faster Response Percentage (>CL)", 0, 1, 100, 50)
+
+		// The initial infected count.
+		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 5)
+
+		// The initial colonization percentage.
+		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
+				
+		// Add a chooser for selecting transition rules.
 		addChooserWL('transitionRule', 'Transition Rule:',
 			['None',
-			'Simple ',
-			'Detailed'], 1)
+			'Simple',
+			'Detailed'], 2)
 		
+		// Add a chooser for showing person movement.
+		addChooserWL('showPersonMovement', 'Show Person Movement:',
+			['Yes',
+			'No'], 1)
+				
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
@@ -60,38 +80,34 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../Prototype_Model_Inputs/60615/sample_60615_activities.csv',
 			'../Prototype_Model_Inputs/60615/all_60615_activities.csv'], 2)
 
-		// The initial infected count.
-		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 5)
-
-		// The initial colonization percentage.
-		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
-				
 		// A.
-		addSliderWL("a", "a", 0, 0.0000001, 1.0, 0.0000137058)
+		addGlobal("a", 0.0000137058)
 		
 		// B.
-		addSliderWL("b", "b", 0, 0.0000001, 1.0, 0.000284505)
+		// 0.000284505 Original value, rapid infection growth (~30 people after 7 days)
+		// 0.0001      Slight infection growth (~10 people after 7 days)
+		addGlobal("b", 0.00009)
 
 		// C.
-		addSliderWL("c", "c", 0, 0.0000001, 1.0, 0.00309173)
+		addGlobal("c", 0.00309173)
 
 		// D.
-		addSliderWL("d", "d", 0, 0.0000001, 1.0, 0.000451166)
+		addGlobal("d", 0.000451166)
 
 		// E.
-		addSliderWL("e", "e", 0, 0.0000001, 1.0, 0.000111936)
+		addGlobal("e", 0.000111936)
 		
 		// Add a global maximum risk variable.
 		addGlobal("maximumRisk", 4)
 				
 		// The total number of people who are currently uncolonized.
-		addGlobal("totalUncolonized")
+		addGlobal("totalUncolonized", 0)
 
 		// The total number of people who are currently colonized.
-		addGlobal("totalColonized")
+		addGlobal("totalColonized", 0)
 
 		// The total number of people who are currently infected.
-		addGlobal("totalInfected")
+		addGlobal("totalInfected", 0)
 
 	}
 	
