@@ -316,7 +316,7 @@ class UserObserver extends BaseObserver {
 		double initialColonizationFraction = initialColonizationPercentage / 100.0
 		
 		// Initialize colonization.
-		println("    persons.size() == " + persons().size())
+		println("    persons().size() == " + persons().size())
 		ask (persons()) {
 			// Set the initial status.
 			if (randomFloat(1.0) <= initialColonizationFraction) {
@@ -325,7 +325,7 @@ class UserObserver extends BaseObserver {
 				status = PersonStatus.UNCOLONIZED
 			}
 		}
-		println("    persons.size() == " + persons().size())
+		println("    persons().size() == " + persons().size())
 		
 		// Initialize infection.
 		ask (nOf(initialInfectedCount, persons())) {
@@ -351,7 +351,6 @@ class UserObserver extends BaseObserver {
 			int centerLine = (int) (getMinPycor() + worldHeight() / 2.0)
 			
 			// Scan the places.
-			println("    places.size() == " + persons().size())
 			ask (places()) {
 				
 				// Set the initial status, as required.	
@@ -522,6 +521,7 @@ class UserObserver extends BaseObserver {
 	def normalizePlaceCoordinates() {
 		
 		// Check for places.
+		println("    places.size() == " + places().size())
 		if (places().size() > 0) {
 			
 			// Find the bounds.

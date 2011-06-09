@@ -278,7 +278,6 @@ class Person extends BaseTurtle implements Comparable {
 			case PersonStatus.INFECTED:
 				if (fasterResponse) {
 					double s = fasterResponseScalingFactor
-					println("Faster Response " + s*d + " " + s*c + " " + 1-s*(c+d))
 					return chooseOne(s*d, s*c, 1-s*(c+d), 1)
 				} else {
 					return chooseOne(d, c, 1-c-d, 1)

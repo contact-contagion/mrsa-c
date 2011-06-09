@@ -81,21 +81,22 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../Prototype_Model_Inputs/60615/all_60615_activities.csv'], 2)
 
 		// A.
-		addGlobal("a", 0.0000137058)
+		addGlobal("a", 1.37058E-06) // Old from MD&CMM: 0.0000137058)
 		
 		// B.
 		// 0.000284505 Original value, rapid infection growth (~30 people after 7 days)
 		// 0.0001      Slight infection growth (~10 people after 7 days)
-		// 0.00009      Slight infection growth
-		// 0.00007      Slight infection growth
-		// 0.00005      Slight infection growth (~7 people after 9 days)
+		// 0.00009     Slight infection growth
+		// 0.00007     Slight infection growth
+		// 0.00005     Slight infection growth (~7 people after 9 days)
+		// 0.000045    Very slight infection growth
 		addGlobal("b", 0.000045)
 
 		// C.
-		addGlobal("c", 0.00309173)
+		addGlobal("c", 0.00191008) // Old from MD&CMM: 0.00309173)
 
 		// D.
-		addGlobal("d", 0.000451166)
+		addGlobal("d", 0.00718554) // Old from MD&CMM: 0.000451166)
 
 		// E.
 		addGlobal("e", 0.000111936)
