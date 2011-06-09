@@ -110,28 +110,27 @@ class UserObserver extends BaseObserver {
 			int time = (ticks() % 24)
 			
 			// Find the next activity.
-			Activity nextActivity = null
+			currentActivity = null
 			for (Activity tempActivity in activityList) {
 				if (tempActivity.start_time <= time && time < tempActivity.stop_time) {
-					nextActivity = tempActivity
+					currentActivity = tempActivity
 				}
 			}
 			
 			// Go to the place for the activity.
-			if (nextActivity == null) {
+			if (currentActivity == null) {
 				goToHH()
-			} else if (nextActivity.place_type.equalsIgnoreCase("Household")) {
+			} else if (currentActivity.place_type.equalsIgnoreCase("Household")) {
 				goToHH()
-			} else if (nextActivity.place_type.equalsIgnoreCase("Work")) {
+			} else if (currentActivity.place_type.equalsIgnoreCase("Work")) {
 				goToWork()
-			} else if (nextActivity.place_type.equalsIgnoreCase("School")) {
+			} else if (currentActivity.place_type.equalsIgnoreCase("School")) {
 				goToSchool()
-			} else if (nextActivity.place_type.equalsIgnoreCase("Group Quarters")) {
+			} else if (currentActivity.place_type.equalsIgnoreCase("Group Quarters")) {
 				goToGQ()
 			} else {
 				goToHH()
 			}
-			
 		}
 		
 		// Count again.
@@ -143,11 +142,10 @@ class UserObserver extends BaseObserver {
 			// Activate a transition as requested.
 			if (transitionRule.equalsIgnoreCase('None')) {
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
-				activateSimpleTransition(nextActivity)
+				activateSimpleTransition(currentActivity)
 			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
-				activateDetailedTransition(nextActivity)
+				activateDetailedTransition(currentActivity)
 			}
-			
 		}
 		
 		// Move to the next hour.
@@ -301,19 +299,11 @@ class UserObserver extends BaseObserver {
 		}
 		println("    persons.size() == " + persons().size())
 		
-		// Initialize infection. Please note that we are choosing with replacement
-		// instead of without it so there is a small nonzero probability of
-		// collisions. These will be ignored.
-		int totalCount = persons().size()
-		int maximumInfectablePersons = Math.min(persons().size(), initialInfectedCount)
-		for (int i = 0; i < maximumInfectablePersons; i++) {
-			int nextIndex = random(totalCount)
-			Person nextPerson = persons().get(nextIndex)
-			ask (nextPerson) {
-				nextPerson.status = PersonStatus.INFECTED
-				setColor(Utility.red())
-				setSize(1.0)
-			}
+		// Initialize infection.
+		ask (nOf(initialInfectedCount, persons())) {
+			status = PersonStatus.INFECTED
+			setColor(Utility.red())
+			setSize(1.0)
 		}
 	}
 	

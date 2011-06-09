@@ -62,6 +62,9 @@ class Person extends BaseTurtle implements Comparable {
 	// The person's activities.
 	ActivityList activityList = new ActivityList()
 	
+	// The person's current activity.
+	Activity currentActivity = null
+	
 	/* This routine sends the person to their household.
 	 *
 	 * @author Michael J. North
