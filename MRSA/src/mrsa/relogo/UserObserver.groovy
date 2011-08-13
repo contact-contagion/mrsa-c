@@ -12,11 +12,6 @@ import au.com.bytecode.opencsv.CSVReader;
 
 class UserObserver extends BaseObserver {
 	
-	//TODO: Initialize 5 people with MRSA infection (this number should remain stable throughout the regular runs)
-	//TODO: Initialize 3% of the people with MRSA colonization (" ")
-	//TODO: For differential run 1 (infected people get medical help faster) cut C and D in half for 50% of the people such that people in the same HH have the same C and D
-	//TODO: For differential run 2 (infected people get medical help faster) cut C and D in half for 50% of the people such that people in the same HH have the same C and D and the North half of 60615 averages 75% change and the South half averages 25% change
-	
 	/* This routine configures the model.
 	 * 
 	 * @author Michael J. North
