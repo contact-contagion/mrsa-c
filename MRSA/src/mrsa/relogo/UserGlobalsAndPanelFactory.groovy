@@ -65,20 +65,20 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'../Prototype_Model_Inputs/60615/sample_60615_people.csv',
-			'../Prototype_Model_Inputs/60615/all_60615_people.csv'], 2)
+			'../MRSA_Model_Inputs/60615/sample_60615_people.csv',
+			'../MRSA_Model_Inputs/60615/all_60615_people.csv'], 2)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'../Prototype_Model_Inputs/60615/sample_60615_places.csv',
-			'../Prototype_Model_Inputs/60615/all_60615_places.csv'], 2)
+			'../MRSA_Model_Inputs/60615/sample_60615_places.csv',
+			'../MRSA_Model_Inputs/60615/all_60615_places.csv'], 2)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'../Prototype_Model_Inputs/60615/sample_60615_activities.csv',
-			'../Prototype_Model_Inputs/60615/all_60615_activities.csv'], 2)
+			'../MRSA_Model_Inputs/60615/sample_60615_activities.csv',
+			'../MRSA_Model_Inputs/60615/all_60615_activities.csv'], 2)
 
 		// A.
 		addGlobal("a", 1.37058E-06) // Old from MD&CMM: 0.0000137058)
