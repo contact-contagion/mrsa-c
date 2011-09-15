@@ -212,7 +212,7 @@ class Person extends BaseTurtle implements Comparable {
 	 * @author Michael J. North
 	 *
 	 */
-	public void activateDetailedTransition(Activity activity) {
+	public void activateDetailedActivityTransition(Activity activity) {
 		
 		// Find out about other currently people at this place.
 		PersonStatus other = PersonStatus.UNCOLONIZED
@@ -247,6 +247,41 @@ class Person extends BaseTurtle implements Comparable {
 			infect()
 		}
 	}
+	
+	/* This routine performs a detailed transition.
+	*
+	* @author Michael J. North
+	*
+	*/
+   public void activateDetailedPlaceTransition() {
+	   
+	   // Find out about other currently people at this place.
+	   PersonStatus other = PersonStatus.UNCOLONIZED
+	   if (currentPlace != null) {
+		   if(currentPlace.infected > 0) {
+			   other = PersonStatus.INFECTED
+		   } else if (currentPlace.colonized > 0) {
+			   other = PersonStatus.COLONIZED
+		   }
+	   }
+	   
+	   // Find the response rate.
+	   boolean fasterResponse = false
+	   if ((hh != null) && (hh.fasterResponse)) {
+		   fasterResponse = true
+	   }
+	   
+	   // Transition.
+	   PersonStatus nextStatus = nextState(status, other,
+			   currentPlace.risk, fasterResponse)
+	   if (nextStatus == PersonStatus.UNCOLONIZED) {
+		   decolonize()
+	   } else if (nextStatus == PersonStatus.COLONIZED) {
+		   colonize()
+	   } else if (nextStatus == PersonStatus.INFECTED) {
+		   infect()
+	   }
+   }
 	
 	/*
 	 * This routine finds the next state.

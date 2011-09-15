@@ -133,8 +133,10 @@ class UserObserver extends BaseObserver {
 			if (transitionRule.equalsIgnoreCase('None')) {
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
 				activateSimpleTransition(currentActivity)
-			} else if (transitionRule.equalsIgnoreCase('Detailed')) {
-				activateDetailedTransition(currentActivity)
+			} else if (transitionRule.equalsIgnoreCase('Detailed Activity Rule')) {
+				activateDetailedActivityTransition(currentActivity)
+			} else if (transitionRule.equalsIgnoreCase('Detailed Place Rule')) {
+				activateDetailedPlaceTransition()
 			}
 		}
 		

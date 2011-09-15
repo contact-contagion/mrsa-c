@@ -55,7 +55,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('transitionRule', 'Transition Rule:',
 			['None',
 			'Simple',
-			'Detailed'], 2)
+			'Detailed Activity Rule',
+			'Detailed Place Rule'], 2)
 		
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
