@@ -483,7 +483,7 @@ class Person extends BaseTurtle implements Comparable {
 		if ((this.tucaseid != null) && (obj instanceof Person)) {
 			
 			// Cast the object to a person.
-			Person otherPerson = (Person) ob
+			Person otherPerson = (Person) obj
 			
 			// Compare the people using the case identifiers.
 			return this.tucaseid.compareTo(otherPerson.tucaseid)

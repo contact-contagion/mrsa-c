@@ -591,7 +591,7 @@ class UserObserver extends BaseObserver {
 								it."$field" = 0
 								
 								// Note the state.
-								println("Error: Garbled integer set to zero in turtle file reader.")
+								//println("Error: Garbled integer set to zero in turtle file reader.")
 
 							}
 							
@@ -610,7 +610,7 @@ class UserObserver extends BaseObserver {
 								it."$field" = 0d
 								
 								// Note the state.
-								println("Error: Garbled double precision number set to zero in turtle file reader.")
+								//println("Error: Garbled double precision number set to zero in turtle file reader.")
 								
 							}
 							
@@ -829,7 +829,7 @@ class UserObserver extends BaseObserver {
 							newActivity."$field" = 0
 							
 							// Note the state.
-							println("Error: Garbled integer set to zero in activity file reader.")
+							//println("Error: Garbled integer set to zero in activity file reader.")
 
 						}
 						
@@ -848,7 +848,7 @@ class UserObserver extends BaseObserver {
 							newActivity."$field" = 0d
 							
 							// Note the state.
-							println("Error: Garbled double precision number set to zero in activity file reader.")
+							//println("Error: Garbled double precision number set to zero in activity file reader.")
 							
 						}
 						
