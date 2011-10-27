@@ -1,5 +1,6 @@
 package mrsa.relogo;
 
+// The person status enumeration.
 public enum PersonStatus {
 	
 	// The uncolonized status.
@@ -10,6 +11,5 @@ public enum PersonStatus {
 	
 	// The infected status.
 	INFECTED
-	
 
 }

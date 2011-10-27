@@ -10,6 +10,7 @@ import repast.simphony.relogo.Undirected;
 import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 
+// The user link base class.
 class UserLink extends BaseLink	{
 
 }

@@ -2,6 +2,7 @@ package mrsa.relogo
 
 import repast.simphony.relogo.factories.AbstractReLogoGlobalsAndPanelFactory
 
+// The user panel configuration class.
 public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFactory {
 	
 	public void addGlobalsAndPanelComponents() {

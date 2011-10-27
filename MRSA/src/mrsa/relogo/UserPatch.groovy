@@ -8,6 +8,7 @@ import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 import repast.simphony.relogo.ast.Diffusible;
 
+// The user patch base class.
 class UserPatch extends BasePatch {
 
 	// The patch uncolonized count.

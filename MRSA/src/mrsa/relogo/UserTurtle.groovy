@@ -9,6 +9,7 @@ import repast.simphony.relogo.Stop;
 import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 
+// The user turtle base class.
 class UserTurtle extends BaseTurtle {
 	
 }

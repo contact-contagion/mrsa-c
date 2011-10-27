@@ -23,7 +23,7 @@ public class ActivityList extends ArrayList<Activity> implements Comparable {
 		
 	}
 
-	// The comparator
+	// The comparator method.
 	@Override
 	public int compareTo(Object obj) {
 		

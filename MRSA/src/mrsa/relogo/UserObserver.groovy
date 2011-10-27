@@ -10,6 +10,7 @@ import repast.simphony.relogo.Utility;
 import repast.simphony.relogo.UtilityG;
 import au.com.bytecode.opencsv.CSVReader;
 
+// The user observer class.
 class UserObserver extends BaseObserver {
 	
 	/* This routine configures the model.
@@ -22,64 +23,109 @@ class UserObserver extends BaseObserver {
 		// Clear any current configuration.
 		clearAll()
 		
-		// Read the people and initialize their disease status.
+		// Check for a persons file request.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
+			
+			// Note the state.
 			println("Started Reading Persons")
+			
+			// Read the people and initialize their disease status.
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
 					'square', 0, Utility.black())
+			
+			// Note the state.
 			println("Completed Reading Persons")
+
 		}
 		
-		// Read the places.
+		// Check for a places file request.
 		if (!placesInputFile.equalsIgnoreCase('None')) {
+
+			// Note the state.
 			println("Started Reading Places")
+
+			// Read the places.
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
 					'square', 0.1, Utility.white())
+
+			// Note the state.
 			println("Completed Reading Places")
+
 		}
 		
-		// Match the people with their places.
+		// Note the state.
 		println("Starting Matching Persons and Places")
+
+		// Match the people with their places.
 		matchPeopleAndPlaces()
+
+		// Note the state.
 		println("Completed Matching Persons and Places")
-		
-		// Normalize the place coordinates.
+
+		// Note the state.
 		println("Started Normalizing Place Locations")
+
+		// Normalize the place coordinates.
 		normalizePlaceCoordinates()
+
+		// Note the state.
 		println("Completed Normalizing Place Locations")
-		
-		// Start the people at their household.
+
+		// Note the state.
 		println("Started Asking Persons to Begin at Home")
+
+		// Start the people at their household.
 		ask (persons()) {
 			
-			// Start home.
+			// Start at home.
 			goToHome()
 			
 		}
+		// Note the state.
 		println("Completed Asking Persons to Begin at Home")
-		
-		// Initialize the disease status.
+
+		// Note the state.
 		println("Started Initializing the Person's Disease Status")
+
+		// Initialize the disease status.
 		initializePersonDiseaseStatus()
+
+		// Note the state.
 		println("Completed Initializing the Disease Status")
-		
-		// Initialize the household behavior status.
+
+		// Note the state.
 		println("Started Initializing the Household Behavior Status")
+
+		// Initialize the household behavior status.
 		initializeHHBehaviorStatus()
+
+		// Note the state.
 		println("Completed Initializing the Household Behavior Status")
 		
-		// Read the activities and convert their times to hours.
+		// Check for an activities file request.
 		if (!activitiesInputFile.equalsIgnoreCase('None')) {
+
+			// Note the state.
 			println("Started Creating Activities")
+			
+			// Read the activities and convert their times to hours.
 			createActivitiesFromCSVFile(activitiesInputFile)
+			
+			// Note the state.
 			println("Completed Creating Activities")
+			
 		}
 		
-		// Show the initial status
+		// Note the state.
 		println("Started Counting People and Places")
+
+		// Show the initial status
 		countPersonsAndPlaces()
+
+		// Note the state.
 		println("Completed Counting People and Places")
 		
+		// Note the state.
 		println("Ready to Run...")
 		
 		
@@ -99,28 +145,59 @@ class UserObserver extends BaseObserver {
 			//TODO: Decide how to differentiate weekdays and weekends in the file and model.
 			int time = (ticks() % 24)
 			
-			// Find the next activity.
+			// Prepare to find the next activity.
 			currentActivity = null
+			
+			// Scan activity list.
 			for (Activity tempActivity in activityList) {
+				
+				// Check the activity scheduled now.
 				if (tempActivity.start_time <= time && time < tempActivity.stop_time) {
+					
+					// NOte the activity.
 					currentActivity = tempActivity
+					
 				}
 			}
 			
 			// Go to the place for the activity.
 			if (currentActivity == null) {
+				
+				// Go home by default.
 				goToHH()
+			
+			// Check for home.
 			} else if (currentActivity.place_type.equalsIgnoreCase("Household")) {
+			
+				// Go home.
 				goToHH()
+			
+			// Check for a workplace.
 			} else if (currentActivity.place_type.equalsIgnoreCase("Work")) {
+			
+				// Go to work.
 				goToWork()
+				
+			// Check for a shcool.
 			} else if (currentActivity.place_type.equalsIgnoreCase("School")) {
+			
+				// Go to school.
 				goToSchool()
+				
+			// CHeck for group quaters.
 			} else if (currentActivity.place_type.equalsIgnoreCase("Group Quarters")) {
+			
+				// Go to the group quarters.
 				goToGQ()
+				
+			// Do the default.
 			} else {
+			
+				// Go home.
 				goToHH()
+				
 			}
+			
 		}
 		
 		// Count again.
@@ -131,13 +208,29 @@ class UserObserver extends BaseObserver {
 			
 			// Activate a transition as requested.
 			if (transitionRule.equalsIgnoreCase('None')) {
+			
+				// Do nothing.
+				
+			// Check for a simple rule request.
 			} else if (transitionRule.equalsIgnoreCase('Simple')) {
+
+				// Perform a simple transition.
 				activateSimpleTransition(currentActivity)
+
+			// Check for a simple rule request.
 			} else if (transitionRule.equalsIgnoreCase('Detailed Activity Rule')) {
+			
+				// Perform a detailed activity-based transition.
 				activateDetailedActivityTransition(currentActivity)
+				
+			// Check for a simple rule request.
 			} else if (transitionRule.equalsIgnoreCase('Detailed Place Rule')) {
+			
+				// Perform a detailed place-based transition.
 				activateDetailedPlaceTransition()
+				
 			}
+			
 		}
 		
 		// Move to the next hour.
@@ -153,397 +246,164 @@ class UserObserver extends BaseObserver {
 	 */
 	def countPersonsAndPlaces() {
 		
-		// Reset the counters.
+		// Reset the total uncolonized counter.
 		totalUncolonized = 0
+
+		// Reset the total colonized counter.
 		totalColonized = 0
+
+		// Reset the total infected counter.
 		totalInfected = 0
+		
+		// Setup a new visual display for each place.
 		ask (places()) {
+			
+			// Check the current place color.
 			if (getColor() != Utility.white()) {
+				
+				// Set a neutral color.
 				setColor(Utility.white())
+				
 			}
+			
+			// Check the place drawing size.
 			if (getSize() != 0.1) {
+				
+				// Set the default size.
 				setSize(0.1)
 			}
+			
+			// Reset the local place uncolonized counter.
 			uncolonized = 0
+			
+			// Reset the local place colonized counter.
 			colonized = 0
+			
+			// Reset the local place infected counter.
 			infected = 0
-		}
-		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
-			ask(patches()) {
-				uncolonized = 0
-				colonized = 0
-				infected = 0
-			}
-		}
-				
-		// Update the counters.
-		ask (persons()) {
-			if (status == PersonStatus.UNCOLONIZED) {
-				totalUncolonized++
-				if (currentPlace != null) currentPlace.uncolonized++
-				patchHere().uncolonized++
-			} else if (status == PersonStatus.COLONIZED) {
-				totalColonized++
-				if (currentPlace != null) currentPlace.colonized++
-				patchHere().colonized++
-			} else if (status == PersonStatus.INFECTED) {
-				totalInfected++
-				if (currentPlace != null) currentPlace.infected++
-				patchHere().infected++
-			}
+
 		}
 		
-		// Report the results.
+		// Setup a new visual display for each patch, if requested.
+		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+			
+			// Setup a new visual display for each place.
+			ask(patches()) {
+				
+				// Reset the local place uncolonized counter.
+				uncolonized = 0
+				
+				// Reset the local place colonized counter.
+				colonized = 0
+				
+				// Reset the local place infected counter.
+				infected = 0
+
+			}
+			
+		}
+		
+		// Update the counters.
+		ask (persons()) {
+			
+			// Account for an uncolonized state.
+			if (status == PersonStatus.UNCOLONIZED) {
+				
+				// Increment the observer global uncolonized counter.
+				totalUncolonized++
+				
+				// Increment place uncolonized counter, if appropriate.
+				if (currentPlace != null) currentPlace.uncolonized++
+				
+				// Increment patch uncolonized counter.
+				patchHere().uncolonized++
+				
+			// Account for a colonized state.
+			} else if (status == PersonStatus.COLONIZED) {
+			
+				// Increment the observer global colonized counter.
+				totalColonized++
+				
+				// Increment place colonized counter, if appropriate.
+				if (currentPlace != null) currentPlace.colonized++
+				
+				// Increment patch colonized counter.
+				patchHere().colonized++
+				
+			// Account for an infected state.
+			} else if (status == PersonStatus.INFECTED) {
+			
+				// Increment the observer global infected counter.
+				totalInfected++
+				
+				// Increment place infected counter, if appropriate.
+				if (currentPlace != null) currentPlace.infected++
+				
+				// Increment patch infected counter.
+				patchHere().infected++
+				
+			}
+
+		}
+		
+		// Send out a header for reporting the results.
 		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected, Total")
+		
+		// Report the results.
 		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
 				totalColonized + ", " + totalInfected + ", " +
 				(totalUncolonized + totalColonized + totalInfected))
 		
 		// Update the map, if needed.
 		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+			
+			// Find the maximum colonization count to prepare for normalization.
 			int maxColonized = maxOneOf(patches(), { colonized }).colonized
+			
+			// Change the display for each patch.
 			ask (patches()) {
+				
+				// Check for infected people.
 				if (infected > 0) {
+					
+					// Select the color to indicate that an infected person is present.
 					setPcolor(Utility.yellow())
+					
 				} else {
+				
+					// Select the color to indicate that a colonized person is present.
 					setPcolor(scaleColor(yellow(), colonized, 0, maxColonized))
+					
 				}
+				
 			}
+			
+			// Change the display for each place.
 			ask (places()) {
+				
+				// Check for infected people.
 				if (infected > 0) {
+					
+					// Select the color to indicate that an infected person is present.
 					setColor(Utility.red())
+					
+					// Select the size to indicate that an infected person is present.
 					setSize(0.5)
+					
+				// Check for c people.
 				} else if (colonized > 0) {
+				
+					// Select the color to indicate that a colonized person is present.
 					setColor(Utility.orange())
+					
 				}
 
 			}
+			
 		}
 		
 	}
-	
-	
-	/* This routine is a file reader that creates turtles from CSV files.
-	 * 
-	 * @author Michael J. North
-	 * 
-	 * @param fileName the path from the default system directory
-	 * @param turtleType the class of turtle to create
-	 * @param defaultSize the turtle size
-	 * @param defaultColor the turtle color
-	 * 
-	 */
-	def createTurtlesFromCSVFile(String fileName, Class turtleType,
-		String defaultShape, double defaultSize, double defaultColor) {
-		
-		// Read the data file.
-		List<String[]> rows = new CSVReader(
-				new InputStreamReader(new FileInputStream(fileName)))
-				.readAll()
-		
-		// Define the fields lists.
-		List fullFieldList
-		List matchedFieldList
-		
-		// Create the agents.
-		for (row in rows) {
-			
-			// Check the fields list.
-			if (fullFieldList == null) {
-				
-				// Fill in the field lists.
-				fullFieldList = (List) row
-				matchedFieldList = (List) turtleType.fields.collect({it.getName() }).
-				intersect((List) row)
-			} else {
-				
-				// Define an index tracker.
-				int index
-				
-				// Create the next agent.
-				createTurtles(1, {
-					
-					// Assign properties from the file.
-					for (field in matchedFieldList) {
-						index = fullFieldList.indexOf(field)
-						if (it."$field" instanceof Integer) {
-							if (isParsableToInteger(row[index])) {
-								it."$field" = (row[index] as Integer)
-							} else {
-								it."$field" = 0
-							}
-						} else if (it."$field" instanceof Double) {
-							if (isParsableToDouble(row[index])) {
-								it."$field" = (row[index] as Double)
-							} else {
-								it."$field" = 0d
-							}
-						} else {
-							it."$field" = row[index]
-						}
-					}
-					
-					// Set the shape.
-					setShape(defaultShape)
-					
-					// Set the size.
-					setSize(defaultSize)
-					
-					// Set the default heading.
-					setHeading(0)
-					
-					// Set the default color.
-					setColor(defaultColor)
-					
-				}, turtleType.getSimpleName())
-			}
-		}
-	}
-	
-	
-	/* This routine is a initializes the disease status.
-	 *
-	 * @author Michael J. North
-	 *
-	 *
-	 */
-	def initializePersonDiseaseStatus() {
-		
-		// Convert the colonization percentage to a fraction.
-		double initialColonizationFraction = initialColonizationPercentage / 100.0
-		
-		// Initialize colonization.
-		println("    persons().size() == " + persons().size())
-		ask (persons()) {
-			// Set the initial status.
-			if (randomFloat(1.0) <= initialColonizationFraction) {
-				status = PersonStatus.COLONIZED
-			} else {
-				status = PersonStatus.UNCOLONIZED
-			}
-		}
-		println("    persons().size() == " + persons().size())
-		
-		// Initialize infection.
-		ask (nOf(initialInfectedCount, persons())) {
-			status = PersonStatus.INFECTED
-		}
-	}
-	
-	/* This routine is a initializes the HH status.
-	 *
-	 * @author Michael J. North
-	 *
-	 *
-	 */
-	def initializeHHBehaviorStatus() {
-		
-		// Convert the percentage to a fraction.
-		double fasterResponseFraction = fasterResponsePercentage / 100.0
-		
-		// Initialize the behavior, if needed.
-		if (!behaviorRule.equalsIgnoreCase('Uniform')) {
-			
-			// Note the north/south axis dividing line.
-			int centerLine = (int) (getMinPycor() + worldHeight() / 2.0)
-			
-			// Scan the places.
-			ask (places()) {
-				
-				// Set the initial status, as required.	
-				if (place_type.equalsIgnoreCase("Household")) {
-					if (behaviorRule.equalsIgnoreCase('Clustered by HH')) {
-						if (randomFloat(1.0) <= fasterResponseFraction) {
-							fasterResponse = true
-						}				
-					} else if (behaviorRule.equalsIgnoreCase('Cluster by HH and Address')) {
-						if (getPycor() > centerLine) {
-							if (randomFloat(1.0) <= fasterResponseFraction) {
-								fasterResponse = true
-							}
-						} else {
-							if (randomFloat(1.0) <= (1.0 - fasterResponseFraction)) {
-								fasterResponse = true
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	/* This routine is a file reader that creates activities from CSV files.
-	 *
-	 * @author Michael J. North
-	 *
-	 * @param fileName the path from the default system directory
-	 *
-	 */
-	def createActivitiesFromCSVFile(String fileName) {
-		
-		// Read the data file.
-		List<String[]> rows = new CSVReader(
-				new InputStreamReader(new FileInputStream(fileName)))
-				.readAll()
-		
-		// Prepare the temporary master list of activity lists.
-		ArrayList<ActivityList> masterListOfActivityLists = new ActivityList()
-		
-		// Prepare the temporary activity list.
-		ActivityList tempActivityList = new ActivityList()
-		
-		// Define the fields lists.
-		List fullFieldList
-		List matchedFieldList
-		
-		// Create the activities.
-		println("    Started Allocating the Activities")
-		for (row in rows) {
-			
-			// Check the fields list.
-			if (fullFieldList == null) {
-				
-				// Fill in the field lists.
-				fullFieldList = (List) row
-				matchedFieldList = (List) Activity.class.fields.collect({it.getName() }).
-				intersect((List) row)
-			} else {
-				
-				// Define an index tracker.
-				int index
-				
-				// Create the next agent.
-				Activity newActivity = new Activity()
-				
-				// Assign properties from the file.
-				for (field in matchedFieldList) {
-					index = fullFieldList.indexOf(field)
-					if (newActivity."$field" instanceof Integer) {
-						if (isParsableToInteger(row[index])) {
-							newActivity."$field" = (row[index] as Integer)
-						} else {
-							newActivity."$field" = 0
-						}
-					} else if (newActivity."$field" instanceof Double) {
-						if (isParsableToDouble(row[index])) {
-							newActivity."$field" = (row[index] as Double)
-						} else {
-							newActivity."$field" = 0d
-						}
-					} else {
-						newActivity."$field" = row[index]
-					}
-				}
-				
-				// Convert the times from minutes to hours.
-				newActivity.start_time = newActivity.start_time / 60
-				newActivity.stop_time = newActivity.stop_time / 60
-				
-				// Progressively update the master list of lists.
-				if ((tempActivityList.getTucaseid() == null) ||
-				(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
-					tempActivityList.add(newActivity)
-				} else {
-					masterListOfActivityLists.add(tempActivityList)
-					tempActivityList = new ActivityList()
-					tempActivityList.add(newActivity)
-				}
-			}
-		}
-		
-		// Note the last activity list.
-		masterListOfActivityLists.add(tempActivityList)
-		println("    Completed Allocating the Activities")
-		
-		// Sort the master list of lists.
-		println("    Started Sorting the Activities")
-		Collections.sort(masterListOfActivityLists)
-		println("    Completed Sorting the Activities")
-		
-		// Sort the list of people.
-		println("    Started Sorting the People")
-		List sortedPersons = Utility.sort(persons())
-		println("    Completed Sorting the People")
-		
-		// Prepare to match people with activities.
-		println("    Started Matching " + sortedPersons.size() +
-				" People to Activities")
-		int scanCounter = 0
-		int matchCounter = 0
-		Iterator personIterator = sortedPersons.iterator()
-		if (personIterator.hasNext()) {
-			
-			// Match people with activities.
-			Person tempPerson = personIterator.next()
-			for (ActivityList nextActivityList in masterListOfActivityLists) {
-				
-				// Ignore people who do not match.
-				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid) > 0) &&
-				(personIterator.hasNext())) {
-					ask (tempPerson) { die() }
-					tempPerson = personIterator.next()
-				}
-				
-				// Match a person with an activity.
-				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
-					tempPerson.activityList = nextActivityList
-					matchCounter++
-					if (personIterator.hasNext()) {
-						tempPerson = personIterator.next()
-					} else {
-						break
-					}
-				}
-				scanCounter++
-				
-				// Report on progress.
-				if (scanCounter % 100 == 0) {
-					println(
-							"        Scanned " + scanCounter +
-							" Activities and Matched " +
-							matchCounter + " People")
-				}
-			}
-		}	
-		println("    Completed Matching " + matchCounter +
-				" of " + sortedPersons.size() + " People to " +
-				scanCounter + " Activities")
-	}
-	
-	/* This routine normalizes the place coordinates.
-	 * 
-	 * @author Michael J. North
-	 * 
-	 */
-	def normalizePlaceCoordinates() {
-		
-		// Check for places.
-		println("    places.size() == " + places().size())
-		if (places().size() > 0) {
-			
-			// Find the bounds.
-			def minX = places().min({it.longitude }).longitude
-			def maxX = places().max({it.longitude }).longitude
-			def minY = places().min({it.latitude }).latitude
-			def maxY = places().max({it.latitude }).latitude
-			
-			// Calculate the normalization factors.
-			def xRange = maxX - minX
-			def yRange = maxY - minY
-			def centerX = (xRange / 2.0) + minX
-			def centerY = (yRange / 2.0) + minY
-			def xScale = (getMaxPxcor() - getMinPxcor()) / xRange
-			def yScale = (getMaxPycor() - getMinPycor()) / yRange
-			def scale = Math.min(xScale, yScale)
-			
-			// Normalize the place coordinates.
-			ask (places()) {
-				setXcor(scale * (longitude - centerX))
-				setYcor(scale * (latitude - centerY))
-			}
-		}
-	}
-	
+
 	/* This routine matches people to places.
 	 * 
 	 * @author Michael J. North
@@ -574,9 +434,14 @@ class UserObserver extends BaseObserver {
 			
 			// Eliminate unassigned people.
 			if ((hh == null) && (gq == null) && (work == null) && (school == null)) {
+				
+				// Explore the undiscovered country.
 				die()
+				
 			}
+			
 		}
+
 	}
 	
 	/* This routine safely looks up places.
@@ -614,12 +479,23 @@ class UserObserver extends BaseObserver {
 	 */
 	public boolean isParsableToInteger(String s) {
 		
+		// Prepare for non-integers.
 		try {
+			
+			// Try to convert the input to an integer.
 			Integer.parseInt(s);
+			
+			// Note success.
 			return true;
+			
+		// Catch errors.
 		} catch (NumberFormatException e) {
+		
+			// Note failure.
 			return false;
+			
 		}
+		
 	}
 	
 	/* This routine checks to see if a string contains a double.
@@ -631,11 +507,547 @@ class UserObserver extends BaseObserver {
 	 */
 	public boolean isParsableToDouble(String s) {
 		
+		// Prepare for non-double precision number.
 		try {
+			
+			// Try to convert the input to a double precision number.
 			Double.parseDouble(s);
+			
+			// Note success.
 			return true;
+			
+		// Catch errors.
 		} catch (NumberFormatException e) {
+		
+			// Note failure.
 			return false;
+			
 		}
+
 	}
-}
+	
+	/* This routine is a file reader that creates turtles from CSV files.
+	 * 
+	 * @author Michael J. North
+	 * 
+	 * @param fileName the path from the default system directory
+	 * @param turtleType the class of turtle to create
+	 * @param defaultSize the turtle size
+	 * @param defaultColor the turtle color
+	 * 
+	 */
+	def createTurtlesFromCSVFile(String fileName, Class turtleType,
+		String defaultShape, double defaultSize, double defaultColor) {
+		
+		// Read the given data file.
+		List<String[]> rows = new CSVReader(
+				new InputStreamReader(new FileInputStream(fileName)))
+				.readAll()
+		
+		// Define the full fields list.
+		List fullFieldList
+		
+		// Define the matched fields list.
+		List matchedFieldList
+		
+		// Create the agents.
+		for (row in rows) {
+			
+			// Check the fields list.
+			if (fullFieldList == null) {
+				
+				// Fill in the field lists.
+				fullFieldList = (List) row
+				
+				// Parse the fields.
+				matchedFieldList = (List) turtleType.fields.collect({it.getName() }).intersect((List) row)
+				
+			} else {
+				
+				// Define an index tracker.
+				int index
+				
+				// Create the next agent.
+				createTurtles(1, {
+					
+					// Assign properties from the file.
+					for (field in matchedFieldList) {
+						
+						// Check the column index of the next field.
+						index = fullFieldList.indexOf(field)
+						
+						// Check for integers.
+						if (it."$field" instanceof Integer) {
+							
+							// Confirm that this is an integer.
+							if (isParsableToInteger(row[index])) {
+								
+								// Convert the field as an integer.
+								it."$field" = (row[index] as Integer)
+								
+							} else {
+							
+								// Set the garbled integer to zero.
+								it."$field" = 0
+								
+								// Note the state.
+								println("Error: Garbled integer set to zero in turtle file reader.")
+
+							}
+							
+						// Check for double precision numbers.
+						} else if (it."$field" instanceof Double) {
+													
+							// Confirm that this is a double precision number.
+							if (isParsableToDouble(row[index])) {
+								
+								// Convert the field as a double precision number.
+								it."$field" = (row[index] as Double)
+								
+							} else {
+							
+								// Set the garbled double precision number to zero.
+								it."$field" = 0d
+								
+								// Note the state.
+								println("Error: Garbled double precision number set to zero in turtle file reader.")
+								
+							}
+							
+						} else {
+						
+							// Store the input as a literal string.
+							it."$field" = row[index]
+							
+						}
+						
+					}
+					
+					// Set the shape.
+					setShape(defaultShape)
+					
+					// Set the size.
+					setSize(defaultSize)
+					
+					// Set the default heading.
+					setHeading(0)
+					
+					// Set the default color.
+					setColor(defaultColor)
+				
+				// Give the agent a good name.
+				}, turtleType.getSimpleName())
+				
+			}
+			
+		}
+		
+	}
+	
+	
+	/* This routine is a initializes the disease status.
+	 *
+	 * @author Michael J. North
+	 *
+	 *
+	 */
+	def initializePersonDiseaseStatus() {
+		
+		// Convert the colonization percentage to a fraction.
+		double initialColonizationFraction = initialColonizationPercentage / 100.0
+		
+		// Note the state.
+		println("    persons().size() == " + persons().size())
+
+		// Initialize colonization.
+		ask (persons()) {
+			
+			// Set the initial status.
+			if (randomFloat(1.0) <= initialColonizationFraction) {
+				
+				// Note a colonized person.
+				status = PersonStatus.COLONIZED
+			} else {
+			
+				// Note an uncolonized person.
+				status = PersonStatus.UNCOLONIZED
+				
+			}
+			
+		}
+
+		// Note the state.
+		println("    persons().size() == " + persons().size())
+		
+		// Initialize infection.
+		ask (nOf(initialInfectedCount, persons())) {
+			
+			// Note an infected person.
+			status = PersonStatus.INFECTED
+			
+		}
+		
+	}
+	
+	/* This routine is a initializes the HH status.
+	 *
+	 * @author Michael J. North
+	 *
+	 *
+	 */
+	def initializeHHBehaviorStatus() {
+		
+		// Convert the percentage to a fraction.
+		double fasterResponseFraction = fasterResponsePercentage / 100.0
+		
+		// Initialize the behavior, if needed.
+		if (!behaviorRule.equalsIgnoreCase('Uniform')) {
+			
+			// Note the north/south axis dividing line.
+			int centerLine = (int) (getMinPycor() + worldHeight() / 2.0)
+			
+			// Scan the places.
+			ask (places()) {
+				
+				// Set the initial status, as required.	
+				if (place_type.equalsIgnoreCase("Household")) {
+					
+					// Check to see if clustering (faster response rates) by household is requested. 
+					if (behaviorRule.equalsIgnoreCase('Clustered by HH')) {
+						
+						// Check for a faster response rate.
+						if (randomFloat(1.0) <= fasterResponseFraction) {
+							
+							// Initialize a faster response rate.
+							fasterResponse = true
+							
+						}
+						
+					// Check to see if clustering (faster response rates) by household and address is requested. 
+					} else if (behaviorRule.equalsIgnoreCase('Cluster by HH and Address')) {
+					
+						// Divide the simulation area in half.
+						if (getPycor() > centerLine) {
+							
+							// Use one fraction for the first half of the geographic area.
+							if (randomFloat(1.0) <= fasterResponseFraction) {
+								
+								// Initialize a faster response rate.
+								fasterResponse = true
+								
+							}
+							
+						} else {
+						
+							// Use another fraction for the other half of the geographic area.
+							if (randomFloat(1.0) <= (1.0 - fasterResponseFraction)) {
+								
+								// Initialize a faster response rate.
+								fasterResponse = true
+								
+							}
+							
+						}
+						
+					}
+					
+				}
+				
+			}
+			
+		}
+		
+	}
+	
+	/* This routine is a file reader that creates activities from CSV files.
+	 *
+	 * @author Michael J. North
+	 *
+	 * @param fileName the path from the default system directory
+	 *
+	 */
+	def createActivitiesFromCSVFile(String fileName) {
+		
+		// Read the data file.
+		List<String[]> rows = new CSVReader(
+				new InputStreamReader(new FileInputStream(fileName)))
+				.readAll()
+		
+		// Prepare the temporary master list of activity lists.
+		ArrayList<ActivityList> masterListOfActivityLists = new ActivityList()
+		
+		// Prepare the temporary activity list.
+		ActivityList tempActivityList = new ActivityList()
+		
+		// Define the fields list.
+		List fullFieldList
+
+		// Define the matched fields list.
+		List matchedFieldList
+		
+		// Note the state.
+		println("    Started Allocating the Activities")
+
+		// Create the activities.
+		for (row in rows) {
+			
+			// Check the fields list.
+			if (fullFieldList == null) {
+				
+				// Fill in the field lists.
+				fullFieldList = (List) row
+				
+				// Parse the fields.
+				matchedFieldList = (List) Activity.class.fields.collect({it.getName() }).intersect((List) row)
+				
+			} else {
+				
+				// Define an index tracker.
+				int index
+				
+				// Create the next agent.
+				Activity newActivity = new Activity()
+				
+				// Assign properties from the file.
+				for (field in matchedFieldList) {
+					
+					// Check the column index of the next field.
+					index = fullFieldList.indexOf(field)
+					
+					// Check for integers.
+					if (newActivity."$field" instanceof Integer) {
+						
+						// Confirm that this is an integer.
+						if (isParsableToInteger(row[index])) {
+							
+							// Convert the field as an integer.
+							newActivity."$field" = (row[index] as Integer)
+							
+						} else {
+						
+							// Set the garbled integer to zero.
+							newActivity."$field" = 0
+							
+							// Note the state.
+							println("Error: Garbled integer set to zero in activity file reader.")
+
+						}
+						
+					// Check for double precision numbers.
+					} else if (newActivity."$field" instanceof Double) {
+					
+						// Confirm that this is a double precision number.
+						if (isParsableToDouble(row[index])) {
+							
+							// Convert the field as a double precision number.
+							newActivity."$field" = (row[index] as Double)
+							
+						} else {
+						
+							// Set the garbled double precision number to zero.
+							newActivity."$field" = 0d
+							
+							// Note the state.
+							println("Error: Garbled double precision number set to zero in activity file reader.")
+							
+						}
+						
+					} else {
+					
+						// Store the input as a literal string.
+						newActivity."$field" = row[index]
+						
+					}
+					
+				}
+				
+				// Convert the start time from minutes to hours.
+				newActivity.start_time = newActivity.start_time / 60
+
+				// Convert the end time from minutes to hours.
+				newActivity.stop_time = newActivity.stop_time / 60
+				
+				// Progressively update the master list of lists.
+				if ((tempActivityList.getTucaseid() == null) ||
+					(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
+					
+					// Store the new activity in the current sublist.
+					tempActivityList.add(newActivity)
+					
+				} else {
+				
+					// Add the current sublist to the master list.
+					masterListOfActivityLists.add(tempActivityList)
+					
+					// Clear the sublist.
+					tempActivityList = new ActivityList()
+					
+					// Store the new activity in the current sublist.
+					tempActivityList.add(newActivity)
+					
+				}
+				
+			}
+			
+		}
+		
+		// Note the last activity list.
+		masterListOfActivityLists.add(tempActivityList)
+		println("    Completed Allocating the Activities")
+		
+		// Sort the master list of lists.
+		println("    Started Sorting the Activities")
+		Collections.sort(masterListOfActivityLists)
+		println("    Completed Sorting the Activities")
+		
+		// Sort the list of people.
+		println("    Started Sorting the People")
+		List sortedPersons = Utility.sort(persons())
+		println("    Completed Sorting the People")
+		
+		// Prepare to match people with activities.
+		println("    Started Matching " + sortedPersons.size() +
+				" People to Activities")
+
+		// Define the scan counter for tracking the number of activities processed.
+		int scanCounter = 0
+		
+		// Define the match counter for tracking the number of persons processed.
+		int matchCounter = 0
+
+		// Prepare the scan the person's list.
+		Iterator personIterator = sortedPersons.iterator()
+		
+		// Make sure that there is at least one person.
+		if (personIterator.hasNext()) {
+			
+			// Match people with activities.
+			Person tempPerson = personIterator.next()
+			
+			// Scan the activities list.
+			for (ActivityList nextActivityList in masterListOfActivityLists) {
+				
+				// Ignore people who do not match.
+				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid) > 0) && (personIterator.hasNext())) {
+				
+					// (Nicely) ask people who do not match activities to die.
+					ask (tempPerson) {
+						
+						// Bye!
+						die()
+
+					}
+					
+					// Move on to the next person.
+					tempPerson = personIterator.next()
+					
+				}
+				
+				// Match a person with an activity.
+				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
+					
+					// Assign the next activitly list to a person.
+					tempPerson.activityList = nextActivityList
+					
+					// Increment the count of people who matched a set of activities.
+					matchCounter++
+					
+					// Check for more people.
+					if (personIterator.hasNext()) {
+						
+						// Move on to the next person.
+						tempPerson = personIterator.next()
+						
+					} else {
+					
+						// Move on the to the next set of activities.
+						break
+						
+					}
+					
+				}
+				
+				// Increment the count of activities that matched a set of activities.
+				scanCounter++
+				
+				// Report on the progress.
+				if (scanCounter % 100 == 0) {
+					println(
+							"        Scanned " + scanCounter +
+							" Activities and Matched " +
+							matchCounter + " People")
+					
+				}
+				
+			}
+			
+		}	
+		
+		// Note the state.
+		println("    Completed Matching " + matchCounter +
+				" of " + sortedPersons.size() + " People to " +
+				scanCounter + " Activities")
+	}
+	
+	/* This routine normalizes the place coordinates.
+	 * 
+	 * @author Michael J. North
+	 * 
+	 */
+	def normalizePlaceCoordinates() {
+
+		// Note the state.
+		println("    places.size() == " + places().size())
+		
+		// Check for places.
+		if (places().size() > 0) {
+			
+			// Find the minimum X bound.
+			def minX = places().min({it.longitude }).longitude
+			
+			// Find the maximum X bound.
+			def maxX = places().max({it.longitude }).longitude
+			
+			// Find the minimum Y bound.
+			def minY = places().min({it.latitude }).latitude
+			
+			// Find the maximum Y bound.
+			def maxY = places().max({it.latitude }).latitude
+			
+			// Calculate the X range normalization factor.
+			def xRange = maxX - minX
+			
+			// Calculate the Y range normalization factor.
+			def yRange = maxY - minY
+			
+			// Calculate the center X value.
+			def centerX = (xRange / 2.0) + minX
+			
+			// Calculate the center Y value.
+			def centerY = (yRange / 2.0) + minY
+			
+			// Calculate the x normalization factor.
+			def xScale = (getMaxPxcor() - getMinPxcor()) / xRange
+			
+			// Calculate the x normalization factor.
+			def yScale = (getMaxPycor() - getMinPycor()) / yRange
+			
+			// Calculate the normalization factors.
+			def scale = Math.min(xScale, yScale)
+			
+			// Normalize the place coordinates.
+			ask (places()) {
+				
+				// Normalize the next place X coordinate.
+				setXcor(scale * (longitude - centerX))
+				
+				// Normalize the next place Y coordinate.
+				setYcor(scale * (latitude - centerY))
+				
+			}
+			
+		}
+		
+	}
+		
+}	
