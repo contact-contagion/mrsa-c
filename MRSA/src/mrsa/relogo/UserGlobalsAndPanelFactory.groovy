@@ -112,6 +112,10 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// The total number of people who are currently infected.
 		addGlobal("totalInfected", 0)
 
+		// Minimum infection period in days.
+		addGlobal("minimumInfectionPeriod", 5)
+		
+		
 	}
 	
 }

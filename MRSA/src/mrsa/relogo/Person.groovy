@@ -65,6 +65,9 @@ class Person extends BaseTurtle implements Comparable {
 	// The person's current activity.
 	Activity currentActivity = null
 	
+	// The day the person was last infected.
+	int lastInfectedDay = 0
+	
 	/* This routine sends the person to their household.
 	 *
 	 * @author Michael J. North
@@ -189,6 +192,11 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	def infect() {
 		
+		// Note the new last day of infection, if appropriate.
+		if (status != PersonStatus.INFECTED) {
+			lastInfectedDay = ticks()
+		}
+		
 		// Update the person's status and appearance.	   
 		status = PersonStatus.INFECTED
 		
@@ -228,6 +236,12 @@ class Person extends BaseTurtle implements Comparable {
 	 */
 	public void activateDetailedActivityTransition(Activity activity) {
 		
+	    // Check for an infected person that is not yet ready to move on.
+	    if ((status == PersonStatus.INFECTED) &&
+		   ((ticks() - lastInfectedDay) <= minimumInfectionPeriod)) {
+			   return;
+		}
+		   
 		// Set the default state.
 		PersonStatus other = PersonStatus.UNCOLONIZED
 		
@@ -300,6 +314,12 @@ class Person extends BaseTurtle implements Comparable {
 	*/
    public void activateDetailedPlaceTransition() {
 	   
+	   // Check for an infected person that is not yet ready to move on.
+	   if ((status == PersonStatus.INFECTED) &&
+		  ((ticks() - lastInfectedDay) <= minimumInfectionPeriod)) {
+			   return;
+	   }
+		   
 	   // Find out about other currently people at this place.
 	   PersonStatus other = PersonStatus.UNCOLONIZED
 	   
