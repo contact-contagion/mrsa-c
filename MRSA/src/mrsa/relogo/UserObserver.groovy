@@ -154,7 +154,7 @@ class UserObserver extends BaseObserver {
 				// Check the activity scheduled now.
 				if (tempActivity.start_time <= time && time < tempActivity.stop_time) {
 					
-					// NOte the activity.
+					// Note the activity.
 					currentActivity = tempActivity
 					
 				}
