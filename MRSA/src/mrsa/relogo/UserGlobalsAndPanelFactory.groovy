@@ -65,7 +65,12 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'No'], 1)
 		
 		// Declare the default data set index.
-		int defaultDataSetIndex = 4
+		int None                  = 0
+		int ZIP_60615_sample      = 1
+		int ZIP_60615             = 2
+		int ZIP_60615_60653       = 3
+		int ZIP_60615_60653_60609 = 4
+		int defaultDataSetIndex   = ZIP_60615
 				
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
