@@ -43,10 +43,6 @@
       <string>Tracking Network</string>
       <string>mrsa.style.TrackingLinkStyle</string>
     </entry>
-    <entry>
-      <string>UserLink</string>
-      <string>mrsa.style.LinkStyle</string>
-    </entry>
   </netStyles>
   <editedNetStyles>
     <entry>
@@ -59,10 +55,6 @@
     </entry>
     <entry>
       <string>Tracking Network</string>
-      <null/>
-    </entry>
-    <entry>
-      <string>UserLink</string>
       <null/>
     </entry>
   </editedNetStyles>
@@ -109,11 +101,6 @@
     </repast.simphony.scenario.data.ProjectionData>
     <repast.simphony.scenario.data.ProjectionData>
       <id>Tracking Network</id>
-      <attributes/>
-      <type>NETWORK</type>
-    </repast.simphony.scenario.data.ProjectionData>
-    <repast.simphony.scenario.data.ProjectionData>
-      <id>UserLink</id>
       <attributes/>
       <type>NETWORK</type>
     </repast.simphony.scenario.data.ProjectionData>
@@ -168,13 +155,6 @@
           </entry>
         </props>
       </repast.simphony.visualization.continuous.ContinuousProjectionDescriptor>
-    </entry>
-    <entry>
-      <string>UserLink</string>
-      <repast.simphony.visualization.engine.DefaultProjectionDescriptor>
-        <proj reference="../../../../projections/repast.simphony.scenario.data.ProjectionData[5]"/>
-        <props/>
-      </repast.simphony.visualization.engine.DefaultProjectionDescriptor>
     </entry>
   </projectionDescriptors>
   <props/>
