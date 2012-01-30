@@ -326,7 +326,7 @@ class Person extends BaseTurtle implements Comparable {
 			   return;
 	   }
 		   
-	   // Find out about other currently people at this place.
+	   // Find out about other people currently at this place.
 	   PersonStatus other = PersonStatus.UNCOLONIZED
 	   
 	   // Check the place.

@@ -187,19 +187,19 @@ class UserObserver extends BaseObserver {
 				// Go home.
 				goToHH()
 			
-			// Check for a workplace.
+			// Check for a work place.
 			} else if (currentActivity.place_type.equalsIgnoreCase("Work")) {
 			
 				// Go to work.
 				goToWork()
 				
-			// Check for a shcool.
+			// Check for a school.
 			} else if (currentActivity.place_type.equalsIgnoreCase("School")) {
 			
 				// Go to school.
 				goToSchool()
 				
-			// CHeck for group quaters.
+			// Check for group quarters.
 			} else if (currentActivity.place_type.equalsIgnoreCase("Group Quarters")) {
 			
 				// Go to the group quarters.
@@ -232,13 +232,13 @@ class UserObserver extends BaseObserver {
 				// Perform a simple transition.
 				activateSimpleTransition(currentActivity)
 
-			// Check for a simple rule request.
+			// Check for a detailed activity rule request.
 			} else if (transitionRule.equalsIgnoreCase('Detailed Activity Rule')) {
 			
 				// Perform a detailed activity-based transition.
 				activateDetailedActivityTransition(currentActivity)
 				
-			// Check for a simple rule request.
+			// Check for a detailed place rule request.
 			} else if (transitionRule.equalsIgnoreCase('Detailed Place Rule')) {
 			
 				// Perform a detailed place-based transition.
@@ -917,7 +917,7 @@ class UserObserver extends BaseObserver {
 		
 		// Sort the list of people.
 		println("    Started Sorting the People for Weekdays")
-		List sortedPersons = Utility.sort(persons(),
+		List sortedPersons = Collections.sort(persons(),
 			new PersonWeekdayComparator())
 		println("    Completed Sorting the People for Weekdays")
 		
@@ -1007,7 +1007,7 @@ class UserObserver extends BaseObserver {
 		
 		// Sort the list of people.
 		println("    Started Sorting the People for Weekends")
-		sortedPersons = Utility.sort(persons(),
+		sortedPersons = Collections.sort(persons(),
 			new PersonWeekendComparator())
 		println("    Completed Sorting the People for Weekends")
 		

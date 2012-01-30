@@ -57,7 +57,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			['None',
 			'Simple',
 			'Detailed Activity Rule',
-			'Detailed Place Rule'], 2)
+			'Detailed Place Rule'], 3)
 		
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
@@ -67,26 +67,29 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'../MRSA Inputs/60615_people_sample.csv',
-			'../MRSA Inputs/60615_60653_people.csv',
-			'../MRSA Inputs/60615_60653_60609_people.csv',
-			'../MRSA Inputs/60615_people.csv'], 1)
+			'../MRSA Inputs/subsets/60615/60615_people_sample.csv',
+			'../MRSA Inputs/subsets/60615/60615_people.csv',
+			'../MRSA Inputs/subsets/60615_60653/60615_60653_people.csv',
+			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_people.csv',],
+			1)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'../MRSA Inputs/60615_places_sample.csv',
-			'../MRSA Inputs/60615_60653_places.csv',
-			'../MRSA Inputs/60615_60653_60609_places.csv',
-			'../MRSA Inputs/60615_places.csv'], 1)
+			'../MRSA Inputs/subsets/60615/60615_places_sample.csv',
+			'../MRSA Inputs/subsets/60615/60615_places.csv',
+			'../MRSA Inputs/subsets/60615_60653/60615_60653_places.csv',
+			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_places.csv'],
+			1)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'../MRSA Inputs/60615_activities_sample.csv',
-			'../MRSA Inputs/60615_60653_activities.csv',
-			'../MRSA Inputs/60615_60653_60609_activities.csv',
-			'../MRSA Inputs/60615_activities.csv'], 1)
+			'../MRSA Inputs/subsets/60615/60615_activities_sample.csv',
+			'../MRSA Inputs/subsets/60615/60615_activities.csv',
+			'../MRSA Inputs/subsets/60615_60653/60615_60653_activities.csv',
+			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_activities.csv'],
+			1)
 
 		// The transmission parameter ranges are taken from an email
 		// from Charles M. Macal with subject
@@ -135,7 +138,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addGlobal("totalInfected", 0)
 
 		// Minimum infection period in days.
-		addGlobal("minimumInfectionPeriod", 5)
+		addGlobal("minimumInfectionPeriod", 7)
 		
 		
 	}
