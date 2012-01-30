@@ -996,11 +996,14 @@ class UserObserver extends BaseObserver {
 				
 				// Report on the progress.
 				if (scanCounter % 100 == 0) {
-//					println(
-//							"        Scanned " + scanCounter +
-//							" Weekday Activities and Matched " +
-//							matchCounter + " People")					
+					println(
+							"        Scanned " + scanCounter +
+							" Weekday Activities and Matched " +
+							matchCounter + " People")					
 				}
+				
+				// Check for more people.
+				if (!personIterator.hasNext()) break
 				
 			}
 			
@@ -1097,7 +1100,10 @@ class UserObserver extends BaseObserver {
 							matchCounter + " People")
 					
 				}
-				
+	
+				// Check for more people.
+				if (!personIterator.hasNext()) break
+
 			}
 			
 		}	
