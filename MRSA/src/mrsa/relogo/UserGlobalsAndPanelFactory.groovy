@@ -62,7 +62,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
 			['Yes',
-			'No'], 0)
+			'No'], 1)
 				
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',

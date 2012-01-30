@@ -943,6 +943,9 @@ class UserObserver extends BaseObserver {
 			// Match people with activities.
 			Person tempPerson = personIterator.next()
 			
+			// Declare the tracker for the last person.
+			boolean lastPersonAssigned = false
+			
 			// Scan the activities list.
 			for (ActivityList nextActivityList in masterListOfActivityLists) {
 				
@@ -974,7 +977,6 @@ class UserObserver extends BaseObserver {
 					
 					// Increment the count of people who matched a set of activities.
 					matchCounter++
-					println("            " + matchCounter + ", " + tempPerson.person_id)
 					
 					// Check for more people.
 					if (personIterator.hasNext()) {
@@ -984,7 +986,8 @@ class UserObserver extends BaseObserver {
 						
 					} else {
 					
-						// Move on to the next set of activities.
+						// The last person has been assigned activities.
+						lastPersonAssigned = true
 						break
 						
 					}
@@ -1002,8 +1005,8 @@ class UserObserver extends BaseObserver {
 							matchCounter + " People")					
 				}
 				
-				// Check for more people.
-				if (!personIterator.hasNext()) break
+				// Check to see if we are done.
+				if (lastPersonAssigned) break
 				
 			}
 			
@@ -1042,6 +1045,9 @@ class UserObserver extends BaseObserver {
 			// Match people with activities.
 			Person tempPerson = personIterator.next()
 			
+			// Clear the tracker for the last person.
+			boolean lastPersonAssigned = false
+
 			// Scan the activities list.
 			for (ActivityList nextActivityList in masterListOfActivityLists) {
 				
@@ -1082,7 +1088,8 @@ class UserObserver extends BaseObserver {
 						
 					} else {
 					
-						// Move on the to the next set of activities.
+						// The last person has been assigned activities.
+						lastPersonAssigned = true
 						break
 						
 					}
@@ -1101,8 +1108,8 @@ class UserObserver extends BaseObserver {
 					
 				}
 	
-				// Check for more people.
-				if (!personIterator.hasNext()) break
+				// Check to see if we are done.
+				if (lastPersonAssigned) break
 
 			}
 			
