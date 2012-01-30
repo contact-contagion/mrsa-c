@@ -63,6 +63,9 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
 			['Yes',
 			'No'], 1)
+		
+		// Declare the default data set index.
+		int defaultDataSetIndex = 4
 				
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
@@ -71,7 +74,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../MRSA Inputs/subsets/60615/60615_people.csv',
 			'../MRSA Inputs/subsets/60615_60653/60615_60653_people.csv',
 			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_people.csv',],
-			1)
+			defaultDataSetIndex)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
@@ -80,7 +83,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../MRSA Inputs/subsets/60615/60615_places.csv',
 			'../MRSA Inputs/subsets/60615_60653/60615_60653_places.csv',
 			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_places.csv'],
-			1)
+			defaultDataSetIndex)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
@@ -89,7 +92,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 			'../MRSA Inputs/subsets/60615/60615_activities.csv',
 			'../MRSA Inputs/subsets/60615_60653/60615_60653_activities.csv',
 			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_activities.csv'],
-			1)
+			defaultDataSetIndex)
 
 		// The transmission parameter ranges are taken from an email
 		// from Charles M. Macal with subject

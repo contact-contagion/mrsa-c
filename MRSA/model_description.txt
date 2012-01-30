@@ -1,1 +1,7 @@
 This is the MRSA model. Please contact the developers for more information.
+
+Current runtimes are:
+
+Scenario	Initialization	Time Step
+1 ZIP		1 minute		1 second
+3 ZIP		6 minutes		6 seconds
