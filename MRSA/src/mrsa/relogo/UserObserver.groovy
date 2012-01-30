@@ -917,8 +917,8 @@ class UserObserver extends BaseObserver {
 		
 		// Sort the list of people.
 		println("    Started Sorting the People for Weekdays")
-		List sortedPersons = Collections.sort(persons(),
-			new PersonWeekdayComparator())
+		List sortedPersons = persons().clone()
+		Collections.sort(sortedPersons, new PersonWeekdayComparator())
 		println("    Completed Sorting the People for Weekdays")
 		
 		// Prepare to match people with activities.
@@ -930,6 +930,9 @@ class UserObserver extends BaseObserver {
 		
 		// Define the match counter for tracking the number of persons processed.
 		int matchCounter = 0
+
+		// Define the counter for tracking the number of persons killed.
+		int deathCounter = 0
 
 		// Prepare the scan the person's list.
 		Iterator personIterator = sortedPersons.iterator()
@@ -952,6 +955,9 @@ class UserObserver extends BaseObserver {
 						
 						// Bye!
 						die()
+						
+						// Note the tragedy.
+						deathCounter++
 
 					}
 					
@@ -968,6 +974,7 @@ class UserObserver extends BaseObserver {
 					
 					// Increment the count of people who matched a set of activities.
 					matchCounter++
+					println("            " + matchCounter + ", " + tempPerson.person_id)
 					
 					// Check for more people.
 					if (personIterator.hasNext()) {
@@ -977,7 +984,7 @@ class UserObserver extends BaseObserver {
 						
 					} else {
 					
-						// Move on the to the next set of activities.
+						// Move on to the next set of activities.
 						break
 						
 					}
@@ -989,26 +996,25 @@ class UserObserver extends BaseObserver {
 				
 				// Report on the progress.
 				if (scanCounter % 100 == 0) {
-					println(
-							"        Scanned " + scanCounter +
-							" Weekday Activities and Matched " +
-							matchCounter + " People")
-					
+//					println(
+//							"        Scanned " + scanCounter +
+//							" Weekday Activities and Matched " +
+//							matchCounter + " People")					
 				}
 				
 			}
 			
 		}	
 		
-		// Note the state.
+		// Note the results.
 		println("    Completed Matching " + matchCounter +
-				" of " + sortedPersons.size() + " People to " +
-				scanCounter + " Activities")
+				" of " + (sortedPersons.size() + deathCounter) + " People to " +
+				scanCounter + " Activities (" + deathCounter +
+				" People Died Due to a Lack of Activities)")
 		
 		// Sort the list of people.
 		println("    Started Sorting the People for Weekends")
-		sortedPersons = Collections.sort(persons(),
-			new PersonWeekendComparator())
+		Collections.sort(sortedPersons, new PersonWeekendComparator())
 		println("    Completed Sorting the People for Weekends")
 		
 		// Prepare to match people with activities.
@@ -1020,6 +1026,9 @@ class UserObserver extends BaseObserver {
 		
 		// Clear the match counter for tracking the number of persons processed.
 		matchCounter = 0
+
+		// Clear the counter for tracking the number of persons killed.
+		deathCounter = 0
 
 		// Prepare the scan the person's list.
 		personIterator = sortedPersons.iterator()
@@ -1042,6 +1051,9 @@ class UserObserver extends BaseObserver {
 						
 						// Bye!
 						die()
+
+						// Note the tragedy.
+						deathCounter++
 
 					}
 					
@@ -1090,10 +1102,11 @@ class UserObserver extends BaseObserver {
 			
 		}	
 		
-		// Note the state.
+		// Note the results.
 		println("    Completed Matching " + matchCounter +
-				" of " + sortedPersons.size() + " People to " +
-				scanCounter + " Activities")		
+				" of " + (sortedPersons.size() + deathCounter) + " People to " +
+				scanCounter + " Activities (" + deathCounter +
+				" People Died Due to a Lack of Activities)")
 		
 	}
 	
