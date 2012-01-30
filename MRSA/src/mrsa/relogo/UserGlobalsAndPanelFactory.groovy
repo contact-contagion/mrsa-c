@@ -67,35 +67,57 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'../MRSA_Model_Inputs/sample_60615_people.csv',
-			'../MRSA_Model_Inputs/all_60615_people.csv'], 2)
+			'../MRSA Inputs/60615_people_sample.csv',
+			'../MRSA Inputs/60615_60653_people.csv',
+			'../MRSA Inputs/60615_60653_60609_people.csv',
+			'../MRSA Inputs/60615_people.csv'], 1)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'../MRSA_Model_Inputs/sample_60615_places.csv',
-			'../MRSA_Model_Inputs/all_60615_places.csv'], 2)
+			'../MRSA Inputs/60615_places_sample.csv',
+			'../MRSA Inputs/60615_60653_places.csv',
+			'../MRSA Inputs/60615_60653_60609_places.csv',
+			'../MRSA Inputs/60615_places.csv'], 1)
 
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'../MRSA_Model_Inputs/sample_60615_activities.csv',
-			'../MRSA_Model_Inputs/all_60615_activities.csv'], 2)
+			'../MRSA Inputs/60615_activities_sample.csv',
+			'../MRSA Inputs/60615_60653_activities.csv',
+			'../MRSA Inputs/60615_60653_60609_activities.csv',
+			'../MRSA Inputs/60615_activities.csv'], 1)
 
+		// The transmission parameter ranges are taken from an email
+		// from Charles M. Macal with subject
+		// "012512 Updated transmission parameters for MRSA ABM"
+		// dated January 25, 2012 1:41:47 PM CST.
+		//	
+		// The central information is as follows:
+		//
+		// Average duration of an infection:
+		// (1) Uniformly distributed over [7,14] days OR (2) (7 + Exponential[1/3.5]) days
+		// 
+		// Range for A: {1.24598E-5, 6.09131E-5}  Range Factor: 4.88877
+		// Range for B: {2.30598E-5, 2.84505E-4}  Range Factor: 12.3377
+		// Range for C: {2.37945E-3, 7.86860E-3}  Range Factor: 3.30689
+		// Range for D: {1.18973E-2, 2.67532E-2}  Range Factor: 2.24869
+		// Range for E: {5.83117E-5, 1.04594E-4}  Range Factor: 1.7937
+			
 		// A.
-		addGlobal("a", 1.37058E-06) // Original from MD&CM: 1.37058E-05
+		addGlobal("a", 3.00000E-5)// Old Fit: 1.37058E-06 Original from MD&CM: 1.37058E-05
 		
 		// B.
-		addGlobal("b", 0.000045) // Original from MD&CM: 0.000284505
+		addGlobal("b", 1.50000E-4)// Old Fit: 0.000045    Original from MD&CM: 0.000284505
 
 		// C.
-		addGlobal("c", 0.00191008) // Original from MD&CM: 0.00309173
+		addGlobal("c", 5.00000E-3)// Old Fit: 0.00191008  Original from MD&CM: 0.00309173
 
 		// D.
-		addGlobal("d", 0.00718554) // Original from MD&CM: 0.000451166
+		addGlobal("d", 2.00000E-2)// Old Fit: 0.00718554  Original from MD&CM: 0.000451166
 
 		// E.
-		addGlobal("e", 0.000111936)
+		addGlobal("e", 8.00000E-5)// Old Fit: 0.000111936 Original from MD&CM: 0.000111936
 		
 		// The C and D scaling factor for faster infection response.
 		addGlobal("fasterResponseScalingFactor", 2.0)

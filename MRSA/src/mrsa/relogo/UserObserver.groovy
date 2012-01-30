@@ -1,14 +1,12 @@
 package mrsa.relogo
 
-import com.sun.tools.jdi.JDWP.ReferenceType.Status;
-
-import static repast.simphony.relogo.Utility.*;
-import static repast.simphony.relogo.UtilityG.*;
-import repast.simphony.relogo.BaseObserver;
-import repast.simphony.relogo.Stop;
-import repast.simphony.relogo.Utility;
-import repast.simphony.relogo.UtilityG;
-import au.com.bytecode.opencsv.CSVReader;
+import static repast.simphony.relogo.Utility.*
+import static repast.simphony.relogo.UtilityG.*
+import mrsa.relogo.comparators.PersonWeekdayComparator
+import mrsa.relogo.comparators.PersonWeekendComparator
+import repast.simphony.relogo.BaseObserver
+import repast.simphony.relogo.Utility
+import au.com.bytecode.opencsv.CSVReader
 
 // The user observer class.
 class UserObserver extends BaseObserver {
@@ -141,10 +139,27 @@ class UserObserver extends BaseObserver {
 		// Ask the people to execute their activities.
 		ask(persons()){	
 			
-			// Find the time in minutes since the start of the current day.
-			//TODO: Decide how to differentiate weekdays and weekends in the file and model.
+			// Find the time in hours since the start of the current day.
 			int time = (ticks() % 24)
 			
+			// Find the day count.
+			int dayCount =  (((int) ticks()) / 24)
+			
+			// Determine if it is a weekend or weekday. Sundays are day 0,
+			// Mondays are day 1, Tuesdays are day 2, etc.
+			int day = dayCount % 7
+			boolean weekday = true
+			if ((day == 0) || (day == 6)) weekday = false
+			
+			// Select the appropriate activity list.
+			ActivityList activityList = null
+			if (weekday) {
+				activityList = activityList_weekday
+			} else {
+				activityList = activityList_weekend
+			}
+			
+				
 			// Prepare to find the next activity.
 			currentActivity = null
 			
@@ -901,13 +916,14 @@ class UserObserver extends BaseObserver {
 		println("    Completed Sorting the Activities")
 		
 		// Sort the list of people.
-		println("    Started Sorting the People")
-		List sortedPersons = Utility.sort(persons())
-		println("    Completed Sorting the People")
+		println("    Started Sorting the People for Weekdays")
+		List sortedPersons = Utility.sort(persons(),
+			new PersonWeekdayComparator())
+		println("    Completed Sorting the People for Weekdays")
 		
 		// Prepare to match people with activities.
 		println("    Started Matching " + sortedPersons.size() +
-				" People to Activities")
+				" People to Weekday Activities")
 
 		// Define the scan counter for tracking the number of activities processed.
 		int scanCounter = 0
@@ -928,7 +944,8 @@ class UserObserver extends BaseObserver {
 			for (ActivityList nextActivityList in masterListOfActivityLists) {
 				
 				// Ignore people who do not match.
-				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid) > 0) && (personIterator.hasNext())) {
+				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid_weekday) > 0)
+					&& (personIterator.hasNext())) {
 				
 					// (Nicely) ask people who do not match activities to die.
 					ask (tempPerson) {
@@ -944,10 +961,10 @@ class UserObserver extends BaseObserver {
 				}
 				
 				// Match a person with an activity.
-				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid)) {
+				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid_weekday)) {
 					
-					// Assign the next activitly list to a person.
-					tempPerson.activityList = nextActivityList
+					// Assign the next activity list to a person.
+					tempPerson.activityList_weekday = nextActivityList
 					
 					// Increment the count of people who matched a set of activities.
 					matchCounter++
@@ -974,7 +991,7 @@ class UserObserver extends BaseObserver {
 				if (scanCounter % 100 == 0) {
 					println(
 							"        Scanned " + scanCounter +
-							" Activities and Matched " +
+							" Weekday Activities and Matched " +
 							matchCounter + " People")
 					
 				}
@@ -987,6 +1004,97 @@ class UserObserver extends BaseObserver {
 		println("    Completed Matching " + matchCounter +
 				" of " + sortedPersons.size() + " People to " +
 				scanCounter + " Activities")
+		
+		// Sort the list of people.
+		println("    Started Sorting the People for Weekends")
+		sortedPersons = Utility.sort(persons(),
+			new PersonWeekendComparator())
+		println("    Completed Sorting the People for Weekends")
+		
+		// Prepare to match people with activities.
+		println("    Started Matching " + sortedPersons.size() +
+				" People to Weekend Activities")
+
+		// Clear the scan counter for tracking the number of activities processed.
+		scanCounter = 0
+		
+		// Clear the match counter for tracking the number of persons processed.
+		matchCounter = 0
+
+		// Prepare the scan the person's list.
+		personIterator = sortedPersons.iterator()
+		
+		// Make sure that there is at least one person.
+		if (personIterator.hasNext()) {
+			
+			// Match people with activities.
+			Person tempPerson = personIterator.next()
+			
+			// Scan the activities list.
+			for (ActivityList nextActivityList in masterListOfActivityLists) {
+				
+				// Ignore people who do not match.
+				while ((nextActivityList.getTucaseid().compareTo(tempPerson.tucaseid_weekend) > 0)
+					&& (personIterator.hasNext())) {
+				
+					// (Nicely) ask people who do not match activities to die.
+					ask (tempPerson) {
+						
+						// Bye!
+						die()
+
+					}
+					
+					// Move on to the next person.
+					tempPerson = personIterator.next()
+					
+				}
+				
+				// Match a person with an activity.
+				while (nextActivityList.getTucaseid().equals(tempPerson.tucaseid_weekend)) {
+					
+					// Assign the next activity list to a person.
+					tempPerson.activityList_weekend = nextActivityList
+					
+					// Increment the count of people who matched a set of activities.
+					matchCounter++
+					
+					// Check for more people.
+					if (personIterator.hasNext()) {
+						
+						// Move on to the next person.
+						tempPerson = personIterator.next()
+						
+					} else {
+					
+						// Move on the to the next set of activities.
+						break
+						
+					}
+					
+				}
+				
+				// Increment the count of activities that matched a set of activities.
+				scanCounter++
+				
+				// Report on the progress.
+				if (scanCounter % 100 == 0) {
+					println(
+							"        Scanned " + scanCounter +
+							" Weekend Activities and Matched " +
+							matchCounter + " People")
+					
+				}
+				
+			}
+			
+		}	
+		
+		// Note the state.
+		println("    Completed Matching " + matchCounter +
+				" of " + sortedPersons.size() + " People to " +
+				scanCounter + " Activities")		
+		
 	}
 	
 	/* This routine normalizes the place coordinates.

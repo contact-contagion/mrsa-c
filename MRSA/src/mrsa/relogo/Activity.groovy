@@ -24,9 +24,6 @@ class Activity {
 	// The activity's ending time.
 	public int stop_time = 0
 	
-	// The activity's code.
-	public String activity_code = ""
-	
 	// The activity's contagion risk.
 	public int activity_risk = 0
 	

@@ -53,16 +53,22 @@ class Person extends BaseTurtle implements Comparable {
 	// The person's school identifier.
 	public String school_id = ""
 	
-	// The person's activity type identifier.
-	public String tucaseid = ""
-	
+	// The person's weekday activity type identifier.
+	public String tucaseid_weekday = ""
+
+	// The person's weekend activity type identifier.
+	public String tucaseid_weekend = ""
+		
 	// The person's infection status.
 	public PersonStatus status = PersonStatus.UNCOLONIZED
 	
-	// The person's activities.
-	ActivityList activityList = new ActivityList()
+	// The person's weekday activities.
+	ActivityList activityList_weekday = new ActivityList()
 	
-	// The person's current activity.
+	// The person's weekend activities.
+	ActivityList activityList_weekend = new ActivityList()
+
+		// The person's current activity.
 	Activity currentActivity = null
 	
 	// The day the person was last infected.
@@ -490,31 +496,5 @@ class Person extends BaseTurtle implements Comparable {
 		}
 		
 	}
-	
-	/*
-	 * This routine compares people (in a friendly way).
-	 *
-	 * @author Michael J. North
-	 */
-	@Override
-	public int compareTo(Object obj) {
-		
-		// Check the incoming object to see if it is a person.
-		if ((this.tucaseid != null) && (obj instanceof Person)) {
-			
-			// Cast the object to a person.
-			Person otherPerson = (Person) obj
-			
-			// Compare the people using the case identifiers.
-			return this.tucaseid.compareTo(otherPerson.tucaseid)
-			
-		} else {
-		
-			// Return the default response for non-humans (take that!).
-			return 0
-			
-		}
-		
-	}
-	
+
 }
