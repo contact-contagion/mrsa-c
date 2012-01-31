@@ -315,13 +315,13 @@ class UserObserver extends BaseObserver {
 			}
 			
 			// Reset the local place uncolonized counter.
-			uncolonized = 0
+			place_uncolonized = 0
 			
 			// Reset the local place colonized counter.
-			colonized = 0
+			place_colonized = 0
 			
 			// Reset the local place infected counter.
-			infected = 0
+			place_infected = 0
 
 		}
 		
@@ -332,13 +332,13 @@ class UserObserver extends BaseObserver {
 			ask (patches()) {
 				
 				// Reset the local place uncolonized counter.
-				uncolonized = 0
+				patch_uncolonized = 0
 				
 				// Reset the local place colonized counter.
-				colonized = 0
+				patch_colonized = 0
 				
 				// Reset the local place infected counter.
-				infected = 0
+				patch_infected = 0
 
 			}
 			
@@ -355,13 +355,13 @@ class UserObserver extends BaseObserver {
 				
 				// Increment place uncolonized counter, if appropriate.
 				if (currentPlace != null) {
-					currentPlace.uncolonized++
+					currentPlace.place_uncolonized++
 				} else {
 					println("Uncolonized person " + person_id + " place is null")
 				}
 				
 				// Increment patch uncolonized counter.
-				if (graphics) patchHere().uncolonized++
+				if (graphics) patchHere().patch_uncolonized++
 				
 			// Account for a colonized state.
 			} else if (status == PersonStatus.COLONIZED) {
@@ -371,13 +371,13 @@ class UserObserver extends BaseObserver {
 				
 				// Increment place colonized counter, if appropriate.
 				if (currentPlace != null) {
-					currentPlace.colonized++
+					currentPlace.place_colonized++
 				} else {
 					println("Colonized person " + person_id + " place is null")
 				}
 				
 				// Increment patch colonized counter.
-				if (graphics) patchHere().colonized++
+				if (graphics) patchHere().patch_colonized++
 				
 			// Account for an infected state.
 			} else if (status == PersonStatus.INFECTED) {
@@ -387,20 +387,20 @@ class UserObserver extends BaseObserver {
 				
 				// Increment place infected counter, if appropriate.
 				if (currentPlace != null) {
-					currentPlace.infected++
+					currentPlace.place_infected++
 				} else {
 					println("Infected person " + person_id + " place is null")
 				}
 				
 				// Increment patch infected counter.
-				if (graphics) patchHere().infected++
+				if (graphics) patchHere().patch_infected++
 				
 			}
 
 		}
 		
 		// Send out a header for reporting the results.
-		if (ticks() <= 0) {
+		if (ticks() == 0) {
 			if (outputFile != null) {
 				outputFile.println("    Hour, Uncolonized, Colonized, Infected, Total, SystemTimeInNanoseconds")
 			}
@@ -423,13 +423,13 @@ class UserObserver extends BaseObserver {
 		if ((graphics) && (persons().size() > 0)) {
 			
 			// Find the maximum colonization count to prepare for normalization.
-			int maxColonized = maxOneOf(patches(), { colonized }).colonized
+			int maxColonized = maxOneOf(patches(), { patch_colonized }).patch_colonized
 			
 			// Change the display for each patch.
 			ask (patches()) {
 				
 				// Check for infected people.
-				if (infected > 0) {
+				if (patch_infected > 0) {
 					
 					// Select the color to indicate that an infected person is present.
 					setPcolor(Utility.yellow())
@@ -437,37 +437,32 @@ class UserObserver extends BaseObserver {
 				} else {
 				
 					// Select the color to indicate that a colonized person is present.
-					setPcolor(scaleColor(yellow(), colonized, 0, maxColonized))
+					setPcolor(scaleColor(yellow(), patch_colonized, 0, maxColonized))
 					
 				}
 				
 			}
 			
-			// Check for display updates.
-			if (graphics)  {
+			// Change the display for each place.
+			ask (places()) {
 				
-				// Change the display for each place.
-				ask (places()) {
+				// Check for infected people.
+				if (place_infected > 0) {
 					
-					// Check for infected people.
-					if (infected > 0) {
-						
-						// Select the color to indicate that an infected person is present.
-						setColor(Utility.red())
-						
-						// Select the size to indicate that an infected person is present.
-						setSize(0.5)
-						
-					// Check for c people.
-					} else if (colonized > 0) {
+					// Select the color to indicate that an infected person is present.
+					setColor(Utility.red())
 					
-						// Select the color to indicate that a colonized person is present.
-						setColor(Utility.orange())
-						
-					}
-	
+					// Select the size to indicate that an infected person is present.
+					setSize(0.5)
+					
+				// Check for c people.
+				} else if (place_colonized > 0) {
+				
+					// Select the color to indicate that a colonized person is present.
+					setColor(Utility.orange())
+					
 				}
-				
+
 			}
 			
 		}

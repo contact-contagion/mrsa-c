@@ -109,35 +109,26 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Average duration of an infection:
 		// (1) Uniformly distributed over [7,14] days OR (2) (7 + Exponential[1/3.5]) days
 		// 
-		// Range for A: {1.24598E-5, 6.09131E-5}  Range Factor: 4.88877
-		// Range for B: {2.30598E-5, 2.84505E-4}  Range Factor: 12.3377
-		// Range for C: {2.37945E-3, 7.86860E-3}  Range Factor: 3.30689
-		// Range for D: {1.18973E-2, 2.67532E-2}  Range Factor: 2.24869
-		// Range for E: {5.83117E-5, 1.04594E-4}  Range Factor: 1.7937
-		//
-		// Tested:
-		//
-		// Range for A: {3.00000E-5, 4.50000E-5}
-		// Range for B: {1.50000E-4, 2.20000E-4}
-		// Range for C: {3.50000E-3, 5.00000E-3}
-		// Range for D: {1.60000E-2, 2.00000E-2}
-		// Range for E: {6.50000E-5, 8.00000E-5}
+		// Range for A: {1.24598E-05, 6.09131E-05}  Range Factor: 4.88877  Old Fit: 1.37058E-06
+		// Range for B: {2.30598E-05, 2.84505E-04}  Range Factor: 12.3377  Old Fit: 4.50000E-05
+		// Range for C: {2.37945E-03, 7.86860E-03}  Range Factor: 3.30689  Old Fit: 1.91008E-03
+		// Range for D: {1.18973E-02, 2.67532E-02}  Range Factor: 2.24869  Old Fit: 7.18554E-03
+		// Range for E: {5.83117E-05, 1.04594E-04}  Range Factor: 1.79370  Old Fit: 1.11936E-04
 
-		
 		// A.
-		addGlobal("a", 3.00000E-05)// Old Fit: 1.37058E-06
-		
+		addGlobal("a", 6.09131E-05) // Upper edge (3.00000E-05 had slow colonized drain)
+	
 		// B.
-		addGlobal("b", 4.50000E-05)// Old Fit: 4.50000E-05
+		addGlobal("b", 4.50000E-05) // In range
 
 		// C.
-		addGlobal("c", 1.91008E-03)// Old Fit: 1.91008E-03
+		addGlobal("c", 1.91008E-03) // Slightly low
 
 		// D.
-		addGlobal("d", 7.18554E-03)// Old Fit: 7.18554E-03
+		addGlobal("d", 7.18554E-03) // Really low
 
 		// E.
-		addGlobal("e", 0.00000E-00)// Old Fit: 1.11936E-04
+		addGlobal("e", 5.83117E-05) // Lower edge (slow colonized drain)
 		
 		// The C and D scaling factor for faster infection response.
 		addGlobal("fasterResponseScalingFactor", 2.0)

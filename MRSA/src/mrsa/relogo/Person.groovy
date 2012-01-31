@@ -255,13 +255,13 @@ class Person extends BaseTurtle implements Comparable {
 		if (currentPlace != null) {
 			
 			// Find out about other people currently at this place.
-			if (currentPlace.infected > 0) {
+			if (currentPlace.place_infected > 0) {
 				
 				// There is an infected person at this location.
 				other = PersonStatus.INFECTED
 				
 			// Check for colonized people. 
-			} else if (currentPlace.colonized > 0) {
+			} else if (currentPlace.place_colonized > 0) {
 
 				// There is a colonized person at this location.
 				other = PersonStatus.COLONIZED
@@ -333,17 +333,17 @@ class Person extends BaseTurtle implements Comparable {
 	   if (currentPlace != null) {
 		   
 		   // Check the number of infected people.
-		   if(currentPlace.infected > 0) {
+		   if(currentPlace.place_infected > 0) {
 			   
 			   // Note one or more infected people.
 			   other = PersonStatus.INFECTED
 			   
 		   // Check the number of colonized people.
-		   } else if (currentPlace.colonized > 0) {
+		   } else if (currentPlace.place_colonized > 0) {
 
 			   // Note one or more colonized people.
 			   other = PersonStatus.COLONIZED
-			   
+
 		   }
 		   
 	   }
@@ -375,12 +375,14 @@ class Person extends BaseTurtle implements Comparable {
 		
 			// Move into a colonized state.
 			colonize()
+			if (status == PersonStatus.UNCOLONIZED) println("Colonized " + person_id)
 			
 		// Check for a move to an infected state.
 		} else if (nextStatus == PersonStatus.INFECTED) {
 		
 			// Move into an infected state.
 			infect()
+			
 		}
 
    }

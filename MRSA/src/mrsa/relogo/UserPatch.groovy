@@ -12,12 +12,12 @@ import repast.simphony.relogo.ast.Diffusible;
 class UserPatch extends BasePatch {
 
 	// The patch uncolonized count.
-	int uncolonized = 0
+	int patch_uncolonized = 0
 	
 	// The patch colonized count.
-	int colonized = 0
+	int patch_colonized = 0
 	
 	// The patch infected count.
-	int infected = 0
+	int patch_infected = 0
 
 }

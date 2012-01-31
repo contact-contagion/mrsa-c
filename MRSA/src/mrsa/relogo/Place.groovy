@@ -25,13 +25,13 @@ class Place extends BaseTurtle {
 	public double longitude = 0
 	
 	// The number of uncolonized people currently here.
-	int uncolonized = 0;
+	int place_uncolonized = 0;
 
 	// The number of colonized people currently here.
-	int colonized = 0;
+	int place_colonized = 0;
 	
 	// The number of infected people currently here.
-	int infected = 0;
+	int place_infected = 0;
 	
 	// The risk factor for the location (0 = no risk, 1 = low risk, and 2 = high risk).
 	int risk = 0;
