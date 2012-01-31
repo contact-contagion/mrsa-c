@@ -1,8 +1,8 @@
 package mrsa.relogo.comparators
 
-import java.util.Comparator
+import java.util.Comparator;
 
-import mrsa.relogo.Person
+import mrsa.relogo.Person;
 
 // The person weekday activity schedule comparator.
 class PersonWeekdayComparator implements Comparator<Person> {
