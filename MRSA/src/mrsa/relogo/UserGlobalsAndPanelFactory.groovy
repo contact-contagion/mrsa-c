@@ -47,7 +47,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addSliderWL("fasterResponsePercentage", "Faster Response Percentage (>CL)", 0, 1, 100, 50)
 
 		// The initial infected count.
-		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 5)
+		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 9)
 
 		// The initial colonization percentage.
 		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
@@ -114,21 +114,30 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Range for C: {2.37945E-3, 7.86860E-3}  Range Factor: 3.30689
 		// Range for D: {1.18973E-2, 2.67532E-2}  Range Factor: 2.24869
 		// Range for E: {5.83117E-5, 1.04594E-4}  Range Factor: 1.7937
-			
+		//
+		// Tested:
+		//
+		// Range for A: {3.00000E-5, 4.50000E-5}
+		// Range for B: {1.50000E-4, 2.20000E-4}
+		// Range for C: {3.50000E-3, 5.00000E-3}
+		// Range for D: {1.60000E-2, 2.00000E-2}
+		// Range for E: {6.50000E-5, 8.00000E-5}
+
+		
 		// A.
-		addGlobal("a", 3.00000E-5)// Old Fit: 1.37058E-06 Original from MD&CM: 1.37058E-05
+		addGlobal("a", 3.00000E-05)// Old Fit: 1.37058E-06
 		
 		// B.
-		addGlobal("b", 1.50000E-4)// Old Fit: 0.000045    Original from MD&CM: 0.000284505
+		addGlobal("b", 4.50000E-05)// Old Fit: 4.50000E-05
 
 		// C.
-		addGlobal("c", 5.00000E-3)// Old Fit: 0.00191008  Original from MD&CM: 0.00309173
+		addGlobal("c", 1.91008E-03)// Old Fit: 1.91008E-03
 
 		// D.
-		addGlobal("d", 2.00000E-2)// Old Fit: 0.00718554  Original from MD&CM: 0.000451166
+		addGlobal("d", 7.18554E-03)// Old Fit: 7.18554E-03
 
 		// E.
-		addGlobal("e", 8.00000E-5)// Old Fit: 0.000111936 Original from MD&CM: 0.000111936
+		addGlobal("e", 0.00000E-00)// Old Fit: 1.11936E-04
 		
 		// The C and D scaling factor for faster infection response.
 		addGlobal("fasterResponseScalingFactor", 2.0)

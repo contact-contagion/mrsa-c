@@ -12,8 +12,8 @@ import au.com.bytecode.opencsv.CSVReader
 class UserObserver extends BaseObserver {
 	
 	// The output tracking file.
-	public static PrintStream outputFile = new PrintStream(new FileOutputStream("outputfile.txt"));
-	public static PrintStream consoleFile = new PrintStream(new FileOutputStream("consolefile.txt"));
+	public static PrintStream outputFile = null //new PrintStream(new FileOutputStream("outputfile.txt"))
+	public static PrintStream consoleFile = null //new PrintStream(new FileOutputStream("consolefile.txt"))
 	
 	/* This routine configures the model.
 	 * 
@@ -26,8 +26,10 @@ class UserObserver extends BaseObserver {
 		clearAll()
 		
 		// Prepare the console output.
-		System.out = consoleFile
-		System.err = consoleFile
+		if (consoleFile != null) {
+			System.out = consoleFile
+			System.err = consoleFile
+		}
 		
 		// Check for a persons file request.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
@@ -36,11 +38,8 @@ class UserObserver extends BaseObserver {
 			println("Started Reading Persons")
 			
 			// Read the people and initialize their disease status.
-			Timer.start()
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
 					'square', 0, Utility.black())
-			Timer.stop()
-			Timer.show()
 			
 			// Note the state.
 			println("Completed Reading Persons")
@@ -54,11 +53,8 @@ class UserObserver extends BaseObserver {
 			println("Started Reading Places")
 
 			// Read the places.
-			Timer.start()
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
 					'square', 0.1, Utility.white())
-			Timer.stop()
-			Timer.show()
 
 			// Note the state.
 			println("Completed Reading Places")
@@ -69,10 +65,7 @@ class UserObserver extends BaseObserver {
 		println("Starting Matching Persons and Places")
 
 		// Match the people with their places.
-		Timer.start()
 		matchPeopleAndPlaces()
-		Timer.stop()
-		Timer.show()
 
 		// Note the state.
 		println("Completed Matching Persons and Places")
@@ -93,15 +86,12 @@ class UserObserver extends BaseObserver {
 		println("Started Asking Persons to Begin at Home")
 
 		// Start the people at their household.
-		Timer.start()
 		ask (persons()) {
 			
 			// Start at home.
 			goToHome()
 			
 		}
-		Timer.stop()
-		Timer.show()
 
 		// Note the state.
 		println("Completed Asking Persons to Begin at Home")
@@ -110,10 +100,7 @@ class UserObserver extends BaseObserver {
 		println("Started Initializing the Person's Disease Status")
 
 		// Initialize the disease status.
-		Timer.start()
 		initializePersonDiseaseStatus()
-		Timer.stop()
-		Timer.show()
 
 		// Note the state.
 		println("Completed Initializing the Disease Status")
@@ -122,10 +109,7 @@ class UserObserver extends BaseObserver {
 		println("Started Initializing the Household Behavior Status")
 
 		// Initialize the household behavior status.
-		Timer.start()
 		initializeHHBehaviorStatus()
-		Timer.stop()
-		Timer.show()
 
 		// Note the state.
 		println("Completed Initializing the Household Behavior Status")
@@ -137,10 +121,8 @@ class UserObserver extends BaseObserver {
 			println("Started Creating Activities")
 			
 			// Read the activities and convert their times to hours.
-			Timer.start()
 			createActivitiesFromCSVFile(activitiesInputFile)
-			Timer.stop()
-			Timer.show()
+
 			
 			// Note the state.
 			println("Completed Creating Activities")
@@ -151,10 +133,7 @@ class UserObserver extends BaseObserver {
 		println("Started Counting People and Places")
 
 		// Show the initial status.
-		Timer.start()
 		countPersonsAndPlaces()
-		Timer.stop()
-		Timer.show()
 
 		// Note the state.
 		println("Completed Counting People and Places")
@@ -173,8 +152,6 @@ class UserObserver extends BaseObserver {
 	def go(){
 		
 		// Ask the people to execute their activities.
-		println("Ask people to execute their activities")
-		Timer.start()
 		ask (persons()){	
 			
 			// Find the time in hours since the start of the current day.
@@ -182,6 +159,9 @@ class UserObserver extends BaseObserver {
 			
 			// Find the day count.
 			int dayCount =  (((int) ticks()) / 24)
+			
+			// Exit after one month (for early stage parameter testing).
+			if (dayCount >= 30) System.exit(0)
 			
 			// Determine if it is a weekend or weekday. Sundays are day 0,
 			// Mondays are day 1, Tuesdays are day 2, etc.
@@ -252,21 +232,11 @@ class UserObserver extends BaseObserver {
 			}
 			
 		}
-		Timer.stop()
-		Timer.show()
-		println("Done with activities")
 		
 		// Count again.
-		println("Count persons and places")
-		Timer.start()
 		countPersonsAndPlaces()
-		Timer.stop()
-		Timer.show()
-		println("Done counting persons and places")
 
 		// Expose people to disease transmission risk.
-		println("Expose people to disease transmission risk")
-		Timer.start()
 		ask(persons()){
 			
 			// Activate a transition as requested.
@@ -295,9 +265,6 @@ class UserObserver extends BaseObserver {
 			}
 			
 		}
-		Timer.stop()
-		Timer.show()
-		println("Done exposing people to disease transmission risk")
 		
 		// Move to the next hour.
 		tick()
@@ -387,10 +354,14 @@ class UserObserver extends BaseObserver {
 				totalUncolonized++
 				
 				// Increment place uncolonized counter, if appropriate.
-				if (currentPlace != null) currentPlace.uncolonized++
+				if (currentPlace != null) {
+					currentPlace.uncolonized++
+				} else {
+					println("Uncolonized person " + person_id + " place is null")
+				}
 				
 				// Increment patch uncolonized counter.
-				patchHere().uncolonized++
+				if (graphics) patchHere().uncolonized++
 				
 			// Account for a colonized state.
 			} else if (status == PersonStatus.COLONIZED) {
@@ -399,10 +370,14 @@ class UserObserver extends BaseObserver {
 				totalColonized++
 				
 				// Increment place colonized counter, if appropriate.
-				if (currentPlace != null) currentPlace.colonized++
+				if (currentPlace != null) {
+					currentPlace.colonized++
+				} else {
+					println("Colonized person " + person_id + " place is null")
+				}
 				
 				// Increment patch colonized counter.
-				patchHere().colonized++
+				if (graphics) patchHere().colonized++
 				
 			// Account for an infected state.
 			} else if (status == PersonStatus.INFECTED) {
@@ -411,20 +386,35 @@ class UserObserver extends BaseObserver {
 				totalInfected++
 				
 				// Increment place infected counter, if appropriate.
-				if (currentPlace != null) currentPlace.infected++
+				if (currentPlace != null) {
+					currentPlace.infected++
+				} else {
+					println("Infected person " + person_id + " place is null")
+				}
 				
 				// Increment patch infected counter.
-				patchHere().infected++
+				if (graphics) patchHere().infected++
 				
 			}
 
 		}
 		
 		// Send out a header for reporting the results.
-		if (ticks() <= 0) outputFile.println("    Hour, Uncolonized, Colonized, Infected, Total, SystemTimeInNanoseconds")
-		
+		if (ticks() <= 0) {
+			if (outputFile != null) {
+				outputFile.println("    Hour, Uncolonized, Colonized, Infected, Total, SystemTimeInNanoseconds")
+			}
+			println("    Hour, Uncolonized, Colonized, Infected, Total, SystemTimeInNanoseconds")
+		}
+					
 		// Report the results.
-		outputFile.println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
+		if (outputFile != null) {
+			outputFile.println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
+				totalColonized + ", " + totalInfected + ", " +
+				(totalUncolonized + totalColonized + totalInfected + ", " +
+					System.nanoTime()))
+		}
+		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
 				totalColonized + ", " + totalInfected + ", " +
 				(totalUncolonized + totalColonized + totalInfected + ", " +
 				System.nanoTime()))
@@ -453,26 +443,31 @@ class UserObserver extends BaseObserver {
 				
 			}
 			
-			// Change the display for each place.
-			ask (places()) {
+			// Check for display updates.
+			if (graphics)  {
 				
-				// Check for infected people.
-				if (infected > 0) {
+				// Change the display for each place.
+				ask (places()) {
 					
-					// Select the color to indicate that an infected person is present.
-					setColor(Utility.red())
+					// Check for infected people.
+					if (infected > 0) {
+						
+						// Select the color to indicate that an infected person is present.
+						setColor(Utility.red())
+						
+						// Select the size to indicate that an infected person is present.
+						setSize(0.5)
+						
+					// Check for c people.
+					} else if (colonized > 0) {
 					
-					// Select the size to indicate that an infected person is present.
-					setSize(0.5)
-					
-				// Check for c people.
-				} else if (colonized > 0) {
-				
-					// Select the color to indicate that a colonized person is present.
-					setColor(Utility.orange())
-					
+						// Select the color to indicate that a colonized person is present.
+						setColor(Utility.orange())
+						
+					}
+	
 				}
-
+				
 			}
 			
 		}
@@ -731,9 +726,6 @@ class UserObserver extends BaseObserver {
 		// Convert the colonization percentage to a fraction.
 		double initialColonizationFraction = initialColonizationPercentage / 100.0
 		
-		// Note the state.
-		println("    persons().size() == " + persons().size())
-
 		// Initialize colonization.
 		ask (persons()) {
 			
@@ -742,6 +734,7 @@ class UserObserver extends BaseObserver {
 				
 				// Note a colonized person.
 				status = PersonStatus.COLONIZED
+				
 			} else {
 			
 				// Note an uncolonized person.
@@ -751,9 +744,6 @@ class UserObserver extends BaseObserver {
 			
 		}
 
-		// Note the state.
-		println("    persons().size() == " + persons().size())
-		
 		// Initialize infection.
 		ask (nOf(initialInfectedCount, persons())) {
 			
