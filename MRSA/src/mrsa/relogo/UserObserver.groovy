@@ -28,8 +28,11 @@ class UserObserver extends BaseObserver {
 			println("Started Reading Persons")
 			
 			// Read the people and initialize their disease status.
+			Timer.start()
 			createTurtlesFromCSVFile(personsInputFile, Person.class,
 					'square', 0, Utility.black())
+			Timer.stop()
+			Timer.show()
 			
 			// Note the state.
 			println("Completed Reading Persons")
@@ -43,8 +46,11 @@ class UserObserver extends BaseObserver {
 			println("Started Reading Places")
 
 			// Read the places.
+			Timer.start()
 			createTurtlesFromCSVFile(placesInputFile, Place.class,
 					'square', 0.1, Utility.white())
+			Timer.stop()
+			Timer.show()
 
 			// Note the state.
 			println("Completed Reading Places")
@@ -55,7 +61,10 @@ class UserObserver extends BaseObserver {
 		println("Starting Matching Persons and Places")
 
 		// Match the people with their places.
+		Timer.start()
 		matchPeopleAndPlaces()
+		Timer.stop()
+		Timer.show()
 
 		// Note the state.
 		println("Completed Matching Persons and Places")
@@ -64,7 +73,10 @@ class UserObserver extends BaseObserver {
 		println("Started Normalizing Place Locations")
 
 		// Normalize the place coordinates.
+		Timer.start()
 		normalizePlaceCoordinates()
+		Timer.stop()
+		Timer.show()
 
 		// Note the state.
 		println("Completed Normalizing Place Locations")
@@ -73,12 +85,16 @@ class UserObserver extends BaseObserver {
 		println("Started Asking Persons to Begin at Home")
 
 		// Start the people at their household.
+		Timer.start()
 		ask (persons()) {
 			
 			// Start at home.
 			goToHome()
 			
 		}
+		Timer.stop()
+		Timer.show()
+
 		// Note the state.
 		println("Completed Asking Persons to Begin at Home")
 
@@ -86,7 +102,10 @@ class UserObserver extends BaseObserver {
 		println("Started Initializing the Person's Disease Status")
 
 		// Initialize the disease status.
+		Timer.start()
 		initializePersonDiseaseStatus()
+		Timer.stop()
+		Timer.show()
 
 		// Note the state.
 		println("Completed Initializing the Disease Status")
@@ -95,7 +114,10 @@ class UserObserver extends BaseObserver {
 		println("Started Initializing the Household Behavior Status")
 
 		// Initialize the household behavior status.
+		Timer.start()
 		initializeHHBehaviorStatus()
+		Timer.stop()
+		Timer.show()
 
 		// Note the state.
 		println("Completed Initializing the Household Behavior Status")
@@ -107,7 +129,10 @@ class UserObserver extends BaseObserver {
 			println("Started Creating Activities")
 			
 			// Read the activities and convert their times to hours.
+			Timer.start()
 			createActivitiesFromCSVFile(activitiesInputFile)
+			Timer.stop()
+			Timer.show()
 			
 			// Note the state.
 			println("Completed Creating Activities")
@@ -117,8 +142,11 @@ class UserObserver extends BaseObserver {
 		// Note the state.
 		println("Started Counting People and Places")
 
-		// Show the initial status
+		// Show the initial status.
+		Timer.start()
 		countPersonsAndPlaces()
+		Timer.stop()
+		Timer.show()
 
 		// Note the state.
 		println("Completed Counting People and Places")
@@ -137,7 +165,9 @@ class UserObserver extends BaseObserver {
 	def go(){
 		
 		// Ask the people to execute their activities.
-		ask(persons()){	
+		println("Ask people to execute their activities")
+		Timer.start()
+		ask (persons()){	
 			
 			// Find the time in hours since the start of the current day.
 			int time = (ticks() % 24)
@@ -214,11 +244,21 @@ class UserObserver extends BaseObserver {
 			}
 			
 		}
+		Timer.stop()
+		Timer.show()
+		println("Done with activities")
 		
 		// Count again.
+		println("Count persons and places")
+		Timer.start()
 		countPersonsAndPlaces()
-		
+		Timer.stop()
+		Timer.show()
+		println("Done counting persons and places")
+
 		// Expose people to disease transmission risk.
+		println("Expose people to disease transmission risk")
+		Timer.start()
 		ask(persons()){
 			
 			// Activate a transition as requested.
@@ -247,6 +287,9 @@ class UserObserver extends BaseObserver {
 			}
 			
 		}
+		Timer.stop()
+		Timer.show()
+		println("Done exposing people to disease transmission risk")
 		
 		// Move to the next hour.
 		tick()

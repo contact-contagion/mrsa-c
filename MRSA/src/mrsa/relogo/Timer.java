@@ -4,16 +4,16 @@ package mrsa.relogo;
 public class Timer {
 	
 	// The tracking state.
-	public boolean counting = false;
+	public static boolean counting = false;
 	
 	// The start time.
-	public long startTime = 0;
+	public static long startTime = 0;
 	
 	// The stop time.
-	public long stopTime = 0;
+	public static long stopTime = 0;
 
 	// The starting time tracker.
-	public void start() {
+	public static void start() {
 		
 		// Start counting.
 		counting = true;
@@ -24,7 +24,7 @@ public class Timer {
 	}
 	
 	// The ending time tracker.
-	public void stop() {
+	public static void stop() {
 
 		// Note the start time.
 		stopTime = System.nanoTime();
@@ -35,7 +35,7 @@ public class Timer {
 	}
 	
 	// The time reporter.
-	public void show() {
+	public static void show() {
 
 		// Show the time.
 		show(0);
@@ -43,7 +43,7 @@ public class Timer {
 	}
 	
 	// The time reporter.
-	public void show(int indentDepth) {
+	public static void show(int indentDepth) {
 		
 		// Indent as requested.
 		for (int i = 0; i< indentDepth; i++) System.out.print(" ");
