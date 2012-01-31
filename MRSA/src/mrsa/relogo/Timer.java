@@ -50,9 +50,9 @@ public class Timer {
 		
 		// Report the time.
 		if (counting) {
-			System.out.println(System.nanoTime() - startTime);
+			System.out.println((double) (System.nanoTime() - startTime));
 		} else {
-			System.out.println(stopTime - startTime);
+			System.out.println((double) (stopTime - startTime));
 		}
 		
 	}

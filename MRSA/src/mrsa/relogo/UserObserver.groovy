@@ -94,6 +94,7 @@ class UserObserver extends BaseObserver {
 		}
 		Timer.stop()
 		Timer.show()
+		System.exit()
 
 		// Note the state.
 		println("Completed Asking Persons to Begin at Home")
