@@ -12,7 +12,7 @@ import au.com.bytecode.opencsv.CSVReader
 class UserObserver extends BaseObserver {
 	
 	// The output tracking file.
-	public static PrintWriter outputFile = new PrintWriter(new FileWriter("outputfile.txt"));
+	public static PrintStream outputFile = new PrintStream(new FileOutputStream("outputfile.txt"));
 	public static PrintStream consoleFile = new PrintStream(new FileOutputStream("consolefile.txt"));
 	
 	/* This routine configures the model.
