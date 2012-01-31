@@ -11,6 +11,9 @@ import au.com.bytecode.opencsv.CSVReader
 // The user observer class.
 class UserObserver extends BaseObserver {
 	
+	// The output tracking file.
+	public static PrintWriter outputFile = new PrintWriter(new FileWriter("outputfile.txt")); 
+	
 	/* This routine configures the model.
 	 * 
 	 * @author Michael J. North
@@ -416,9 +419,10 @@ class UserObserver extends BaseObserver {
 		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected, Total")
 		
 		// Report the results.
-		println("    @," + ((int) ticks()) + ", " + totalUncolonized + ", " +
+		outputFile.println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
 				totalColonized + ", " + totalInfected + ", " +
-				(totalUncolonized + totalColonized + totalInfected))
+				(totalUncolonized + totalColonized + totalInfected + ", " +
+				System.nanoTime()))
 		
 		// Update the map, if needed.
 		if ((graphics) && (persons().size() > 0)) {
