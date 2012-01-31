@@ -12,7 +12,8 @@ import au.com.bytecode.opencsv.CSVReader
 class UserObserver extends BaseObserver {
 	
 	// The output tracking file.
-	public static PrintWriter outputFile = new PrintWriter(new FileWriter("outputfile.txt")); 
+	public static PrintWriter outputFile = new PrintWriter(new FileWriter("outputfile.txt"));
+	public static PrintStream consoleFile = new PrintStream(new FileOutputStream("consolefile.txt"));
 	
 	/* This routine configures the model.
 	 * 
@@ -23,6 +24,10 @@ class UserObserver extends BaseObserver {
 		
 		// Clear any current configuration.
 		clearAll()
+		
+		// Prepare the console output.
+		System.out = consoleFile
+		System.err = consoleFile
 		
 		// Check for a persons file request.
 		if (!personsInputFile.equalsIgnoreCase('None')) {
