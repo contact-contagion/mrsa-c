@@ -421,7 +421,7 @@ class UserObserver extends BaseObserver {
 		}
 		
 		// Send out a header for reporting the results.
-		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected, Total")
+		if (ticks() <= 0) outputFile.println("    Hour, Uncolonized, Colonized, Infected, Total, SystemTimeInNanoseconds")
 		
 		// Report the results.
 		outputFile.println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
