@@ -70,16 +70,16 @@ class UserObserver extends BaseObserver {
 		println("Completed Matching Persons and Places")
 
 		// Note the state.
-		println("Started Normalizing Place Locations")
+		//println("Started Normalizing Place Locations")
 
 		// Normalize the place coordinates.
-		Timer.start()
-		normalizePlaceCoordinates()
-		Timer.stop()
-		Timer.show()
+		//Timer.start()
+		//normalizePlaceCoordinates()
+		//Timer.stop()
+		//Timer.show()
 
 		// Note the state.
-		println("Completed Normalizing Place Locations")
+		//println("Completed Normalizing Place Locations")
 
 		// Note the state.
 		println("Started Asking Persons to Begin at Home")
@@ -94,7 +94,6 @@ class UserObserver extends BaseObserver {
 		}
 		Timer.stop()
 		Timer.show()
-		System.exit()
 
 		// Note the state.
 		println("Completed Asking Persons to Begin at Home")
@@ -314,22 +313,30 @@ class UserObserver extends BaseObserver {
 		// Reset the total infected counter.
 		totalInfected = 0
 		
+		// Note the graphics request.
+		boolean graphics = (showPersonMovement.equalsIgnoreCase('Yes'))
+		
 		// Setup a new visual display for each place.
 		ask (places()) {
 			
-			// Check the current place color.
-			if (getColor() != Utility.white()) {
-				
-				// Set a neutral color.
-				setColor(Utility.white())
-				
-			}
+			// Check the graphics request.
+			if (graphics) {
 			
-			// Check the place drawing size.
-			if (getSize() != 0.1) {
+				// Check the current place color.
+				if (getColor() != Utility.white()) {
+					
+					// Set a neutral color.
+					setColor(Utility.white())
+					
+				}
 				
-				// Set the default size.
-				setSize(0.1)
+				// Check the place drawing size.
+				if (getSize() != 0.1) {
+					
+					// Set the default size.
+					setSize(0.1)
+				}
+				
 			}
 			
 			// Reset the local place uncolonized counter.
@@ -344,10 +351,10 @@ class UserObserver extends BaseObserver {
 		}
 		
 		// Setup a new visual display for each patch, if requested.
-		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+		if ((graphics) && (persons().size() > 0)) {
 			
 			// Setup a new visual display for each place.
-			ask(patches()) {
+			ask (patches()) {
 				
 				// Reset the local place uncolonized counter.
 				uncolonized = 0
@@ -409,12 +416,12 @@ class UserObserver extends BaseObserver {
 		if (ticks() <= 0) println("    Hour, Uncolonized, Colonized, Infected, Total")
 		
 		// Report the results.
-		println("    " + ((int) ticks()) + ", " + totalUncolonized + ", " +
+		println("    @," + ((int) ticks()) + ", " + totalUncolonized + ", " +
 				totalColonized + ", " + totalInfected + ", " +
 				(totalUncolonized + totalColonized + totalInfected))
 		
 		// Update the map, if needed.
-		if ((showPersonMovement.equalsIgnoreCase('Yes')) && (persons().size() > 0)) {
+		if ((graphics) && (persons().size() > 0)) {
 			
 			// Find the maximum colonization count to prepare for normalization.
 			int maxColonized = maxOneOf(patches(), { colonized }).colonized

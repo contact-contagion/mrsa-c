@@ -391,7 +391,7 @@ class Person extends BaseTurtle implements Comparable {
 	 * @author Michael J. North
 	 */
 	public PersonStatus nextState(PersonStatus startStatus,
-	PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
+		PersonStatus otherStatus, double activityRisk, boolean fasterResponse) {
 		
 		// Find the next state.
 		switch (startStatus) {
