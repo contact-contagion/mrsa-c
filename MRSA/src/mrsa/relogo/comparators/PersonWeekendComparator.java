@@ -1,8 +1,8 @@
-package mrsa.relogo.comparators
+package mrsa.relogo.comparators;
 
-import java.util.Comparator
+import java.util.Comparator;
 
-import mrsa.relogo.Person
+import mrsa.relogo.Person;
 
 // The person weekend activity schedule comparator.
 class PersonWeekendComparator implements Comparator<Person> {
@@ -16,7 +16,7 @@ class PersonWeekendComparator implements Comparator<Person> {
 	public int compare(Person o1, Person o2) {
 
 		// Compare the people using the case identifiers.
-		return (o1.tucaseid_weekend.compareTo(o2.tucaseid_weekend))
+		return (o1.tucaseid_weekend.compareTo(o2.tucaseid_weekend));
 	
 	}
 	

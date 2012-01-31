@@ -1,4 +1,4 @@
-package mrsa.relogo.comparators
+package mrsa.relogo.comparators;
 
 import java.util.Comparator;
 
@@ -16,7 +16,7 @@ class PersonWeekdayComparator implements Comparator<Person> {
 	public int compare(Person o1, Person o2) {
 
 		// Compare the people using the case identifiers.
-		return (o1.tucaseid_weekday.compareTo(o2.tucaseid_weekday))
+		return (o1.tucaseid_weekday.compareTo(o2.tucaseid_weekday));
 	
 	}
 	
