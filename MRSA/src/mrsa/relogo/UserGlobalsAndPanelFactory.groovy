@@ -116,7 +116,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Range for E: {5.83117E-05, 1.04594E-04}  Range Factor: 1.79370  Old Fit: 1.11936E-04
 
 		// A.
-		addGlobal("a", 6.09131E-05) // Upper edge (3.00000E-05 had slow colonized drain)
+		addGlobal("a", 1.0) // Very high (0.05 and 6.09131E-05 both had slow colonized drain)
 	
 		// B.
 		addGlobal("b", 4.50000E-05) // In range

@@ -33,9 +33,6 @@ class Place extends BaseTurtle {
 	// The number of infected people currently here.
 	int place_infected = 0;
 	
-	// The risk factor for the location (0 = no risk, 1 = low risk, and 2 = high risk).
-	int risk = 0;
-	
 	// The behavior type for homes.
 	boolean fasterResponse = false
 

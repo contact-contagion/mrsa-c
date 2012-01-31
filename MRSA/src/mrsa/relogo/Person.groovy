@@ -360,8 +360,10 @@ class Person extends BaseTurtle implements Comparable {
 	   }
 	   
 		// Transition to the next state.
+	   int currentRisk = 2
+	   if (currentActivity != null) currentRisk = currentActivity.place_risk
 	   PersonStatus nextStatus = nextState(status, other,
-			   currentPlace.risk, fasterResponse)
+			   currentRisk, fasterResponse)
 	   
 	  
 		// Check for a move to an uncolonized state.
