@@ -47,7 +47,7 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		addSliderWL("fasterResponsePercentage", "Faster Response Percentage (>CL)", 0, 1, 100, 50)
 
 		// The initial infected count.
-		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 9)
+		addSliderWL("initialInfectedCount", "Initial Infected Count", 0, 1, 1000, 17) //9)
 
 		// The initial colonization percentage.
 		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
@@ -116,19 +116,23 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Range for E: {5.83117E-05, 1.04594E-04}  Range Factor: 1.79370  Old Fit: 1.11936E-04
 
 		// A.
-		addGlobal("a", 1.0) // Very high (0.05 and 6.09131E-05 both had slow colonized drain)
+		addGlobal("a", 6.50000E-05) // Middle of range (* current adjustment):
+		//    Slow growth:
+		//    1.24598E-05, 2.62299E-05, 3.31150E-05, 3.65574E-05, 3.82787E-05, 3.91394E-05, 3.95697E-05, 4.00000E-05,
+		//    5.00000E-05, and 6.00000E-05 had slow decline
+		//    6.09131E-05 had slow growth
 	
 		// B.
-		addGlobal("b", 4.50000E-05) // In range
+		addGlobal("b", 2.84505E-04) // Middle of range (4.50000E-05 had fast shrink)
 
 		// C.
-		addGlobal("c", 1.91008E-03) // Slightly low
+		addGlobal("c", 2.37945E-03) // Bottom of range (7.86860E-03 and 1.18973E-02 had slow shrink)
 
 		// D.
-		addGlobal("d", 7.18554E-03) // Really low
+		addGlobal("d", 2.67532E-02) // Top of range (1.18973E-02 had slow shrink)
 
 		// E.
-		addGlobal("e", 5.83117E-05) // Lower edge (slow colonized drain)
+		addGlobal("e", 5.83117E-05) // Bottom of range
 		
 		// The C and D scaling factor for faster infection response.
 		addGlobal("fasterResponseScalingFactor", 2.0)
