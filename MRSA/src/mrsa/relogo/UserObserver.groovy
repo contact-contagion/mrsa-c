@@ -161,7 +161,7 @@ class UserObserver extends BaseObserver {
 			int dayCount =  (((int) ticks()) / 24)
 			
 			// Exit after one month (for early stage parameter testing).
-			if (dayCount >= 30) System.exit(0)
+			//if (dayCount >= 30) System.exit(0)
 			
 			// Determine if it is a weekend or weekday. Sundays are day 0,
 			// Mondays are day 1, Tuesdays are day 2, etc.
