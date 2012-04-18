@@ -480,23 +480,23 @@ class Person extends BaseTurtle implements Comparable {
 		double draw = randomFloat(1.0)
 		
 		// Select the next state.
+		if (draw >= (risk * p2 + p3)) {
+
+			// Select an uncolonized state.
+			return PersonStatus.UNCOLONIZED
+		
 		// Check for a colonized state draw.
-		if (draw < (risk * p2)) {
+		} else if (draw < (risk * p2)) {
 
 			// Select a colonized state.
 			return PersonStatus.COLONIZED
 			
 		// Check for an infected state draw.
-		if (draw < (risk * p2 + p3)) {
+		} else {
 			
 			// Select an infected state.
 			return PersonStatus.INFECTED
 		
-		} else {
-		
-			// Select an uncolonized state.
-			return PersonStatus.UNCOLONIZED
-			
 		}
 		
 	}

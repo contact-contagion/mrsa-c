@@ -150,6 +150,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Minimum infection period in days.
 		addGlobal("minimumInfectionPeriod", 7)
 		
+		// Minimum place risk.
+		addGlobal("lowPlaceRisk", 0.1)
 		
 	}
 	

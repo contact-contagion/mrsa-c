@@ -927,6 +927,11 @@ class UserObserver extends BaseObserver {
 				// Convert the end time from minutes to hours.
 				newActivity.stop_time = newActivity.stop_time / 60
 				
+				// Set "no risk" to low risk.
+				if (newActivity.place_risk == 0) {
+					newActivity.place_risk = lowPlaceRisk
+				}
+				
 				// Progressively update the master list of lists.
 				if ((tempActivityList.getTucaseid() == null) ||
 					(newActivity.tucaseid.equals(tempActivityList.getTucaseid()))) {
