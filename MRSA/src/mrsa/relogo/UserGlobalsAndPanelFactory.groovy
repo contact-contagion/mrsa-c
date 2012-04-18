@@ -114,10 +114,9 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Range for C: {2.37945E-03, 7.86860E-03}  Range Factor: 3.30689  Old Fit: 1.91008E-03
 		// Range for D: {1.18973E-02, 2.67532E-02}  Range Factor: 2.24869  Old Fit: 7.18554E-03
 		// Range for E: {5.83117E-05, 1.04594E-04}  Range Factor: 1.79370  Old Fit: 1.11936E-04
-
+		
 		// A.
 		addGlobal("a", 6.85270E-05) // Near top of range (* current adjustment):
-		//    Slow growth:
 		//    1.24598E-05, 2.62299E-05, 3.31150E-05, 3.65574E-05, 3.82787E-05, 3.91394E-05, 3.95697E-05, 4.00000E-05,
 		//    5.00000E-05, 6.00000E-05, 6.09131E-05, and 6.50000E-05 had slow decline
 	

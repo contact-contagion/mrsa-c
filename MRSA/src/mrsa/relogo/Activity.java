@@ -19,7 +19,7 @@ class Activity {
 	public int activity_risk = 0;
 	
 	// The activity's place's contagion risk.
-	public int place_risk = 0;
+	public double place_risk = 0.1;
 	
 	// Calculate the activity's total risk.
 	double risk() {
