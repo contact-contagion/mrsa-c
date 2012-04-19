@@ -16,11 +16,11 @@ using namespace boost;
 
 CSVReader::CSVReader(const string& file) : fname(file),
 		in(file.c_str()) {
-	if (!in.is_open()) std::cerr << "Error opening " << file << std::endl;
+	if (!in.is_open()) throw invalid_argument("Error opening: " + file);
 }
 
 CSVReader::CSVReader(const CSVReader& reader) : fname(reader.fname), in(reader.fname.c_str()) {
-	if (!in.is_open()) std::cerr << "Error opening " << fname << std::endl;
+	if (!in.is_open()) throw invalid_argument("Error opening: " + fname);
 }
 
 bool CSVReader::next(vector<string>& vec) {

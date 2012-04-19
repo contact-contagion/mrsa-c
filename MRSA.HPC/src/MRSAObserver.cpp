@@ -120,7 +120,7 @@ void MRSAObserver::createPlaces(Properties& props,
 	//std::cout << "places line count: " << lines << std::endl;
 
 	if (lines == -1)
-		std::cerr << "Error opening " << placesFile << std::endl;
+		throw invalid_argument("Error opening: " + placesFile);
 
 	PlaceCreator placeCreator(placesFile);
 	// we skip the first line so one less person to make
@@ -143,7 +143,7 @@ void MRSAObserver::createPersons(Properties& props,
 	int lines = line_count(personsFile);
 
 	if (lines == -1)
-		std::cerr << "Error opening " << personsFile << std::endl;
+		throw invalid_argument("Error opening: " + personsFile);
 
 	PersonsCreator pCreator(personsFile, placeMap);
 	// we skip the first line so one less person to make
