@@ -1,0 +1,40 @@
+#random.seed = 1284067381
+
+# hours
+stop.at = 720.5
+
+# per process
+persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
+places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv 
+activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv 
+
+initial.colonization.fraction = 0.03
+initial.infected.count = 17;
+# for now, just - detailed place
+transition.rule = detailed place
+minimum.infection.period = 7
+
+a = 6.85270E-05
+b = 2.84505E-04
+c = 2.37945E-03
+d = 2.67532E-02
+e = 5.83117E-05
+
+faster.response.scaling.factor = 2.0
+
+
+# world definition props
+min.x = -100
+min.y = -100
+max.x = 99
+max.y = 99 
+grid.buffer = 2
+
+# these must multiply to total number of processes
+proc.per.x = 1
+proc.per.y = 1
+
+# named random number distributions
+#distribution.zombie_move = int_uniform, 0, 2
+
+
