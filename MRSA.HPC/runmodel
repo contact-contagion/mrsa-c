@@ -1,0 +1,2 @@
+cd bin
+mpirun -np 1 ./mrsa_model ../config/config.props ../config/model.props 
