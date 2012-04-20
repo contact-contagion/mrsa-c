@@ -65,14 +65,19 @@ MRSAObserver::~MRSAObserver() {
 
 void MRSAObserver::go() {
 	person_stats->clear();
-
 	int tick =
 			(int) RepastProcess::instance()->getScheduleRunner().currentTick();
 	int time = tick % 24;
 	int day = (tick / 24) % 7;
 	bool is_weekday = (day == 0 || day == 6) ? false : true;
 
-	//std::cout << "tick: " << tick << ", time: " << time << ", day: " << day << ", weekday: " << is_weekday << std::endl;
+	if (tick % 720 == 0) {
+		std::string time;
+		repast::timestamp(time);
+		std::cout << time << " -- Month: " << (tick / 720) << std::endl;
+	}
+
+//std::cout << "tick: " << tick << ", time: " << time << ", day: " << day << ", weekday: " << is_weekday << std::endl;
 
 	AgentSet<Person> people;
 	get(people);
@@ -214,7 +219,7 @@ void MRSAObserver::initializeDataCollection() {
 void MRSAObserver::setup(Properties& props) {
 	std::string time;
 	repast::timestamp(time);
-	std::cout << "Setup Started at " << time  << std::endl;
+	std::cout << "Setup Started at " << time << std::endl;
 
 	double a = strToDouble(props.getProperty("a"));
 	double b = strToDouble(props.getProperty("b"));
