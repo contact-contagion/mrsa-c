@@ -19,7 +19,7 @@ PersonStats::~PersonStats() {
 }
 
 void PersonStats::countPerson(Person* person) {
-	PersonStatus status = person->getStatus();
+	PersonStatus status = person->status();
 	if (status == UNCOLONIZED)
 		total_uncolonized++;
 	else if (status == COLONIZED)

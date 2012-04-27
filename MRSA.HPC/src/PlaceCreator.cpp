@@ -6,38 +6,59 @@
  */
 
 #include <vector>
+#include <iostream>
 
 #include "PlaceCreator.h"
+#include "CSVReader.h"
+#include "Household.h"
+#include "School.h"
+#include "Workplace.h"
+#include "DefaultPlace.h"
 
 namespace mrsa {
 
 using namespace std;
 
-PlaceCreator::PlaceCreator(const string& file) :
-		reader(file) {
-	// skip the first line
-	vector<string> vec;
-	reader.next(vec);
-}
+// the type is lower-cased before the compare
+// so these are OK, even though they don't match
+// the case of those in the data files.
+const string SCHOOL_TYPE = "school";
+const string HOUSEHOLD_TYPE = "household";
+const string WORKPLACE_TYPE	= "workplace";
 
-PlaceCreator::PlaceCreator(const PlaceCreator& creator) :
-		reader(creator.reader) {
-	// skip the first line
-	vector<string> vec;
-	reader.next(vec);
+const int TYPE_IDX = 1;
+
+PlaceCreator::PlaceCreator() {
 }
 
 PlaceCreator::~PlaceCreator() {
 }
 
-Place* PlaceCreator::operator()(repast::AgentId id,
-		repast::relogo::Observer* obs) {
+void PlaceCreator::run(const string& file, vector<Place*>& places) {
+	CSVReader reader(file);
 	vector<string> vec;
+	// skip the first line
 	reader.next(vec);
-	Place* place = new Place(id, obs, vec);
-	//std::cout << (*place) << std::endl;
 
-	return place;
+	while (reader.next(vec)) {
+		string type = vec[TYPE_IDX];
+		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+		Place* place = 0;
+		if (type == SCHOOL_TYPE) {
+			place = new School(vec);
+			///std::cout << "making a school" << std::endl;
+		} else if (type == HOUSEHOLD_TYPE) {
+			place = new Household(vec);
+			//std::cout << "making a household" << std::endl;
+		} else if (type == WORKPLACE_TYPE) {
+			place = new Workplace(vec);
+			//std::cout << "making a workplace" << std::endl;
+		} else {
+			place = new DefaultPlace(vec);
+			//std::cout << "making a default" << std::endl;
+		}
+		places.push_back(place);
+	}
 }
 
 }

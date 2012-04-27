@@ -11,20 +11,18 @@
 namespace mrsa {
 
 using namespace repast;
-using namespace repast::relogo;
 
 const int PLACE_ID_IDX = 0;
 const int PLACE_TYPE_IDX = 1;
-const int NAME_IDX = 2;
-const int PERSONS_IDX = 3;
+// skip name and persons as we don't use them
+// in the model.
+//const int NAME_IDX = 2;
+//const int PERSONS_IDX = 3;
 const int LAT_IDX = 4;
 const int LON_IDX = 5;
 
-Place::Place(repast::AgentId id, repast::relogo::Observer* obs,
-		std::vector<std::string>& vec) :
-		Turtle(id, obs), place_id(vec[PLACE_ID_IDX]), place_type(
-				vec[PLACE_TYPE_IDX]), place_colonized(0), place_uncolonized(0), place_infected(
-				0), faster_response(false) {
+Place::Place(std::vector<std::string>& vec, float risk) : id(vec[PLACE_ID_IDX]), type(vec[PLACE_TYPE_IDX]),
+		longitude(0), latitude(0), risk_(risk) {
 
 	std::string val = vec[LAT_IDX];
 	val = trim(val);
@@ -41,7 +39,7 @@ Place::~Place() {
 }
 
 std::ostream& operator<<(std::ostream& os, const Place& place) {
-	os << "Place[" << place.place_id << ", " << place.place_type << "]";
+	os << "Place[" << place.id << ", " << place.type << "]";
 	return os;
 }
 

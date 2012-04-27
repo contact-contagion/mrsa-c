@@ -1,15 +1,4 @@
-SOURCES = main.cpp \
-          CSVReader.cpp \
-          Activity.cpp \
-          Person.cpp \
-          PersonsCreator.cpp \
-          Place.cpp \
-          PlaceCreator.cpp \
-          ActivityCreator.cpp \
-          PersonStats.cpp \
-          MRSAObserver.cpp \
-          
-          
+SOURCES = main.cpp
          
 local_dir := src
 local_src := $(addprefix $(local_dir)/, $(SOURCES))

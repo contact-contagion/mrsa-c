@@ -59,8 +59,6 @@ Person* PersonsCreator::operator()(repast::AgentId id,
 	const string& work_id = vec[WORK_ID_IDX];
 	Place* work = findPlace(work_id);
 
-	//std::cout << (vec[0]) << std::endl;
-
 	return new Person(id, obs, vec, home, group_quarters, work, school);
 }
 

@@ -16,6 +16,7 @@
 #include "PersonsCreator.h"
 #include "PlaceCreator.h"
 #include "ActivityCreator.h"
+#include "TransmissionAlgorithm.h"
 
 namespace mrsa {
 
@@ -29,7 +30,6 @@ const string ACTIVITIES_FILE = "activities.file";
 
 const string COLONIZATION_FRAC = "initial.colonization.fraction";
 const string INITIAL_INFECTION_COUNT = "initial.infected.count";
-const string TRANSITION_RULE = "transition.rule";
 const string INFECTION_PERIOD = "minimum.infection.period";
 const string FASTER_SCALING = "faster.response.scaling.factor";
 
@@ -53,14 +53,16 @@ int line_count(const std::string& file) {
 }
 
 MRSAObserver::MRSAObserver() :
-		transition(new NoOpTransitionFunctor()), person_stats(0), places(0) {
-
+		personType(0), person_stats(0), places(0), people_(0) {
 }
 
 MRSAObserver::~MRSAObserver() {
-	delete transition;
 	delete person_stats;
-	delete places;
+	delete people_;
+
+	for (vector<Place*>::iterator iter  = places.begin(); iter != places.end(); ++iter) {
+		delete (*iter);
+	}
 }
 
 void MRSAObserver::go() {
@@ -77,25 +79,17 @@ void MRSAObserver::go() {
 		std::cout << time << " -- Month: " << (tick / 720) << std::endl;
 	}
 
-//std::cout << "tick: " << tick << ", time: " << time << ", day: " << day << ", weekday: " << is_weekday << std::endl;
-
-	AgentSet<Person> people;
-	get(people);
-	for (unsigned int i = 0, n = people.size(); i < n; i++) {
-		Person* person = people[i];
+	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
+		Person* person = (*people_)[i];
 		person->performActivity(time, is_weekday);
-		person->updatePlaceCounters();
 		person_stats->countPerson(person);
 	}
 
-	people.apply(*transition);
-
-	for (unsigned int i = 0, n = places->size(); i < n; i++) {
-		Place* place = (*places)[i];
-		place->place_colonized = place->place_infected =
-				place->place_uncolonized = 0;
+	for (unsigned int i = 0, n = places.size(); i < n; ++i) {
+		Place* place = places[i];
+		place->runTransmission();
+		place->reset();
 	}
-
 }
 
 void MRSAObserver::initializeActivities(Properties& props) {
@@ -121,24 +115,15 @@ void MRSAObserver::initializeActivities(Properties& props) {
 void MRSAObserver::createPlaces(Properties& props,
 		map<string, Place*>* placeMap) {
 	const string placesFile = props.getProperty(PLACES_FILE);
-	int lines = line_count(placesFile);
-	//std::cout << "places line count: " << lines << std::endl;
 
-	if (lines == -1)
-		throw invalid_argument("Error opening: " + placesFile);
 
-	PlaceCreator placeCreator(placesFile);
+	PlaceCreator placeCreator;
+	placeCreator.run(placesFile, places);
 	// we skip the first line so one less person to make
-	placeType = create<Place>(lines - 1, placeCreator);
 
-	// use a pointer here because this map could be very large
-	// so we don't want to copy it around.
-
-	places = new AgentSet<Place>();
-	get(*places);
-	for (int i = 0, n = places->size(); i < n; i++) {
-		Place* place = (*places)[i];
-		placeMap->insert(pair<string, Place*>(place->place_id, place));
+	for (int i = 0, n = places.size(); i < n; i++) {
+		Place* place =  places[i];
+		placeMap->insert(pair<string, Place*>(place->placeId(), place));
 	}
 }
 
@@ -185,7 +170,6 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props,
 	for (unsigned int i = 0; i < infected; i++) {
 		people.at(i)->updateStatus(INFECTED);
 	}
-
 }
 
 void MRSAObserver::initializeDataCollection() {
@@ -226,9 +210,8 @@ void MRSAObserver::setup(Properties& props) {
 	double c = strToDouble(props.getProperty("c"));
 	double d = strToDouble(props.getProperty("d"));
 	double e = strToDouble(props.getProperty("e"));
-	double scaling = strToDouble(props.getProperty(FASTER_SCALING));
 
-	StatusCalculator::initialize(a, b, c, d, e, scaling);
+	TransmissionAlgorithm::initialize(a, b, c, d, e);
 
 	map<string, Place*>* placeMap = new map<string, Place*>();
 	createPlaces(props, placeMap);
@@ -241,29 +224,13 @@ void MRSAObserver::setup(Properties& props) {
 
 	initializeDiseaseStatus(props, people);
 	people.ask(&Person::goToHome);
-	// update the stats to clear out any place
-	// infection etc. counts triggered by going home.
-	//place_stats->update();
-
-	string transition_rule = props.getProperty(TRANSITION_RULE);
-
-	if (transition_rule == NONE) {
-		transition = new NoOpTransitionFunctor();
-	} else if (transition_rule == DETAILED_PLACE) {
-		float infection_period = (float) strToDouble(
-				props.getProperty(INFECTION_PERIOD));
-		transition = new DetailedPlaceTransitionFunctor(infection_period);
-	} else {
-		throw domain_error("Invalid transition rule");
-	}
 
 	initializeDataCollection();
-
-	// update the place counters
-	for (unsigned int i = 0, n = people.size(); i < n; i++) {
-		Person* person = people[i];
-		person->updatePlaceCounters();
-	}
+	// get the set of people so we don't have to grab
+	// them each iteration. We do this here because
+	// other setup type methods may alter the set.
+	people_ = new AgentSet<Person>();
+	get(*people_);
 
 	repast::timestamp(time);
 	std::cout << "Setup Finished at " << time << std::endl;

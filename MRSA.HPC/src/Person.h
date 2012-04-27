@@ -11,6 +11,8 @@
 #include <map>
 
 #include "relogo/Turtle.h"
+
+#include "PersonStatus.h"
 #include "Place.h"
 #include "Activity.h"
 
@@ -27,7 +29,6 @@ const int WORK_ID_IDX = 7;
 const int TUCASE_ID_WEEKEND_IDX = 8;
 const int TUCASE_ID_WEEKDAY_IDX = 9;
 
-enum PersonStatus {UNCOLONIZED, COLONIZED, INFECTED};
 
 class Person : public repast::relogo::Turtle {
 
@@ -50,26 +51,23 @@ public:
 	 */
 	bool initializeActivities(std::map<std::string, std::vector<Activity*> *>& map);
 
-	const std::string& id() const {
+	const std::string& personId() const {
 		return person_id;
 	}
 
 	void updateStatus(PersonStatus status);
 
-	PersonStatus getStatus() const {
-		return _status;
+	const PersonStatus& status() const {
+		return status_;
 	}
+
+	int age() const {
+		return age_;
+	}
+
 
 	void goToHome();
 	void performActivity(int time, bool isWeekday);
-
-	// increments appropriate counter (infected etc.) at
-	// this Person's current place.
-	void updatePlaceCounters();
-
-	//void simpleTransition();
-	void detailedPlaceTransition(float infection_period);
-	//void detailedActivityTransition();
 
 private:
 	typedef std::vector<Activity*>* ActivityList;
@@ -78,7 +76,7 @@ private:
 	std::string person_id;
 	Place* _household, *_group_quarters, *_work, *_school, *current;
 	std::string tucaseid_weekday, tucaseid_weekend;
-	int relate, sex, age;
+	int relate, sex, age_;
 
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
@@ -86,34 +84,12 @@ private:
 
 	double hourOfInfection;
 
-	PersonStatus _status;
+	PersonStatus status_;
 
 	void changePlace(Place* place);
 };
 
 std::ostream& operator<<(std::ostream& os, const Person& id);
-
-class StatusCalculator {
-
-private:
-	static StatusCalculator* instance_;
-	double a_, b_, c_, d_, e_;
-	double scaling;
-
-	PersonStatus chooseOne(double p1, double p2, double p3, double risk);
-
-protected:
-	StatusCalculator(double a, double b, double c, double d, double e, double scalingFactor);
-
-public:
-	static void initialize(double a, double b, double c, double d, double e, double scalingFactor);
-	static StatusCalculator* instance();
-	virtual ~StatusCalculator();
-
-	PersonStatus next(PersonStatus start, PersonStatus other, double risk, bool faster);
-
-};
-
 
 } /* namespace mrsa */
 #endif /* PERSON_H_ */

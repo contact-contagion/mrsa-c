@@ -10,8 +10,7 @@ activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv
 
 initial.colonization.fraction = 0.03
 initial.infected.count = 17;
-# for now, just - detailed place
-transition.rule = detailed place
+
 minimum.infection.period = 7
 
 a = 6.85270E-05
@@ -19,9 +18,6 @@ b = 2.84505E-04
 c = 2.37945E-03
 d = 2.67532E-02
 e = 5.83117E-05
-
-faster.response.scaling.factor = 2.0
-
 
 # world definition props
 min.x = -100
