@@ -18,12 +18,12 @@ using namespace repast;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Place* home, Place* group_quarters, Place* work, Place* school) :
+		Place* home, Place* group_quarters, Place* work, Place* school, float min_infection_duration) :
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), _household(home), _group_quarters(
 				group_quarters), _work(work), _school(school), current(0), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), hourOfInfection(0), status_(
-				UNCOLONIZED) {
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), hour_of_infection(0), status_(
+				UNCOLONIZED), min_infection_duration_(min_infection_duration) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -50,6 +50,12 @@ void Person::validate() {
 	// remove this person from the model if it has no places
 	if (_school == 0 && _household == 0 && _work == 0 && _group_quarters == 0)
 		die();
+}
+
+bool Person::statusCanChange() {
+	 if (status_ == INFECTED)
+		 return RepastProcess::instance()->getScheduleRunner().currentTick() - hour_of_infection > min_infection_duration_;
+	 return true;
 }
 
 // initialize the lists of activities for this Person by getting those
@@ -130,7 +136,7 @@ void Person::performActivity(int time, bool isWeekday) {
 void Person::updateStatus(DiseaseStatus status) {
 	// if newly infected set the hour of infection
 	if (status_ != INFECTED && status == INFECTED) {
-		hourOfInfection = RepastProcess::instance()->getScheduleRunner().currentTick();
+		hour_of_infection = RepastProcess::instance()->getScheduleRunner().currentTick();
 	}
 	status_ = status;
 }

@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 
 	double b = 1;
 	TransmissionAlgorithm::initialize(0, b, 0.0, 0, 0);
-	PersonStatus status(COLONIZED);
+	DiseaseStatus status(COLONIZED);
 	// b is one so should always move from colonized to infected
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
@@ -68,7 +68,7 @@ BOOST_AUTO_TEST_CASE(infected) {
 	double c = 0;
 	double d = 1;
 	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
-	PersonStatus status(INFECTED);
+	DiseaseStatus status(INFECTED);
 	// d is one so should always move from infected to uncolonized
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
@@ -106,7 +106,7 @@ BOOST_AUTO_TEST_CASE(workplace) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
 	obs->create<Person>(14, pCreator);
 	AgentSet<Person> persons;
 	obs->get(persons);
@@ -153,7 +153,7 @@ BOOST_AUTO_TEST_CASE(school) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
 	obs->create<Person>(14, pCreator);
 	AgentSet<Person> persons;
 	obs->get(persons);
@@ -229,7 +229,7 @@ BOOST_AUTO_TEST_CASE(household) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
 	obs->create<Person>(2, pCreator);
 	repast::relogo::AgentSet<Person> persons;
 	obs->get(persons);
@@ -299,7 +299,7 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
 	obs->create<Person>(14, pCreator);
 
 	AgentSet<Person> persons;

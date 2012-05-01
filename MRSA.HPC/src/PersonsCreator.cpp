@@ -16,8 +16,8 @@ namespace mrsa {
 using namespace std;
 using namespace repast;
 
-PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map) :
-		reader(file), places(map) {
+PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map, float min_infection_duration) :
+		reader(file), places(map), min_infection_duration_(min_infection_duration) {
 	init();
 }
 
@@ -65,7 +65,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	Place* work = findPlace(work_id);
 
 	// create the Person
-	return new Person(id, obs, vec, home, group_quarters, work, school);
+	return new Person(id, obs, vec, home, group_quarters, work, school, min_infection_duration_);
 }
 
 }

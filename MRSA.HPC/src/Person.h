@@ -37,7 +37,7 @@ class Person : public repast::relogo::Turtle {
 public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Place* home, Place* group_quarters,
-			Place* work, Place* school);
+			Place* work, Place* school, float min_infection_duration);
 	virtual ~Person();
 
 	/**
@@ -63,6 +63,14 @@ public:
 	 * Update this Person's disease status to the specified status.
 	 */
 	void updateStatus(DiseaseStatus status);
+
+	/**
+	 * Gets whether or not this Person's disease status can change. For example,
+	 * if a Person is infected there is a minimum amount of time that has to pass
+	 * with the Person in the infected state before he or she can become
+	 * uninfected.
+	 */
+	bool statusCanChange();
 
 	/**
 	 * Gets this Person's disease status.
@@ -110,9 +118,10 @@ private:
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
 
-	double hourOfInfection;
+	double hour_of_infection;
 
 	DiseaseStatus status_;
+	float min_infection_duration_;
 
 	/**
 	 * Changes this Person's place to the specified place.

@@ -35,6 +35,8 @@ const string INITIAL_INFECTION_COUNT = "initial.infected.count";
 const string INFECTION_PERIOD = "minimum.infection.period";
 const string FASTER_SCALING = "faster.response.scaling.factor";
 
+const string MIN_INFECT_PERIOD = "minimum.infection.period";
+
 // counts the number of lines in the specified file.
 // We need to know this because we have to tell the Observer how
 // many persons to create and each line in the file is a person.
@@ -168,9 +170,11 @@ void MRSAObserver::createPersons(Properties& props,
 	if (lines == -1)
 		throw invalid_argument("Error opening: " + personsFile);
 
+	float min_infection_duration = (float)strToDouble(props.getProperty(MIN_INFECT_PERIOD));
+
 	// A PersonsCreator is used a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap);
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration);
 	// First line is the header info so we create one less
 	// than the number of lines in the file.
 	personType = create<Person>(lines - 1, pCreator);

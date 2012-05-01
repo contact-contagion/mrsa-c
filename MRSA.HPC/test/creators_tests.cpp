@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(people_creator) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7.0f);
 	obs->create<Person>(14, pCreator);
 
 	AgentSet<Person> persons;
