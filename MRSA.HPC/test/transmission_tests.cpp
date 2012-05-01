@@ -6,6 +6,7 @@
 #include "../src/TransmissionAlgorithm.h"
 #include "../src/PlaceCreator.h"
 #include "../src/PersonsCreator.h"
+#include "../src/ActivityCreator.h"
 
 #include "ObserverSetup.h"
 
@@ -285,6 +286,71 @@ BOOST_AUTO_TEST_CASE(household) {
 	for (int i = 0, n = places.size(); i < n; i++) {
 		delete places[i];
 	}
+}
+
+BOOST_AUTO_TEST_CASE(activity_test) {
+	// create the persons
+	PlaceCreator creator;
+	vector<Place*> places;
+	creator.run("../test_data/places.csv", places);
+	std::map<std::string, Place*> placeMap;
+	for (int i = 0, n = places.size(); i < n; i++) {
+		Place* place = places[i];
+		placeMap.insert(pair<string, Place*>(place->placeId(), place));
+	}
+
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap);
+	obs->create<Person>(14, pCreator);
+
+	AgentSet<Person> persons;
+	obs->get(persons);
+
+	// no matter the time or the day, should be at home as
+	// no activities.
+	for (ASIter iter = persons.begin(); iter != persons.end(); ++iter) {
+		Person* p = (*iter);
+		p->goToHome();
+		for (int i = 0; i <= 24; ++i) {
+			p->performActivity(i, true);
+			BOOST_REQUIRE_EQUAL(p->currentPlace()->placeType(), "Household");
+		}
+	}
+
+	// create the activities
+	ActivityCreator actCreator;
+	map<string, vector<Activity> > map;
+	actCreator.run("../test_data/activities.csv", map);
+
+	Person* p1(0);
+	Person* p2(0);
+
+	for (ASIter iter = persons.begin(); iter != persons.end(); ++iter) {
+		Person* p = (*iter);
+		p->initializeActivities(map);
+		if (p->personId() == "5450835") p1 = p;
+		else if (p->personId() == "5450836") p2 = p;
+	}
+
+	BOOST_REQUIRE(p1 != 0);
+	BOOST_REQUIRE(p2 != 0);
+
+	p1->performActivity(14, true);
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "School");
+	// gone back home
+	p1->performActivity(17, true);
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "Household");
+	// go to work
+	p1->performActivity(19, true);
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "Workplace");
+
+	p2->performActivity(14, false);
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "School");
+	// gone back home
+	p2->performActivity(17, false);
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "Household");
+	// go to work
+	p2->performActivity(19, false);
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "Workplace");
 }
 
 BOOST_AUTO_TEST_SUITE_END()
