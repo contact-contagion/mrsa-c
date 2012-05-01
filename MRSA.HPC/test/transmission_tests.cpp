@@ -3,6 +3,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <repast_hpc/RepastProcess.h>
+
 #include "../src/TransmissionAlgorithm.h"
 #include "../src/PlaceCreator.h"
 #include "../src/PersonsCreator.h"
@@ -229,7 +231,8 @@ BOOST_AUTO_TEST_CASE(household) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
+
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
 	obs->create<Person>(2, pCreator);
 	repast::relogo::AgentSet<Person> persons;
 	obs->get(persons);
@@ -274,6 +277,12 @@ BOOST_AUTO_TEST_CASE(household) {
 	hh->addPerson(p1);
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == INFECTED);
+
+	// run the schedule for two ticks, to increment the tick count by 2.
+	// this means that the minimum disease duration has passed and p1
+	// can move to uncolonized
+	repast::RepastProcess::instance()->getScheduleRunner().scheduleStop(2);
+	repast::RepastProcess::instance()->getScheduleRunner().run();
 
 	double c = 0;
 	double d = 1;

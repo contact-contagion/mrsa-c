@@ -70,7 +70,7 @@ public:
 	 * with the Person in the infected state before he or she can become
 	 * uninfected.
 	 */
-	bool statusCanChange();
+	bool canStatusChange();
 
 	/**
 	 * Gets this Person's disease status.

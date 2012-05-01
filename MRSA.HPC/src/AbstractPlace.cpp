@@ -35,8 +35,10 @@ void AbstractPlace::reset() {
 void AbstractPlace::processPerson(Person* person, TransmissionAlgorithm* ta) {
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
-	DiseaseStatus status = person->status();
-	person->updateStatus(ta->run(infected, colonized, uncolonized, status, risk_));
+	if (person->canStatusChange()) {
+		DiseaseStatus status = person->status();
+		person->updateStatus(ta->run(infected, colonized, uncolonized, status, risk_));
+	}
 }
 
 } /* namespace mrsa */

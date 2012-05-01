@@ -52,7 +52,7 @@ void Person::validate() {
 		die();
 }
 
-bool Person::statusCanChange() {
+bool Person::canStatusChange() {
 	 if (status_ == INFECTED)
 		 return RepastProcess::instance()->getScheduleRunner().currentTick() - hour_of_infection > min_infection_duration_;
 	 return true;
