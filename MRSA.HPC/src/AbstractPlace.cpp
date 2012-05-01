@@ -6,7 +6,7 @@
  */
 
 #include "AbstractPlace.h"
-#include "PersonStatus.h"
+#include "DiseaseStatus.h"
 #include "Person.h"
 
 namespace mrsa {
@@ -19,18 +19,23 @@ AbstractPlace::~AbstractPlace() {
 }
 
 void AbstractPlace::addPerson(Person* person) {
-	PersonStatus status = person->status();
+	// increments the disease status counts
+	// based on the person's status
+	DiseaseStatus status = person->status();
 	if (status == COLONIZED) colonized++;
 	else if (status == UNCOLONIZED) uncolonized++;
 	else if (status == INFECTED) infected++;
 }
 
+// sets the status counts to 0
 void AbstractPlace::reset() {
 	colonized = uncolonized = infected = 0;
 }
 
 void AbstractPlace::processPerson(Person* person, TransmissionAlgorithm* ta) {
-	PersonStatus status = person->status();
+	// updates the status of the specified person given the current
+	// disease status counts in this place.
+	DiseaseStatus status = person->status();
 	person->updateStatus(ta->run(infected, colonized, uncolonized, status, risk_));
 }
 

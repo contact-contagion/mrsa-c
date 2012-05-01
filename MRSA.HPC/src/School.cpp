@@ -6,7 +6,7 @@
  */
 
 #include "School.h"
-#include "PersonStatus.h"
+#include "DiseaseStatus.h"
 
 namespace mrsa {
 
@@ -21,8 +21,11 @@ AgeGroup::~AgeGroup() {
 }
 
 void AgeGroup::addPerson(Person* person) {
+	// add the person to the vector of Persons.
 	persons.push_back(person);
-	PersonStatus status = person->status();
+	// increment the disease status counts based
+	// on the person's status.
+	DiseaseStatus status = person->status();
 	if (status == UNCOLONIZED)
 		++uncolonized;
 	else if (status == COLONIZED)
@@ -32,14 +35,17 @@ void AgeGroup::addPerson(Person* person) {
 }
 
 void AgeGroup::processPeople(TransmissionAlgorithm* ta, float risk) {
+	// run the transmission algorithm for each person, using the
+	// status counts for this AgeGroup.
 	for (vector<Person*>::iterator iter = persons.begin(); iter != persons.end(); ++iter) {
 		Person* person = (*iter);
-		PersonStatus status = person->status();
+		DiseaseStatus status = person->status();
 		person->updateStatus(ta->run(infected, colonized, uncolonized, status, risk));
 	}
 }
 
 void AgeGroup::reset() {
+	// clear the vector of persons and set the counts to 0
 	persons.clear();
 	infected = colonized = uncolonized = 0;
 }
@@ -50,35 +56,43 @@ School::School(std::vector<std::string>& vec) :
 }
 
 School::~School() {
-	for (PersonMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
+	// delete the AgeGroups.
+	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
 		delete iter->second;
 	}
 
 }
 
+// adds the person to the age group for that person.
 void School::addPerson(Person* person) {
+
 	int age = person->age();
-	PersonMapIter iter = person_map.find(age);
+	// find the AgeGroup for age.
+	AgeGroupMapIter iter = person_map.find(age);
 	if (iter == person_map.end()) {
-		// create a new AgeGroup
+		// create a new AgeGroup and
+		// add the person to it.
 		AgeGroup* grp = new AgeGroup();
 		grp->addPerson(person);
+		// put the AgeGroup in the map.
 		person_map.insert(pair<int, AgeGroup*>(age, grp));
-
 	} else {
+		// add the person to found AgeGroup.s
 		iter->second->addPerson(person);
 	}
 }
 
 void School::runTransmission() {
+	// run the transmission algorithm for all the AgeGroups.
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-	for (PersonMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
+	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
 		iter->second->processPeople(ta, risk_);
 	}
 }
 
 void School::reset() {
-	for (PersonMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
+	// reset all the age groups.
+	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
 		iter->second->reset();
 	}
 }

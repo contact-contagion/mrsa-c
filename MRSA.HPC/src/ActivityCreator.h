@@ -21,7 +21,7 @@ public:
 	ActivityCreator();
 	virtual ~ActivityCreator();
 
-	void run(const std::string& file, std::map<std::string, std::vector<Activity*>* >& map);
+	void run(const std::string& file, std::map<std::string, std::vector<Activity> >& map);
 };
 
 } /* namespace mrsa */

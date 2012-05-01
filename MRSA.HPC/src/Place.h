@@ -20,7 +20,9 @@ class Person;
 
 /**
  * Base class that encapsulates a Place (school, home, etc.) in the
- * MRSA model.
+ * MRSA model. Disease transmission is dependent on place, and
+ * so the runTransmission virtual method should be implemented based
+ * on the semantics of the Place sub type.
  */
 class Place {
 
@@ -28,6 +30,9 @@ class Place {
 
 public:
 
+	/**
+	 * Creates the place based on the values in the vector, and with the specified risk.
+	 */
 	Place(std::vector<std::string>& vec, float risk);
 	virtual ~Place();
 
@@ -45,16 +50,20 @@ public:
 
 
 	/**
-	 * Resets this place for the next iteration of the model. Typically
-	 * this will set the counter to 0 and remove all the persons
-	 * from the this place.
+	 * Resets this place for the next iteration of the model.
 	 */
 	virtual void reset() = 0;
 
+	/**
+	 * Gets the place id of this place.
+	 */
 	const std::string& placeId() const {
 		return id;
 	}
 
+	/**
+	 * Gets the type of this place (Household etc.)
+	 */
 	const std::string& placeType() const {
 		return type;
 	}

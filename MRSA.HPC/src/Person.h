@@ -12,7 +12,7 @@
 
 #include "relogo/Turtle.h"
 
-#include "PersonStatus.h"
+#include "DiseaseStatus.h"
 #include "Place.h"
 #include "Activity.h"
 
@@ -49,29 +49,58 @@ public:
 	 * Initialize the activity vectors for this Person, return true on successful
 	 * initialization, otherwise false.
 	 */
-	bool initializeActivities(std::map<std::string, std::vector<Activity*> *>& map);
+	bool initializeActivities(std::map<std::string, std::vector<Activity> >& map);
 
+	/**
+	 * Gets the person id of this Person. This is the id that is in the
+	 * data files. Repast HPC will also assign this Persons an AgentId.
+	 */
 	const std::string& personId() const {
 		return person_id;
 	}
 
-	void updateStatus(PersonStatus status);
+	/**
+	 * Update this Person's disease status to the specified status.
+	 */
+	void updateStatus(DiseaseStatus status);
 
-	const PersonStatus& status() const {
+	/**
+	 * Gets this Person's disease status.
+	 */
+	const DiseaseStatus& status() const {
 		return status_;
 	}
 
+	/**
+	 * Gets the age of this Person.
+	 */
 	int age() const {
 		return age_;
 	}
 
+	/**
+	 * Gets the Place where this Person is currently.
+	 */
+	const Place* currentPlace() const {
+		return current;
+	}
 
+	/**
+	 * Makes this Person, go home. This typically sets the current place for this
+	 * Person to its household, but it may move it to other places, such as
+	 * general quarters etc.
+	 */
 	void goToHome();
+
+	/**
+	 * Performs the current activity for the specified time
+	 * and weekday / weekend.
+	 */
 	void performActivity(int time, bool isWeekday);
 
 private:
-	typedef std::vector<Activity*>* ActivityList;
-	typedef std::vector<Activity*>::const_iterator ActivityIter;
+	typedef std::vector<Activity> ActivityList;
+	typedef std::vector<Activity>::const_iterator ActivityIter;
 
 	std::string person_id;
 	Place* _household, *_group_quarters, *_work, *_school, *current;
@@ -80,12 +109,14 @@ private:
 
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
-	Activity* current_activity;
 
 	double hourOfInfection;
 
-	PersonStatus status_;
+	DiseaseStatus status_;
 
+	/**
+	 * Changes this Person's place to the specified place.
+	 */
 	void changePlace(Place* place);
 };
 

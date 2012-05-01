@@ -19,7 +19,8 @@ PersonStats::~PersonStats() {
 }
 
 void PersonStats::countPerson(Person* person) {
-	PersonStatus status = person->status();
+	// get the person's status and increment the appropriate count.
+	DiseaseStatus status = person->status();
 	if (status == UNCOLONIZED)
 		total_uncolonized++;
 	else if (status == COLONIZED)
@@ -35,6 +36,10 @@ InfectionSum::InfectionSum(PersonStats* stats) :
 InfectionSum::~InfectionSum() {
 }
 
+/**
+ * Gets the total number of infected persons using
+ * the wrapped PersonStats object.
+ */
 double InfectionSum::getData() {
 	return stats_->totalInfected();
 }
@@ -46,6 +51,10 @@ UnColonizedSum::UnColonizedSum(PersonStats* stats) :
 UnColonizedSum::~UnColonizedSum() {
 }
 
+/**
+ * Gets the total number of uncolonized persons using
+ * the wrapped PersonStats object.
+ */
 double UnColonizedSum::getData() {
 	return stats_->totalUnColonized();
 }
@@ -57,6 +66,10 @@ ColonizedSum::ColonizedSum(PersonStats* stats) :
 ColonizedSum::~ColonizedSum() {
 }
 
+/**
+ * Gets the total number of colonized persons using
+ * the wrapped PersonStats object.
+ */
 double ColonizedSum::getData() {
 	return stats_->totalColonized();
 }
@@ -68,6 +81,10 @@ TotalSum::TotalSum(PersonStats* stats) : repast::TDataSource<double>(),
 TotalSum::~TotalSum() {
 }
 
+/**
+ * Gets the total number of persons using
+ * the wrapped PersonStats object.
+ */
 double TotalSum::getData() {
 	return stats_->totalUnColonized() + stats_->totalColonized() + stats_->totalInfected();
 }

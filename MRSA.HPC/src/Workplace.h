@@ -13,7 +13,8 @@
 namespace mrsa {
 
 /**
- * Implements the Worksplace place.
+ * Implements the Workplace place. This does randomly
+ * selected transmission on 4 persons, using a risk of 0.1
  */
 class Workplace: public SelectiveTransmissionPlace {
 

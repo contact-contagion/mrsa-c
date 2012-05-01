@@ -8,14 +8,14 @@
 #ifndef TRANSMISSIONALGORITHM_H_
 #define TRANSMISSIONALGORITHM_H_
 
-
-#include "PersonStatus.h"
+#include "DiseaseStatus.h"
 
 namespace mrsa {
 
 /**
  * Implements the algorithm for transitioning
- * from one disease state to another.
+ * from one disease state to another. This is implemented
+ * as a Singleton that must be explicitly initialized before use.
  */
 class TransmissionAlgorithm {
 
@@ -23,7 +23,16 @@ public:
 	TransmissionAlgorithm(double a, double b, double c, double d, double e);
 	virtual ~TransmissionAlgorithm();
 
+	/**
+	 * Initialize the TransmissionAlgorithm singleton with the
+	 * a, b, c, d, and e parameters.
+	 */
 	static void initialize(double a, double b, double c, double d, double e);
+
+	/**
+	 * Gets singleton instance. If it has not been initialized, an exception
+	 * is thrown.
+	 */
 	static TransmissionAlgorithm* instance();
 
 	/**
@@ -35,20 +44,32 @@ public:
 	 * @param uncolonized
 	 * @param currentStatus
 	 */
-	PersonStatus run(unsigned int infected, unsigned int colonized, unsigned int uncolonized,
-			PersonStatus currentStatus, float risk);
+	DiseaseStatus run(unsigned int infected, unsigned int colonized, unsigned int uncolonized,
+			DiseaseStatus currentStatus, float risk);
 
 private:
 	static TransmissionAlgorithm* instance_;
 	double a_, b_, c_, d_, e_;
 
-	PersonStatus runUncolonized(float risk, unsigned int infected, unsigned int colonized, unsigned int uncolonized);
-	PersonStatus runColonized();
-	PersonStatus runInfected();
-};
+	/**
+	 * Run the transmission algorithm for an uncolonized person, returning the result as a
+	 * DiseaseStatus.
+	 */
+	DiseaseStatus runUncolonized(float risk, unsigned int infected, unsigned int colonized,
+			unsigned int uncolonized);
+	/**
+	 * Run the transmission algorithm for a colonized person, returning the result as a
+	 * DiseaseStatus.
+	 */
+	DiseaseStatus runColonized();
 
+	/**
+	 * Run the transmission algorithm for an infected person, returning the result as a
+	 * DiseaseStatus.
+	 */
+	DiseaseStatus runInfected();
+};
 
 } /* namespace mrsa */
 #endif /* TRANSMISSIONALGORITHM_H_ */
-
 

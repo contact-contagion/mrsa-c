@@ -12,6 +12,11 @@
 
 namespace mrsa {
 
+/**
+ * A household place in the mrsa model. The risk is set
+ * to 2.0 and each uncolonized person currently in the household
+ * undergoes the transmission algorithm.
+ */
 class Household : public mrsa::AbstractPlace {
 
 public:

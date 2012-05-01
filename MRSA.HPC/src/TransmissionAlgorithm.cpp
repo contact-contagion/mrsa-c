@@ -18,9 +18,11 @@ TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, doubl
 }
 
 void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
+	// if the instance exists, delete the old one.
 	if (instance_ != 0) {
 		delete instance_;
 	}
+	// create the one.
 	instance_ = new TransmissionAlgorithm(a, b, c, d, e);
 }
 
@@ -35,8 +37,10 @@ TransmissionAlgorithm* TransmissionAlgorithm::instance() {
 	return instance_;
 }
 
-PersonStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int colonized,
-		unsigned int uncolonized, PersonStatus currentStatus, float risk) {
+// run the algorithm
+DiseaseStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int colonized,
+		unsigned int uncolonized, DiseaseStatus currentStatus, float risk) {
+	// depending on the status, run the algorithm for uncolonized, colonized or infected persons.
 	if (currentStatus == UNCOLONIZED) {
 		return runUncolonized(risk, infected, colonized, uncolonized);
 	} else if (currentStatus == COLONIZED) {
@@ -48,14 +52,20 @@ PersonStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int colo
 	return currentStatus;
 }
 
-PersonStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int infected,
+// the algorithm for uncolonized persons.
+DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int infected,
 		unsigned int colonized, unsigned int uncolonized) {
 
-	PersonStatus ret(UNCOLONIZED);
+	// default return value.
+	DiseaseStatus ret(UNCOLONIZED);
 	if (infected > 0) {
+		// set the return value based on the results of a random draw
+		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
 	} else if (colonized > 0) {
+		// set the return value based on the results of a random draw
+		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
 	}
@@ -63,72 +73,36 @@ PersonStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int infe
 	return ret;
 }
 
-PersonStatus TransmissionAlgorithm::runColonized() {
-
-	PersonStatus ret(COLONIZED);
+// the algorithm for colonized persons.
+DiseaseStatus TransmissionAlgorithm::runColonized() {
+	DiseaseStatus ret(COLONIZED);
 	double draw = repast::Random::instance()->nextDouble();
 	if (draw <= b_)
+		// move from colonized to infected with a probability of b_
 		ret = INFECTED;
 	else if (draw <= e_ + b_)
+		// move from colonized to infected with a probability of e_
+		// we already tested for <= b_ so only get here if > b_ but
+		// <= e_.
 		ret = UNCOLONIZED;
 
 	return ret;
 }
 
-PersonStatus TransmissionAlgorithm::runInfected() {
+DiseaseStatus TransmissionAlgorithm::runInfected() {
 
-	PersonStatus ret(INFECTED);
+	DiseaseStatus ret(INFECTED);
 	double draw = repast::Random::instance()->nextDouble();
 	if (draw <= d_)
+		// move from infected to uncolonized with a probability of d_
 		ret = UNCOLONIZED;
 	else if (draw <= d_ + c_)
+		// move from infected to uncolonized with a probability of c_
+		// we already tested for <= d_ so only get here if > d_ but
+		// <= c_.
 		ret = COLONIZED;
 
 	return ret;
 }
-
-/*
- PersonStatus StatusCalculator::next(PersonStatus start, PersonStatus other,
- double risk, bool faster) {
-
- PersonStatus ret = UNCOLONIZED;
- if (start == UNCOLONIZED) {
- if (other == UNCOLONIZED)
- ret = chooseOne(1, 0, 0, risk);
- else if (other == COLONIZED)
- ret = chooseOne(1 - a_, a_, 0, risk);
- else if (other == INFECTED)
- ret = chooseOne(1 - 2 * a_, 2 * a_, 0, risk);
- } else if (start == COLONIZED) {
- ret = chooseOne(e_, 1 - b_ - e_, b_, 1);
- } else if (start == INFECTED) {
- if (faster) {
- ret = chooseOne(scaling * d_, scaling * c_, 1 - scaling * (c_ + d_),
- 1);
- } else {
- ret = chooseOne(d_, c_, 1 - c_ - d_, 1);
- }
- }
-
- return ret;
- }
-
- PersonStatus StatusCalculator::chooseOne(double p1, double p2, double p3,
- double risk) {
- // Draw a new random threshold.
- double draw = Random::instance()->nextDouble();
- PersonStatus ret = UNCOLONIZED;
-
- // Select the next state.
- // Check for an infected state draw.
- if (draw < (risk * p3)) {
- ret = INFECTED;
- } else if (draw < (risk * (p2 + p3))) {
- ret = COLONIZED;
- }
-
- return ret;
- }
- */
 
 } /* namespace mrsa */

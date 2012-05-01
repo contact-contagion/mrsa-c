@@ -16,6 +16,10 @@
 
 namespace mrsa {
 
+/**
+ * A group of persons of the same age in a school. Transmission
+ * occurs between members of an AgeGroup.
+ */
 class AgeGroup {
 
 public:
@@ -47,7 +51,9 @@ private:
 
 
 /**
- * A School place.
+ * A School place. Transmission in a School is via
+ * persons in the same grade (i.e. of the same age here),
+ * with a risk of 1.0.
  */
 class School: public Place {
 public:
@@ -73,7 +79,7 @@ public:
 
 private:
 
-	typedef std::map<int, AgeGroup* >::iterator PersonMapIter;
+	typedef std::map<int, AgeGroup* >::iterator AgeGroupMapIter;
 	std::map<int, AgeGroup*> person_map;
 
 };

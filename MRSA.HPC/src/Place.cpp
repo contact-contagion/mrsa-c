@@ -21,6 +21,7 @@ const int PLACE_TYPE_IDX = 1;
 const int LAT_IDX = 4;
 const int LON_IDX = 5;
 
+// creates a Place from the data in the vector and with the specified risk.
 Place::Place(std::vector<std::string>& vec, float risk) : id(vec[PLACE_ID_IDX]), type(vec[PLACE_TYPE_IDX]),
 		longitude(0), latitude(0), risk_(risk) {
 

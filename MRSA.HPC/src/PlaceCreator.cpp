@@ -34,14 +34,17 @@ PlaceCreator::PlaceCreator() {
 PlaceCreator::~PlaceCreator() {
 }
 
+// reads the file and fills the vector of places with the created places.
 void PlaceCreator::run(const string& file, vector<Place*>& places) {
 	CSVReader reader(file);
 	vector<string> vec;
-	// skip the first line
+	// skip the first header line.
 	reader.next(vec);
 
+	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
 		string type = vec[TYPE_IDX];
+		// lower case the type for easier, less type prone comparisons
 		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 		Place* place = 0;
 		if (type == SCHOOL_TYPE) {
@@ -54,9 +57,12 @@ void PlaceCreator::run(const string& file, vector<Place*>& places) {
 			place = new Workplace(vec);
 			//std::cout << "making a workplace" << std::endl;
 		} else {
+			// if the type is not one we have a specific place for
+			// yet, then create a DefaultPlace.
 			place = new DefaultPlace(vec);
 			//std::cout << "making a default" << std::endl;
 		}
+		// add the place to the vector.
 		places.push_back(place);
 	}
 }

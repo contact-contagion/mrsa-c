@@ -14,9 +14,9 @@ namespace mrsa {
 
 /**
  * Place implementation that will run the transmision algorithm
- * on a specified number of randomly selected uncolonized persons.
- * The transmision state change for non-uncolonized persons will happen
- * for all of those persons.
+ * on only a specified number of randomly selected uncolonized persons, rather
+ * than all uncolonized persons.  The transmision state change for non-uncolonized
+ * persons will happen for all of the non-uncolonized persons in this place
  */
 class SelectiveTransmissionPlace: public AbstractPlace {
 

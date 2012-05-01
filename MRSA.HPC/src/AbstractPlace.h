@@ -15,10 +15,9 @@
 namespace mrsa {
 
 /**
- * Abstract base implementation of a Place. This accumulates
- * Persons in a vector, incrementing the status counts as the Persons
- * are added. On a reset, the vector is cleared and the status counts
- * are set to 0.
+ * Abstract base implementation of a Place that
+ * accumulates the disease status counts for Persons
+ * in this place using the addPerson method.
  */
 class AbstractPlace: public Place {
 
