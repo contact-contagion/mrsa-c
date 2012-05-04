@@ -9,6 +9,7 @@
 #include "../src/PlaceCreator.h"
 #include "../src/PersonsCreator.h"
 #include "../src/ActivityCreator.h"
+#include "../src/SummaryInfectionStats.h"
 
 #include "ObserverSetup.h"
 
@@ -26,20 +27,20 @@ BOOST_AUTO_TEST_CASE(uncolonized) {
 	// a is 0, so starting with UNCOLONIZED should always return UNCOLONIZED
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, 0, UNCOLONIZED, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->run(0, 0, UNCOLONIZED, 0) == UNCOLONIZED);
 	}
 
 	TransmissionAlgorithm::initialize(1, 0, 0.0, 0, 0);
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(1, 0, 0, UNCOLONIZED, 1) == COLONIZED);
+		BOOST_REQUIRE(ta->run(1, 0, UNCOLONIZED, 1) == COLONIZED);
 	}
 
 	TransmissionAlgorithm::initialize(0.5, 0, 0.0, 0, 0);
 	// a is .5 and risk is 2 so double a is one so always move to colonized.
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(1, 0, 0, UNCOLONIZED, 2) == COLONIZED);
+		BOOST_REQUIRE(ta->run(1, 0, UNCOLONIZED, 2) == COLONIZED);
 	}
 
 }
@@ -52,7 +53,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 	// b is one so should always move from colonized to infected
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, 0, status, 0) == INFECTED);
+		BOOST_REQUIRE(ta->run(0, 0, status, 0) == INFECTED);
 	}
 
 	b = 0;
@@ -61,7 +62,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 	// b is 0 and e is one so should always return to uncolonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, 0, status, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->run(0, 0, status, 0) == UNCOLONIZED);
 	}
 }
 
@@ -74,7 +75,7 @@ BOOST_AUTO_TEST_CASE(infected) {
 	// d is one so should always move from infected to uncolonized
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, 0, status, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->run(0, 0, status, 0) == UNCOLONIZED);
 	}
 
 	c = 1;
@@ -83,7 +84,7 @@ BOOST_AUTO_TEST_CASE(infected) {
 	// c is 1 and d is 0 so should move to colonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, 0, status, 0) == COLONIZED);
+		BOOST_REQUIRE(ta->run(0, 0, status, 0) == COLONIZED);
 	}
 }
 
@@ -98,9 +99,14 @@ struct PlacePredicate {
 	}
 };
 
-BOOST_AUTO_TEST_CASE(workplace) {
+void deletePlaces(std::vector<Place*>& places) {
+	for (int i = 0, n = places.size(); i < n; i++) {
+		delete places[i];
+	}
+}
+
+void createPersons(Observer* obs, AgentSet<Person>& persons, std::vector<Place*>& places, int count = 14) {
 	PlaceCreator creator;
-	vector<Place*> places;
 	creator.run("../test_data/places.csv", places);
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
@@ -108,10 +114,15 @@ BOOST_AUTO_TEST_CASE(workplace) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
-	obs->create<Person>(14, pCreator);
-	AgentSet<Person> persons;
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
+	obs->create<Person>(count, pCreator);
 	obs->get(persons);
+}
+
+BOOST_AUTO_TEST_CASE(workplace) {
+	AgentSet<Person> persons;
+	std::vector<Place*> places;
+	createPersons(obs, persons, places);
 
 	Place* place = *(find_if(places.begin(), places.end(), PlacePredicate("1703101010000001")));
 
@@ -140,25 +151,13 @@ BOOST_AUTO_TEST_CASE(workplace) {
 
 	BOOST_REQUIRE(colonized_count == 4);
 
-	for (int i = 0, n = places.size(); i < n; i++) {
-		delete places[i];
-	}
+	deletePlaces(places);
 }
 
 BOOST_AUTO_TEST_CASE(school) {
-	PlaceCreator creator;
-	vector<Place*> places;
-	creator.run("../test_data/places.csv", places);
-	std::map<std::string, Place*> placeMap;
-	for (int i = 0, n = places.size(); i < n; i++) {
-		Place* place = places[i];
-		placeMap.insert(pair<string, Place*>(place->placeId(), place));
-	}
-
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
-	obs->create<Person>(14, pCreator);
 	AgentSet<Person> persons;
-	obs->get(persons);
+	std::vector<Place*> places;
+	createPersons(obs, persons, places);
 
 	vector<Person*> forties;
 	vector<Person*> twelves;
@@ -219,23 +218,14 @@ BOOST_AUTO_TEST_CASE(school) {
 
 	BOOST_REQUIRE_EQUAL(forties[1]->status(), COLONIZED);
 	BOOST_REQUIRE_EQUAL(forties[2]->status(), COLONIZED);
+
+	deletePlaces(places);
 }
 
 BOOST_AUTO_TEST_CASE(household) {
-	PlaceCreator creator;
-	vector<Place*> places;
-	creator.run("../test_data/places.csv", places);
-	std::map<std::string, Place*> placeMap;
-	for (int i = 0, n = places.size(); i < n; i++) {
-		Place* place = places[i];
-		placeMap.insert(pair<string, Place*>(place->placeId(), place));
-	}
-
-
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
-	obs->create<Person>(2, pCreator);
-	repast::relogo::AgentSet<Person> persons;
-	obs->get(persons);
+	AgentSet<Person> persons;
+	std::vector<Place*> places;
+	createPersons(obs, persons, places, 2);
 
 	Person* p1 = persons[0];
 	p1->updateStatus(UNCOLONIZED);
@@ -278,10 +268,10 @@ BOOST_AUTO_TEST_CASE(household) {
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == INFECTED);
 
-	// run the schedule for two ticks, to increment the tick count by 2.
+	// run the schedule for two ticks, to increment the tick count by 3.
 	// this means that the minimum disease duration has passed and p1
 	// can move to uncolonized
-	repast::RepastProcess::instance()->getScheduleRunner().scheduleStop(2);
+	repast::RepastProcess::instance()->getScheduleRunner().scheduleStop(3);
 	repast::RepastProcess::instance()->getScheduleRunner().run();
 
 	double c = 0;
@@ -292,27 +282,14 @@ BOOST_AUTO_TEST_CASE(household) {
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == UNCOLONIZED);
 
-	for (int i = 0, n = places.size(); i < n; i++) {
-		delete places[i];
-	}
+	deletePlaces(places);
 }
 
 BOOST_AUTO_TEST_CASE(activity_test) {
 	// create the persons
-	PlaceCreator creator;
-	vector<Place*> places;
-	creator.run("../test_data/places.csv", places);
-	std::map<std::string, Place*> placeMap;
-	for (int i = 0, n = places.size(); i < n; i++) {
-		Place* place = places[i];
-		placeMap.insert(pair<string, Place*>(place->placeId(), place));
-	}
-
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7);
-	obs->create<Person>(14, pCreator);
-
 	AgentSet<Person> persons;
-	obs->get(persons);
+	std::vector<Place*> places;
+	createPersons(obs, persons, places);
 
 	// no matter the time or the day, should be at home as
 	// no activities.
@@ -360,6 +337,45 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 	// go to work
 	p2->performActivity(19, false);
 	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "Workplace");
+
+	deletePlaces(places);
+}
+
+// this test will fail if not run by itself
+BOOST_AUTO_TEST_CASE(disease_update_test) {
+	AgentSet<Person> persons;
+	std::vector<Place*> places;
+	createPersons(obs, persons, places);
+
+	Person* p1 = persons[0];
+	p1->updateStatus(INFECTED);
+
+	Person* p2 = persons[1];
+	p2->updateStatus(COLONIZED);
+
+	Person* p3 = persons[2];
+
+
+	// infected then drop to colonized
+	p3->updateStatus(INFECTED);
+	p3->updateStatus(COLONIZED);
+
+	repast::RepastProcess::instance()->getScheduleRunner().scheduleStop(2);
+	repast::RepastProcess::instance()->getScheduleRunner().run();
+
+	p1->updateStatus(UNCOLONIZED);
+	p2->updateStatus(INFECTED);
+	p3->updateStatus(UNCOLONIZED);
+
+	SummaryInfectionStats stats;
+	stats.gatherStats(persons);
+
+	BOOST_REQUIRE_EQUAL(stats.infectedCount(), 2);
+	BOOST_REQUIRE_EQUAL(stats.avgInfectedDuration(), 1);
+	BOOST_REQUIRE_EQUAL(stats.colonizedCount(), 2);
+	BOOST_REQUIRE_EQUAL(stats.avgColonizedDuration(), 2);
+
+	deletePlaces(places);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
