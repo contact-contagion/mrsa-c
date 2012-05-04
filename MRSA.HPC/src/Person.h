@@ -12,7 +12,7 @@
 
 #include "relogo/Turtle.h"
 
-#include "DiseaseStatus.h"
+#include "DiseaseStatusUpdater.h"
 #include "Place.h"
 #include "Activity.h"
 
@@ -75,8 +75,8 @@ public:
 	/**
 	 * Gets this Person's disease status.
 	 */
-	const DiseaseStatus& status() const {
-		return status_;
+	const DiseaseStatus status() const {
+		return status_.status();
 	}
 
 	/**
@@ -118,10 +118,7 @@ private:
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
 
-	double hour_of_infection;
-
-	DiseaseStatus status_;
-	float min_infection_duration_;
+	DiseaseStatusUpdater status_;
 
 	/**
 	 * Changes this Person's place to the specified place.

@@ -22,8 +22,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), _household(home), _group_quarters(
 				group_quarters), _work(work), _school(school), current(0), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), hour_of_infection(0), status_(
-				UNCOLONIZED), min_infection_duration_(min_infection_duration) {
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -53,9 +52,7 @@ void Person::validate() {
 }
 
 bool Person::canStatusChange() {
-	 if (status_ == INFECTED)
-		 return RepastProcess::instance()->getScheduleRunner().currentTick() - hour_of_infection > min_infection_duration_;
-	 return true;
+	return status_.canStatusChange();
 }
 
 // initialize the lists of activities for this Person by getting those
@@ -134,11 +131,7 @@ void Person::performActivity(int time, bool isWeekday) {
 
 // sets the new disease status for this person.
 void Person::updateStatus(DiseaseStatus status) {
-	// if newly infected set the hour of infection
-	if (status_ != INFECTED && status == INFECTED) {
-		hour_of_infection = RepastProcess::instance()->getScheduleRunner().currentTick();
-	}
-	status_ = status;
+	status_.updateStatus(status);
 }
 
 // makes the person to go "home" where home
