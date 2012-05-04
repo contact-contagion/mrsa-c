@@ -28,6 +28,10 @@ public:
 	SummaryInfectionStats();
 	virtual ~SummaryInfectionStats();
 
+	/**
+	 * Gather the base stats from the persons. These base
+	 * stats then used to calculate the summary stats.
+	 */
 	void gatherStats(repast::relogo::AgentSet<Person>& people);
 
 	/**
@@ -62,6 +66,7 @@ private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;
 	typedef std::map<unsigned int, unsigned long>::iterator HistIter;
 
+	// adds the count to the histogram of count sizes
 	void addToHistogram(unsigned int count, std::map<unsigned int, unsigned long>& hist);
 
 	std::map<unsigned int, unsigned long> infection_hist;
