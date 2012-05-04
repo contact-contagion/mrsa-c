@@ -13,7 +13,7 @@ namespace mrsa {
 using namespace std;
 
 AgeGroup::AgeGroup() :
-		infected(0), colonized(0), uncolonized(0), persons() {
+		infected(0), colonized(0), persons() {
 
 }
 
@@ -26,9 +26,7 @@ void AgeGroup::addPerson(Person* person) {
 	// increment the disease status counts based
 	// on the person's status.
 	DiseaseStatus status = person->status();
-	if (status == UNCOLONIZED)
-		++uncolonized;
-	else if (status == COLONIZED)
+	if (status == COLONIZED)
 		++colonized;
 	else if (status == INFECTED)
 		++infected;
@@ -41,7 +39,7 @@ void AgeGroup::processPeople(TransmissionAlgorithm* ta, float risk) {
 		Person* person = (*iter);
 		if (person->canStatusChange()) {
 			DiseaseStatus status = person->status();
-			person->updateStatus(ta->run(infected, colonized, uncolonized, status, risk));
+			person->updateStatus(ta->run(infected, colonized, status, risk));
 		}
 	}
 }
@@ -49,7 +47,7 @@ void AgeGroup::processPeople(TransmissionAlgorithm* ta, float risk) {
 void AgeGroup::reset() {
 	// clear the vector of persons and set the counts to 0
 	persons.clear();
-	infected = colonized = uncolonized = 0;
+	infected = colonized = 0;
 }
 
 // low risk = 1f

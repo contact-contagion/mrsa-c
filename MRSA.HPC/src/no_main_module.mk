@@ -1,8 +1,10 @@
 SOURCES = CSVReader.cpp \
           Activity.cpp \
           TransmissionAlgorithm.cpp \
+          DiseaseStatusUpdater.cpp \
           Person.cpp \
           PersonsCreator.cpp \
+          SummaryInfectionStats.cpp \
           Place.cpp \
           SelectiveTransmissionPlace.cpp \
           AbstractPlace.cpp \

@@ -46,9 +46,9 @@ public:
 
 protected:
 	typedef std::vector<Person*>::iterator PersonIter;
-	// number of colonized, uncolonized, and infected persons in this
+	// number of colonized, and infected persons in this
 	// place.
-	int colonized, uncolonized, infected;
+	int colonized, infected;
 
 	/**
 	 * Process the specifed person for transmission.

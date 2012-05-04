@@ -33,6 +33,7 @@ const int TUCASE_ID_WEEKDAY_IDX = 9;
 class Person : public repast::relogo::Turtle {
 
 	friend std::ostream& operator<<(std::ostream& os, const Person& id);
+	friend class SummaryInfectionStats;
 
 public:
 

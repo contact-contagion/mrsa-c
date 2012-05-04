@@ -14,7 +14,7 @@ namespace mrsa {
 TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
 TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
-		a_(a), b_(b), c_(c), d_(d), e_(e) {
+		a_(a), b_(b), c_(c), d_(d), e_(e), from_infection(0), from_colonization(0) {
 }
 
 void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
@@ -39,10 +39,10 @@ TransmissionAlgorithm* TransmissionAlgorithm::instance() {
 
 // run the algorithm
 DiseaseStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int colonized,
-		unsigned int uncolonized, DiseaseStatus currentStatus, float risk) {
+		DiseaseStatus currentStatus, float risk) {
 	// depending on the status, run the algorithm for uncolonized, colonized or infected persons.
 	if (currentStatus == UNCOLONIZED) {
-		return runUncolonized(risk, infected, colonized, uncolonized);
+		return runUncolonized(risk, infected, colonized);
 	} else if (currentStatus == COLONIZED) {
 		return runColonized();
 	} else if (currentStatus == INFECTED) {
@@ -54,7 +54,7 @@ DiseaseStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int col
 
 // the algorithm for uncolonized persons.
 DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int infected,
-		unsigned int colonized, unsigned int uncolonized) {
+		unsigned int colonized) {
 
 	// default return value.
 	DiseaseStatus ret(UNCOLONIZED);
@@ -63,12 +63,17 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
+		if (ret == COLONIZED) ++from_infection;
 	} else if (colonized > 0) {
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
+		if (ret == COLONIZED) ++from_colonization;
 	}
+
+	//std::cout << "fc: " << from_colonization << std::endl;
+	//std::cout << "fi: " << from_infection << std::endl;
 
 	return ret;
 }

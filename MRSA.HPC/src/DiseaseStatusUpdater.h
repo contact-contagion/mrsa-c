@@ -18,6 +18,9 @@ namespace mrsa {
  *
  */
 class DiseaseStatusUpdater {
+
+	friend class SummaryInfectionStats;
+
 public:
 	DiseaseStatusUpdater(float min_infection_duration);
 	virtual ~DiseaseStatusUpdater();

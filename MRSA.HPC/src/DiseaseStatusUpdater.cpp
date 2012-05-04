@@ -17,7 +17,7 @@ DiseaseStatusUpdater::DiseaseStatusUpdater(float min_infection_duration) :
 }
 
 void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
-	if (status_ == UNCOLONIZED && status == COLONIZED) {
+	if (status_ == UNCOLONIZED && (status == COLONIZED || status == INFECTED)) {
 		// set timestamp
 		timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
@@ -56,9 +56,10 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
 bool DiseaseStatusUpdater::canStatusChange() {
 	// if the current status is infected, then can only change if the minimum
 	// disease duration has been reached.
-	if (status_ == INFECTED)
+	if (status_ == INFECTED) {
 		return repast::RepastProcess::instance()->getScheduleRunner().currentTick()
 				- timestamp > min_infection_duration_;
+	}
 
 	// otherwise, can always change.
 	return true;

@@ -34,6 +34,12 @@ public:
 	void go();
 
 	/**
+	 * Performs some additional final statistics collection
+	 * when called at the end of the simluation.
+	 */
+	void atEnd();
+
+	/**
 	 * Sets up the simulation for a run, given the specified properties.
 	 */
 	virtual void setup(repast::Properties& props);

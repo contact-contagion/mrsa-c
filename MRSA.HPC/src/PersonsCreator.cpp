@@ -23,7 +23,7 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map, flo
 
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
-		reader(creator.reader), places(creator.places) {
+		reader(creator.reader), places(creator.places), min_infection_duration_(creator.min_infection_duration_) {
 	init();
 }
 

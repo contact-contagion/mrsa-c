@@ -45,7 +45,7 @@ public:
 
 private:
 	AgeGroup(const AgeGroup& other);
-	unsigned int infected, colonized, uncolonized;
+	unsigned int infected, colonized;
 	std::vector<Person*> persons;
 };
 

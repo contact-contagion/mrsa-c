@@ -17,6 +17,7 @@
 #include "PlaceCreator.h"
 #include "ActivityCreator.h"
 #include "TransmissionAlgorithm.h"
+#include "SummaryInfectionStats.h"
 
 namespace mrsa {
 
@@ -65,7 +66,7 @@ MRSAObserver::~MRSAObserver() {
 	delete people_;
 
 	// delete each place from the list of places.
-	for (vector<Place*>::iterator iter  = places.begin(); iter != places.end(); ++iter) {
+	for (vector<Place*>::iterator iter = places.begin(); iter != places.end(); ++iter) {
 		delete (*iter);
 	}
 }
@@ -76,8 +77,7 @@ void MRSAObserver::go() {
 	person_stats->clear();
 	// using the current tick determine the simulated hour and
 	// day and whether this is a weekday or weekend.
-	int tick =
-			(int) RepastProcess::instance()->getScheduleRunner().currentTick();
+	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
 	int time = tick % 24;
 	int day = (tick / 24) % 7;
 	bool is_weekday = (day == 0 || day == 6) ? false : true;
@@ -126,8 +126,7 @@ void MRSAObserver::initializeActivities(Properties& props) {
 
 	// each person finds his / her list of activities
 	// in the map
-	for (AgentSet<Person>::as_iterator iter = people.begin();
-			iter != people.end(); iter++) {
+	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
 		Person* person = (*iter);
 		//std::cout << (*person) << std::endl;
 		if (!person->initializeActivities(map)) {
@@ -140,10 +139,8 @@ void MRSAObserver::initializeActivities(Properties& props) {
 
 // creates the places. The places are pointers to
 // Place so they can be easily shared among persons.
-void MRSAObserver::createPlaces(Properties& props,
-		map<string, Place*>* placeMap) {
+void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap) {
 	const string placesFile = props.getProperty(PLACES_FILE);
-
 
 	// create the places.
 	PlaceCreator placeCreator;
@@ -153,15 +150,16 @@ void MRSAObserver::createPlaces(Properties& props,
 	// so that the PersonsCreator can easily look up
 	// places and assign them to Persons.
 	for (int i = 0, n = places.size(); i < n; i++) {
-		Place* place =  places[i];
+		Place* place = places[i];
 		placeMap->insert(pair<string, Place*>(place->placeId(), place));
 	}
 }
 
+
+
 // Creates the Persons. The Persons are turtles and
 // so must be created by the Observer using a functor.
-void MRSAObserver::createPersons(Properties& props,
-		map<string, Place*>* placeMap) {
+void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMap) {
 	const string personsFile = props.getProperty(PERSONS_FILE);
 	// count the lines in the file so we know how many
 	// persons to create: one per line.
@@ -170,7 +168,7 @@ void MRSAObserver::createPersons(Properties& props,
 	if (lines == -1)
 		throw invalid_argument("Error opening: " + personsFile);
 
-	float min_infection_duration = (float)strToDouble(props.getProperty(MIN_INFECT_PERIOD));
+	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
 
 	// A PersonsCreator is used a functor to create the persons
 	// in concert with this MRSAObserver.
@@ -182,8 +180,7 @@ void MRSAObserver::createPersons(Properties& props,
 	// get all the created Persons and validate them.
 	AgentSet<Person> people;
 	get(people);
-	for (AgentSet<Person>::as_iterator iter = people.begin();
-			iter != people.end(); iter++) {
+	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
 		Person* person = (*iter);
 		// check if a person was assigned any places, and if not
 		// then remove the person with die().
@@ -193,8 +190,7 @@ void MRSAObserver::createPersons(Properties& props,
 
 // initialize the disease state of all the persons in the model
 // from some initial parameters.
-void MRSAObserver::initializeDiseaseStatus(Properties& props,
-		AgentSet<Person>& people) {
+void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& people) {
 
 	// set the specified fraction of persons to colonized
 	// using a random draw.
@@ -224,7 +220,8 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props,
 			p->updateStatus(INFECTED);
 			++count;
 			// enough colonized so break.
-			if (count == infected) break;
+			if (count == infected)
+				break;
 		}
 	}
 }
@@ -243,30 +240,29 @@ void MRSAObserver::initializeDataCollection() {
 	// data source for counting the number of uncolonized persons
 	UnColonizedSum* ocSum = new UnColonizedSum(person_stats);
 	builder.addDataSource(
-			repast::createSVDataSource("uncolonized_count", ocSum,
-					std::plus<double>()));
+			repast::createSVDataSource("uncolonized_count", ocSum, std::plus<double>()));
 
 	// data source for counting the number of colonized persons
 	ColonizedSum* cSum = new ColonizedSum(person_stats);
-	builder.addDataSource(
-			repast::createSVDataSource("colonized_count", cSum,
-					std::plus<double>()));
+	builder.addDataSource(repast::createSVDataSource("colonized_count", cSum, std::plus<double>()));
 
 	// data source for counting the number of infected persons
 	InfectionSum* iSum = new InfectionSum(person_stats);
-	builder.addDataSource(
-			repast::createSVDataSource("infection_count", iSum,
-					std::plus<double>()));
+	builder.addDataSource(repast::createSVDataSource("infection_count", iSum, std::plus<double>()));
 
 	// data source for the total number of persons
 	TotalSum* tSum = new TotalSum(person_stats);
-	builder.addDataSource(
-			repast::createSVDataSource("total_count", tSum,
-					std::plus<double>()));
+	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
 
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.
 	addDataSet(builder.createDataSet());
+}
+
+void MRSAObserver::atEnd() {
+	SummaryInfectionStats stats;
+	stats.gatherStats(*people_);
+	std::cout << stats << std::endl;
 }
 
 // entry point for model setup.
@@ -314,6 +310,12 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
+
+	// schedule MRSAObserver::atEnd() to be called with the sim terminates.
+	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();
+	runner.scheduleEndEvent(
+			Schedule::FunctorPtr(
+					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
 
 	repast::timestamp(time);
 	std::cout << "Setup Finished at " << time << std::endl;
