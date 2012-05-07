@@ -41,6 +41,8 @@ Activity::Activity(std::vector<std::string>& vec) :
 	val = trim(val);
 	place_risk = (float)strToDouble(val);
 	if (place_risk == 0) place_risk = .1f;
+	//if (place_type != "Household") place_risk = .0f;
+
 }
 
 Activity::Activity(const Activity& act) : tucase_id(act.tucase_id), place_type(act.place_type),
