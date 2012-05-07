@@ -51,13 +51,15 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 
 		// The initial colonization percentage.
 		addSliderWL("initialColonizationPercentage", "Initial Colonization Percentage", 0, 1, 100, 3)
-				
+			
+		/*	
 		// Add a chooser for selecting transition rules.
 		addChooserWL('transitionRule', 'Transition Rule:',
 			['None',
 			'Simple',
 			'Detailed Activity Rule',
 			'Detailed Place Rule'], 3)
+		*/
 		
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
