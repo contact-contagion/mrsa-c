@@ -9,7 +9,7 @@ places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv
 activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv 
 
 initial.colonization.fraction = 0.03
-initial.infected.count = 17;
+initial.infected.count = 34;
 
 minimum.infection.period = 7
 
