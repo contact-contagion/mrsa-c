@@ -53,8 +53,10 @@ class UserObserver extends BaseObserver {
 			println("Started Reading Places")
 
 			// Read the places.
-			createTurtlesFromCSVFile(placesInputFile, Place.class,
-					'square', 0.1, Utility.white())
+			//createTurtlesFromCSVFile(placesInputFile, Place.class,
+			//		'square', 0.1, Utility.white())
+			PlaceCreator creator = new PlaceCreator(this);
+			creator.run(placesInputFile, 'square', 0.1, Utility.white());
 
 			// Note the state.
 			println("Completed Reading Places")
@@ -138,6 +140,11 @@ class UserObserver extends BaseObserver {
 		// Note the state.
 		println("Completed Counting People and Places")
 		
+		// reset the places prior to starting.
+		ask(places()) {
+			reset();
+		}
+		
 		// Note the state.
 		println("Ready to Run...")
 		
@@ -206,7 +213,7 @@ class UserObserver extends BaseObserver {
 				goToHH()
 			
 			// Check for a work place.
-			} else if (currentActivity.place_type.equalsIgnoreCase("Work")) {
+			} else if (currentActivity.place_type.equalsIgnoreCase("Workplace")) {
 			
 				// Go to work.
 				goToWork()
@@ -236,34 +243,15 @@ class UserObserver extends BaseObserver {
 		// Count again.
 		countPersonsAndPlaces()
 
-		// Expose people to disease transmission risk.
-		ask(persons()){
+		// ask each place to run the transmission rule for
+		// that place
+		ask(places()){
 			
-			// Activate a transition as requested.
-			if (transitionRule.equalsIgnoreCase('None')) {
+			// run the transmission
+			runTransmission();
 			
-				// Do nothing.
-				
-			// Check for a simple rule request.
-			} else if (transitionRule.equalsIgnoreCase('Simple')) {
-
-				// Perform a simple transition.
-				activateSimpleTransition(currentActivity)
-
-			// Check for a detailed activity rule request.
-			} else if (transitionRule.equalsIgnoreCase('Detailed Activity Rule')) {
-			
-				// Perform a detailed activity-based transition.
-				activateDetailedActivityTransition(currentActivity)
-				
-			// Check for a detailed place rule request.
-			} else if (transitionRule.equalsIgnoreCase('Detailed Place Rule')) {
-			
-				// Perform a detailed place-based transition.
-				activateDetailedPlaceTransition()
-				
-			}
-			
+			// reset the place to its occupied status
+			reset();
 		}
 		
 		// Move to the next hour.
@@ -313,15 +301,6 @@ class UserObserver extends BaseObserver {
 				}
 				
 			}
-			
-			// Reset the local place uncolonized counter.
-			place_uncolonized = 0
-			
-			// Reset the local place colonized counter.
-			place_colonized = 0
-			
-			// Reset the local place infected counter.
-			place_infected = 0
 
 		}
 		
@@ -354,9 +333,7 @@ class UserObserver extends BaseObserver {
 				totalUncolonized++
 				
 				// Increment place uncolonized counter, if appropriate.
-				if (currentPlace != null) {
-					currentPlace.place_uncolonized++
-				} else {
+				if (currentPlace == null) {
 					println("Uncolonized person " + person_id + " place is null")
 				}
 				
@@ -370,9 +347,7 @@ class UserObserver extends BaseObserver {
 				totalColonized++
 				
 				// Increment place colonized counter, if appropriate.
-				if (currentPlace != null) {
-					currentPlace.place_colonized++
-				} else {
+				if (currentPlace == null) {
 					println("Colonized person " + person_id + " place is null")
 				}
 				
@@ -386,9 +361,7 @@ class UserObserver extends BaseObserver {
 				totalInfected++
 				
 				// Increment place infected counter, if appropriate.
-				if (currentPlace != null) {
-					currentPlace.place_infected++
-				} else {
+				if (currentPlace == null) {
 					println("Infected person " + person_id + " place is null")
 				}
 				
@@ -702,7 +675,7 @@ class UserObserver extends BaseObserver {
 				
 				// Give the agent a good name.
 				}, turtleType.getSimpleName())
-				
+	
 			}
 			
 		}
