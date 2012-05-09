@@ -34,9 +34,12 @@ void AbstractPlace::reset() {
 void AbstractPlace::processPerson(Person* person, TransmissionAlgorithm* ta) {
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
+	DiseaseStatus status = person->status();
 	if (person->canStatusChange()) {
-		DiseaseStatus status = person->status();
 		person->updateStatus(ta->run(infected, colonized, status, risk_));
+	} else if (status == INFECTED) {
+		// person is infected so we need to count that
+		ta->incrementInfectionFromInfectionCount();
 	}
 }
 

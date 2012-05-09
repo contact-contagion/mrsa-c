@@ -37,9 +37,13 @@ void AgeGroup::processPeople(TransmissionAlgorithm* ta, float risk) {
 	// status counts for this AgeGroup.
 	for (vector<Person*>::iterator iter = persons.begin(); iter != persons.end(); ++iter) {
 		Person* person = (*iter);
+
+		DiseaseStatus status = person->status();
 		if (person->canStatusChange()) {
-			DiseaseStatus status = person->status();
 			person->updateStatus(ta->run(infected, colonized, status, risk));
+		} else if (status == INFECTED) {
+			// person is infected so we need to count that
+			ta->incrementInfectionFromInfectionCount();
 		}
 	}
 }

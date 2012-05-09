@@ -70,7 +70,7 @@ public:
 
 private:
 	std::string tucase_id, place_type;
-	float start_time, end_time;
+	int start_time, end_time;
 	int activity_risk;
 	float place_risk;
 

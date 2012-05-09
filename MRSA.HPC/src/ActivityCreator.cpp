@@ -42,11 +42,8 @@ void ActivityCreator::run(const std::string& file, std::map<std::string, std::ve
 			// and put that activity in it.
 			vector<Activity>& activities = iter->second;
 			activities.push_back(activity);
-			std::cout << activities.size() << std::endl;
 		}
-
 	}
-
 }
 
 } /* namespace mrsa */

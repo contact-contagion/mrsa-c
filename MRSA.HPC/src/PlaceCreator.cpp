@@ -14,17 +14,11 @@
 #include "School.h"
 #include "Workplace.h"
 #include "DefaultPlace.h"
+#include "Constants.h"
 
 namespace mrsa {
 
 using namespace std;
-
-// the type is lower-cased before the compare
-// so these are OK, even though they don't match
-// the case of those in the data files.
-const string SCHOOL_TYPE = "school";
-const string HOUSEHOLD_TYPE = "household";
-const string WORKPLACE_TYPE	= "workplace";
 
 const int TYPE_IDX = 1;
 

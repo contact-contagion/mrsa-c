@@ -14,7 +14,8 @@ namespace mrsa {
 TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
 TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
-		a_(a), b_(b), c_(c), d_(d), e_(e), from_infection(0), from_colonization(0) {
+		a_(a), b_(b), c_(c), d_(d), e_(e), colonization_from_infection(0), colonization_from_colonization(0), infection_from_infection (0),
+		infection_from_colonization (0){
 }
 
 void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
@@ -63,13 +64,13 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++from_infection;
+		if (ret == COLONIZED) ++colonization_from_infection;
 	} else if (colonized > 0) {
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++from_colonization;
+		if (ret == COLONIZED) ++colonization_from_colonization;
 	}
 
 	//std::cout << "fc: " << from_colonization << std::endl;
@@ -82,10 +83,11 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 DiseaseStatus TransmissionAlgorithm::runColonized() {
 	DiseaseStatus ret(COLONIZED);
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= b_)
+	if (draw <= b_) {
 		// move from colonized to infected with a probability of b_
 		ret = INFECTED;
-	else if (draw <= e_ + b_)
+		++infection_from_colonization;
+	} else if (draw <= e_ + b_)
 		// move from colonized to infected with a probability of e_
 		// we already tested for <= b_ so only get here if > b_ but
 		// <= e_.
@@ -106,6 +108,12 @@ DiseaseStatus TransmissionAlgorithm::runInfected() {
 		// we already tested for <= d_ so only get here if > d_ but
 		// <= c_.
 		ret = COLONIZED;
+	else {
+		// default ret status is INFECTION so we don't need to
+		// set that here, just increment the count of persons
+		// who stayed in infection from infection.
+		++infection_from_infection;
+	}
 
 	return ret;
 }

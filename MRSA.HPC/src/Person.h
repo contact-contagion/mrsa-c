@@ -37,7 +37,8 @@ class Person : public repast::relogo::Turtle {
 
 public:
 
-	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Place* home, Place* group_quarters,
+	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Place* home,
+			Place* other_home, Place* group_quarters,
 			Place* work, Place* school, float min_infection_duration);
 	virtual ~Person();
 
@@ -112,7 +113,7 @@ private:
 	typedef std::vector<Activity>::const_iterator ActivityIter;
 
 	std::string person_id;
-	Place* _household, *_group_quarters, *_work, *_school, *current;
+	Place* _household, *other_household, *_group_quarters, *_work, *_school, *current;
 	std::string tucaseid_weekday, tucaseid_weekend;
 	int relate, sex, age_;
 

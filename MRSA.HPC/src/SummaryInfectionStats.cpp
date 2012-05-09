@@ -14,7 +14,7 @@ using namespace repast::relogo;
 
 SummaryInfectionStats::SummaryInfectionStats() : infection_hist(), colonized_hist(),
 		infection_count(0), colonized_count(0), infection_duration(0), colonization_duration(0),
-		colonization_r0(0), infection_r0(0) {
+		colonization_from_colonization_r0(0), colonization_from_infection_r0(0) {
 
 }
 
@@ -42,14 +42,20 @@ void SummaryInfectionStats::gatherStats(AgentSet<Person>& people) {
 	if (infection_count != 0) infection_duration = infection_duration / infection_count;
 	if (colonized_count != 0) colonization_duration = colonization_duration / colonized_count;
 
-	double fc = TransmissionAlgorithm::instance()->fromColonizationCount();
-	double fi = TransmissionAlgorithm::instance()->fromInfectionCount();
+	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
+	double cfc = ta->colonizationFromColonizationCount();
+	double cfi = ta->colonizationFromInfectionCount();
+	double ifc = ta->infectionFromColonizationCount();
+	double ifi = ta->infectionFromInfectionCount();
 
 	//std::cout << "fc at end: " << fc << std::endl;
 	//std::cout << "fi at end: " << fi << std::endl;
 
-	infection_r0 = fi / infection_count;
-	colonization_r0 = fc / colonized_count;
+	colonization_from_infection_r0 = cfi / infection_count;
+	colonization_from_colonization_r0 = cfc / colonized_count;
+
+	infection_from_colonization_r0 = ifc / colonized_count;
+	infection_from_infection_r0 = ifi / infection_count;
 }
 
 void SummaryInfectionStats::addToHistogram(unsigned int count, std::map<unsigned int, unsigned long>& hist) {
@@ -67,8 +73,10 @@ std::ostream& operator<<(std::ostream& os, const SummaryInfectionStats& stats) {
 			"\ttotal colonization: " << stats.colonized_count << std::endl <<
 			"\tavg. infection duration: " << stats.infection_duration << std::endl <<
 			"\tavg. colonization duration: " << stats.colonization_duration << std::endl <<
-			"\tinfection r0: " << stats.infection_r0 << std::endl <<
-			"\tcolonization r0: " << stats.colonization_r0 << std::endl;
+			"\t colonization_infection r0: " << stats.colonization_from_infection_r0 << std::endl <<
+			"\t coloniztion_colonization r0: " << stats.colonization_from_colonization_r0 << std::endl <<
+			"\t infection_colonization r0: " << stats.infection_from_colonization_r0 << std::endl <<
+			"\t infection_infection r0: " << stats.infection_from_infection_r0 << std::endl;
 
 	for (SummaryInfectionStats::ConstHistIter iter = stats.infection_hist.begin(); iter != stats.infection_hist.end(); ++iter) {
 		os << "\t" << iter->second << " persons infected " << iter->first << " times" << std::endl;

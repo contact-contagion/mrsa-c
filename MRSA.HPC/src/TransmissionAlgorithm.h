@@ -40,8 +40,8 @@ public:
 	 * from uncolonized to colonized as the result
 	 * of colocation with infected person(s).
 	 */
-	const long fromInfectionCount() const {
-		return from_infection;
+	const long colonizationFromInfectionCount() const {
+		return colonization_from_infection;
 	}
 
 	/**
@@ -49,8 +49,32 @@ public:
 	 * from uncolonized to colonized as the result
 	 * of colocation with colonized person(s).
 	 */
-	const long fromColonizationCount() const {
-		return from_colonization;
+	const long colonizationFromColonizationCount() const {
+		return colonization_from_colonization;
+	}
+
+	/**
+	 * Gets the number of persons who transitioned
+	 * from colonization to infection.
+	 */
+	const long infectionFromColonizationCount() const {
+		return infection_from_colonization;
+	}
+
+	/**
+	 * Gets the number of persons who remained in
+	 * infection.
+	 */
+	const long infectionFromInfectionCount() const {
+		return infection_from_infection;
+	}
+
+	/**
+	 * Increments the number of persons who remained
+	 * in infection state during a transition.
+	 */
+	void incrementInfectionFromInfectionCount() {
+		++infection_from_infection;
 	}
 
 	/**
@@ -71,7 +95,8 @@ private:
 	// counts the number of persons who were
 	// colonized from contact with infected persons,
 	// and from colonized persons.
-	long from_infection, from_colonization;
+	long colonization_from_infection, colonization_from_colonization;
+	long infection_from_infection, infection_from_colonization;
 
 	/**
 	 * Run the transmission algorithm for an uncolonized person, returning the result as a

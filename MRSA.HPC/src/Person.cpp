@@ -18,8 +18,8 @@ using namespace repast;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Place* home, Place* group_quarters, Place* work, Place* school, float min_infection_duration) :
-		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), _household(home), _group_quarters(
+		Place* home, Place* other_home, Place* group_quarters, Place* work, Place* school, float min_infection_duration) :
+		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), _household(home), other_household(other_home), _group_quarters(
 				group_quarters), _work(work), _school(school), current(0), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration) {
@@ -114,6 +114,10 @@ void Person::performActivity(int time, bool isWeekday) {
 			changePlace(_household);
 		} else if (place_type == "Workplace") {
 			changePlace(_work);
+		} else if (place_type == "Other Household") {
+			//std::cout << "going to other household" << std::endl;
+			changePlace(other_household);
+
 		} else if (place_type == "School") {
 			changePlace(_school);
 		} else if (place_type == "Group Quarters") {

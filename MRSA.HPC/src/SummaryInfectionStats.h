@@ -74,7 +74,8 @@ private:
 
 	long infection_count, colonized_count;
 	double infection_duration, colonization_duration;
-	double colonization_r0, infection_r0;
+	double colonization_from_colonization_r0, colonization_from_infection_r0;
+	double infection_from_colonization_r0, infection_from_infection_r0;
 };
 
 std::ostream& operator<<(std::ostream& os, const SummaryInfectionStats& stats);
