@@ -15,12 +15,19 @@
 
 namespace mrsa {
 
+/**
+ * Creates the Activities from an activity csv file.
+ */
 class ActivityCreator {
 
 public:
 	ActivityCreator();
 	virtual ~ActivityCreator();
 
+	/**
+	 * Runs this ActivityCreator on the specified file, put the results in into the specified map.
+	 * The map key is the tucaseid, and value is a vector of all the activities with that id.
+	 */
 	void run(const std::string& file, std::map<std::string, std::vector<Activity> >& map);
 };
 
