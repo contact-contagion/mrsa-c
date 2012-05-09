@@ -1,6 +1,8 @@
-#random.seed = 1284067381
+#random.seed = 1
 
 # hours
+# month = 720
+# year = 86400
 stop.at = 720.5
 
 # per process
