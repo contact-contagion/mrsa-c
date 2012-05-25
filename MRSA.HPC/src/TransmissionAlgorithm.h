@@ -20,7 +20,6 @@ namespace mrsa {
 class TransmissionAlgorithm {
 
 public:
-	TransmissionAlgorithm(double a, double b, double c, double d, double e);
 	virtual ~TransmissionAlgorithm();
 
 	/**
@@ -43,31 +42,21 @@ public:
 		return newly_infected;
 	}
 
-	/**
-	 * Runs the transmission algorithm given the current status and the
-	 * infected, colonized and uncolonized counts.
-	 *
-	 * @param infected
-	 * @param colonized
-	 * @param uncolonized
-	 * @param currentStatus
-	 */
-	DiseaseStatus run(unsigned int infected, unsigned int colonized, DiseaseStatus currentStatus,
-			float risk);
+	const long colonizedFromInfectionCount() const {
+		return colonized_from_infection;
+	}
 
-	/**
-	 * Resets the transmission counts.
-	 */
-	void resetCounts();
+	const long colonizedFromColonizationCount() const {
+		return colonized_from_colonization;
+	}
 
-private:
-	static TransmissionAlgorithm* instance_;
-	double a_, b_, c_, d_, e_;
+	const double colonizedPerInfectedCount() const {
+		return colonized_per_infected;
+	}
 
-	// counts the number of persons who were
-	// are newly_colonized and newly_infected
-	long newly_colonized, newly_infected;
-	//long infected_to_infected, colonized_to_infected;
+	const double colonizedPerColonizedCount() const {
+		return colonized_per_colonization;
+	}
 
 	/**
 	 * Run the transmission algorithm for an uncolonized person, returning the result as a
@@ -84,7 +73,29 @@ private:
 	 * Run the transmission algorithm for an infected person, returning the result as a
 	 * DiseaseStatus.
 	 */
-	DiseaseStatus runInfected();
+	DiseaseStatus runInfected(float seek_care_modifier);
+
+	/**
+	 * Resets the transmission counts.
+	 */
+	void resetCounts();
+
+private:
+
+	static TransmissionAlgorithm* instance_;
+	double a_, b_, c_, d_, e_;
+
+	// counts the number of persons who were
+	// are newly_colonized and newly_infected
+	long newly_colonized, newly_infected;
+	long colonized_from_infection, colonized_from_colonization;
+	double colonized_per_infected, colonized_per_colonization;
+
+	/**
+	 * Private constructor.
+	 */
+	TransmissionAlgorithm(double a, double b, double c, double d, double e);
+
 };
 
 } /* namespace mrsa */

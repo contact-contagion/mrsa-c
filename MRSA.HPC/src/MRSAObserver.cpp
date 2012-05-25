@@ -30,10 +30,15 @@ const string PERSONS_FILE = "persons.file";
 const string PLACES_FILE = "places.file";
 const string ACTIVITIES_FILE = "activities.file";
 
+const string HOURLY_OUTPUT_FILE = "hourly.output.file";
+const string YEARLY_OUTPUT_FILE = "yearly.output.file";
+const string SUMMARY_OUTPUT_FILE = "summary.output.file";
+
 const string COLONIZATION_FRAC = "initial.colonization.fraction";
 const string INITIAL_INFECTION_COUNT = "initial.infected.count";
 const string INFECTION_PERIOD = "minimum.infection.period";
 const string FASTER_SCALING = "faster.response.scaling.factor";
+const string SEEK_CARE_FRACTION = "seek.care.fraction";
 
 const string MIN_INFECT_PERIOD = "minimum.infection.period";
 
@@ -55,11 +60,10 @@ int line_count(const std::string& file) {
 }
 
 MRSAObserver::MRSAObserver() :
-		personType(0), stats(0), places(0), people_(0) {
+		personType(0), places(0), people_(0), summary_output_file() {
 }
 
 MRSAObserver::~MRSAObserver() {
-	delete stats;
 	// delete the permanent AgentSet used to hold the
 	// population.
 	delete people_;
@@ -72,8 +76,9 @@ MRSAObserver::~MRSAObserver() {
 
 // called each tick
 void MRSAObserver::go() {
-	// clear the stats, as they are per tick.
-	stats->clearHourlyStats();
+	// reset the hourly stats, as they are per tick.
+	Statistics* stats = Statistics::getInstance();
+	stats->resetHourlyStats();
 	// using the current tick determine the simulated hour and
 	// day and whether this is a weekday or weekend.
 	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
@@ -81,7 +86,7 @@ void MRSAObserver::go() {
 	int day = (tick / 24) % 7;
 	bool is_weekday = (day == 0 || day == 6) ? false : true;
 
-	// print out time stamp each simluated month
+	// print out time stamp each simulated month
 	// on process 0
 	if (RepastProcess::instance()->rank() == 0 && tick % 720 == 0) {
 		std::string time;
@@ -110,6 +115,8 @@ void MRSAObserver::go() {
 	}
 
 	stats->calculateHourlyStats();
+	// this has to be called last so that we capture the
+	// initial infection counts that were set during setup.
 	TransmissionAlgorithm::instance()->resetCounts();
 }
 
@@ -169,10 +176,13 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 		throw invalid_argument("Error opening: " + personsFile);
 
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
+	float seek_care_fraction = (float) strToDouble(props.getProperty(SEEK_CARE_FRACTION));
+	std::cout << "seek care fraction: " << seek_care_fraction << std::endl;
 
 	// A PersonsCreator is used a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration);
+
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, seek_care_fraction);
 	// First line is the header info so we create one less
 	// than the number of lines in the file.
 	personType = create<Person>(lines - 1, pCreator);
@@ -226,51 +236,131 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 	}
 }
 
+void MRSAObserver::calcYearlyStats() {
+	Statistics::getInstance()->calculateYearlyStats(*people_);
+}
+
+void MRSAObserver::initializeYearlyDataCollection(const string& file) {
+	Statistics* stats = Statistics::getInstance();
+
+	// Create a DataSet that will output data to yearly_data.csv
+	SVDataSetBuilder builder(file, ",",
+			repast::RepastProcess::instance()->getScheduleRunner().schedule());
+
+	builder.addDataSource(
+			createSVDataSource("infection_count", new LDataSourceAdapter(&stats->yearly_infected),
+					std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("colonized_count", new LDataSourceAdapter(&stats->yearly_colonized),
+					std::plus<double>()));
+
+	builder.addDataSource(createSVDataSource("colonizations_from_infection", new LDataSourceAdapter(&stats->yearly_c_from_i),
+					std::plus<double>()));
+
+	builder.addDataSource(createSVDataSource("colonizations_from_colonization", new LDataSourceAdapter(&stats->yearly_c_from_c),
+			std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("avg_infection_duration",
+					new DDataSourceAdapter(&stats->yearly_infection_duration),
+					std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("avg_colonization_duration",
+					new DDataSourceAdapter(&stats->yearly_colonization_duration),
+					std::plus<double>()));
+
+
+	builder.addDataSource(repast::createSVDataSource("infected_r0", new DDataSourceAdapter(&stats->yearly_infected_r0),
+			std::plus<double>()));
+
+	builder.addDataSource(repast::createSVDataSource("colonized_r0", new DDataSourceAdapter(&stats->yearly_colonized_r0),
+				std::plus<double>()));
+
+	string place_names[] = {"household", "hospital", "school", "workplace", "gym", "nursing home", "college dorm", "prison"};
+	for (int i = 0; i < 8; i++) {
+		std::string header = place_names[i] + "_colonization_fraction";
+		builder.addDataSource(createSVDataSource(header, new PlaceCount(&stats->colonization_count_map, place_names[i]),
+						std::plus<double>()));
+	}
+
+	repast::DataSet* ds = builder.createDataSet();
+	// add it to the inherit dataSets vector.
+	// this insures that it will be written on end
+	// and properly cleaned up.
+	Observer::dataSets.push_back(ds);
+	// schedule the execution for yearly intervals.
+	// 8760 = 24 * 365
+	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();
+	// schedule calcYearlyStats at year + .15
+	runner.scheduleEvent(8760.15, 8760.0,
+			Schedule::FunctorPtr(
+					new MethodFunctor<MRSAObserver>(this, &MRSAObserver::calcYearlyStats)));
+	// schedule record at year + .2
+	runner.scheduleEvent(8760.2, 8760.0,
+			Schedule::FunctorPtr(new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::record)));
+	// schedule write at year + .3
+	runner.scheduleEvent(8760.3, 8760.0,
+			Schedule::FunctorPtr(new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::write)));
+	// schedule write at year + .4
+	runner.scheduleEvent(8760.4, 8760.0,
+			Schedule::FunctorPtr(
+					new MethodFunctor<Statistics>(stats, &Statistics::resetYearlyStats)));
+
+}
+
 // initialize the data collection by creating
 // a data set and adding data sources to it.
-void MRSAObserver::initializeDataCollection() {
-	// PersonStats counts number of colonized,
-	// uncolonized and infected persons.
-	stats = new Statistics();
+void MRSAObserver::initializeHourlyDataCollection(const string& file) {
+	Statistics* stats = Statistics::getInstance();
 
-	// Create a DataSet that will output data to data.csv
-	SVDataSetBuilder builder("./output/data.csv", ",",
+	// Create a DataSet that will output data to hourly_data.csv
+	SVDataSetBuilder builder(file, ",",
 			repast::RepastProcess::instance()->getScheduleRunner().schedule());
 
 	// data source for counting the number of uncolonized persons
-	UnColonizedSum* ocSum = new UnColonizedSum(stats);
 	builder.addDataSource(
-			repast::createSVDataSource("uncolonized_count", ocSum, std::plus<double>()));
+			repast::createSVDataSource("uncolonized_count",
+					new LDataSourceAdapter(&stats->hourly_uncolonized), std::plus<double>()));
 
 	// data source for counting the number of colonized persons
-	ColonizedSum* cSum = new ColonizedSum(stats);
-	builder.addDataSource(repast::createSVDataSource("colonized_count", cSum, std::plus<double>()));
+	builder.addDataSource(
+			repast::createSVDataSource("colonized_count",
+					new LDataSourceAdapter(&stats->hourly_colonized), std::plus<double>()));
 
 	// data source for counting the number of infected persons
-	InfectionSum* iSum = new InfectionSum(stats);
-	builder.addDataSource(repast::createSVDataSource("infection_count", iSum, std::plus<double>()));
+	builder.addDataSource(
+			repast::createSVDataSource("infection_count",
+					new LDataSourceAdapter(&stats->hourly_infected), std::plus<double>()));
 
 	// data source for the total number of persons
 	TotalSum* tSum = new TotalSum(stats);
 	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
 
-	IOverIR0* iiR0 = new IOverIR0(stats);
-	builder.addDataSource(repast::createSVDataSource("newly_infected_over_total_infected_r0", iiR0, std::plus<double>()));
+	/*
+	 builder.addDataSource(
+	 repast::createSVDataSource("newly_infected_over_total_infected_r0",
+	 new DDataSourceAdapter(&stats->ni_over_ti), std::plus<double>()));
 
-	IOverCR0* icR0 = new IOverCR0(stats);
-	builder.addDataSource(repast::createSVDataSource("newly_infected_over_total_colonized_r0", icR0, std::plus<double>()));
+	 builder.addDataSource(
+	 repast::createSVDataSource("newly_infected_over_total_colonized_r0",
+	 new DDataSourceAdapter(&stats->ni_over_tc), std::plus<double>()));
 
-	COverIR0* ciR0 = new COverIR0(stats);
-	builder.addDataSource(repast::createSVDataSource("newly_colonized_over_total_infected_r0", ciR0, std::plus<double>()));
+	 builder.addDataSource(
+	 repast::createSVDataSource("newly_colonized_over_total_infected_r0",
+	 new DDataSourceAdapter(&stats->nc_over_ti), std::plus<double>()));
 
-	COverCR0* ccR0 = new COverCR0(stats);
-	builder.addDataSource(repast::createSVDataSource("newly_colonized_over_total_colonized_r0", ccR0, std::plus<double>()));
+	 builder.addDataSource(
+	 repast::createSVDataSource("newly_colonized_over_total_colonized_r0",
+	 new DDataSourceAdapter(&stats->nc_over_tc), std::plus<double>()));
 
-	TCOverPTC* ptc = new TCOverPTC(stats);
-	builder.addDataSource(repast::createSVDataSource("current_colonized_over_prev_colonized", ptc, std::plus<double>()));
+	 builder.addDataSource(
+	 repast::createSVDataSource("current_colonized_over_prev_colonized",
+	 new DDataSourceAdapter(&stats->tc_over_ptc), std::plus<double>()));
 
-	TIOverPTI* pti = new TIOverPTI(stats);
-	builder.addDataSource(repast::createSVDataSource("current_infected_over_prev_infected", pti, std::plus<double>()));
+	 builder.addDataSource(
+	 repast::createSVDataSource("current_infected_over_prev_infected",
+	 new DDataSourceAdapter(&stats->ti_over_pti), std::plus<double>()));
+	 */
 
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.
@@ -278,7 +368,7 @@ void MRSAObserver::initializeDataCollection() {
 }
 
 void MRSAObserver::atEnd() {
-	stats->calculateSummaryStats(*people_, "./output/summary_stats.txt");
+	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file);
 }
 
 // entry point for model setup.
@@ -317,8 +407,12 @@ void MRSAObserver::setup(Properties& props) {
 	initializeDiseaseStatus(props, people);
 	people.ask(&Person::goToHome);
 
-	// initialize the data collection
-	initializeDataCollection();
+
+	// initialize the hourly data collection
+	initializeHourlyDataCollection(props.getProperty(HOURLY_OUTPUT_FILE));
+	// initialize yearly data collection
+	initializeYearlyDataCollection(props.getProperty(YEARLY_OUTPUT_FILE));
+	summary_output_file = props.getProperty(SUMMARY_OUTPUT_FILE);
 
 	// get a permanent set of people so we don't have to retrieve
 	// them each iteration which will be slow. We do this here because
@@ -326,6 +420,7 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
+	Statistics* stats = Statistics::getInstance();
 	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		Person* person = (*people_)[i];
 		stats->countPerson(person);

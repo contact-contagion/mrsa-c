@@ -18,11 +18,12 @@ using namespace repast;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Place* home, Place* other_home, Place* group_quarters, Place* work, Place* school, float min_infection_duration) :
+		Place* home, Place* other_home, Place* group_quarters, Place* work, Place* school, float min_infection_duration,
+		bool seek_care) :
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), _household(home), other_household(other_home), _group_quarters(
 				group_quarters), _work(work), _school(school), current(0), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration) {
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration), seek_care_(seek_care) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -131,6 +132,10 @@ void Person::performActivity(int time, bool isWeekday) {
 				changePlace(_group_quarters);
 		}
 	}
+}
+
+void Person::incrementColonizationsCaused(float colonization_caused) {
+	status_.incrementColonizationsCaused(colonization_caused);
 }
 
 // sets the new disease status for this person.

@@ -8,7 +8,6 @@
 #ifndef PLACE_H_
 #define PLACE_H_
 
-
 #include <vector>
 #include <string>
 #include <ostream>
@@ -34,6 +33,12 @@ public:
 	 * Creates the place based on the values in the vector, and with the specified risk.
 	 */
 	Place(std::vector<std::string>& vec, float risk);
+
+	/**
+	 * Creates a place with just a risk and an id.
+	 */
+	Place(std::string id, std::string type, float risk_);
+
 	virtual ~Place();
 
 	/**
@@ -48,7 +53,6 @@ public:
 	 */
 	virtual void runTransmission() = 0;
 
-
 	/**
 	 * Resets this place for the next iteration of the model.
 	 */
@@ -58,27 +62,26 @@ public:
 	 * Gets the place id of this place.
 	 */
 	const std::string& placeId() const {
-		return id;
+		return id_;
 	}
 
 	/**
 	 * Gets the type of this place (Household etc.)
 	 */
 	const std::string& placeType() const {
-		return type;
+		return type_;
 	}
 
 protected:
 
 	// id and type of place
-	std::string id, type;
+	std::string id_, type_;
 	// place location
 	double longitude, latitude;
 	float risk_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Place& place);
-
 
 } /* namespace mrsa */
 #endif /* PLACE_H_ */

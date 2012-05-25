@@ -23,6 +23,7 @@ class AbstractPlace: public Place {
 
 public:
 	AbstractPlace(std::vector<std::string>& vec, float risk);
+	AbstractPlace(std::string id, std::string type, float risk);
 	virtual ~AbstractPlace();
 
 	/**
@@ -48,12 +49,22 @@ protected:
 	typedef std::vector<Person*>::iterator PersonIter;
 	// number of colonized, and infected persons in this
 	// place.
-	int colonized, infected;
+	std::vector<Person*> infected, colonized, uncolonized;
 
 	/**
-	 * Process the specifed person for transmission.
+	 * Process the specifed infected person for transmission.
 	 */
-	void processPerson(Person* person, TransmissionAlgorithm* ta);
+	void processInfected(Person* person, TransmissionAlgorithm* ta);
+
+	/**
+	 * Process the specified colonized person for transmission.
+	 */
+	void processColonized(Person* person, TransmissionAlgorithm* ta);
+
+	/**
+	 * Process the specified uncolonized person for transmission.
+	 */
+	void processUncolonized(Person* person, TransmissionAlgorithm* ta);
 };
 
 } /* namespace mrsa */

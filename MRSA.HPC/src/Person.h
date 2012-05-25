@@ -39,7 +39,8 @@ public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Place* home,
 			Place* other_home, Place* group_quarters,
-			Place* work, Place* school, float min_infection_duration);
+			Place* work, Place* school, float min_infection_duration,
+			bool seek_care);
 	virtual ~Person();
 
 	/**
@@ -62,6 +63,13 @@ public:
 	}
 
 	/**
+	 * Gets whether or not this Person seeks care when infected.
+	 */
+	const bool seeksCare() const {
+		return seek_care_;
+	}
+
+	/**
 	 * Update this Person's disease status to the specified status.
 	 */
 	void updateStatus(DiseaseStatus status);
@@ -73,6 +81,14 @@ public:
 	 * uninfected.
 	 */
 	bool canStatusChange();
+
+	/**
+	 * Increment the number colonization caused by this person by the specified
+	 * amount.
+	 *
+	 * @param colonizations_caused the amount to increment by
+	 */
+	void incrementColonizationsCaused(float colonization_caused);
 
 	/**
 	 * Gets this Person's disease status.
@@ -121,6 +137,7 @@ private:
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
+	bool seek_care_;
 
 	/**
 	 * Changes this Person's place to the specified place.

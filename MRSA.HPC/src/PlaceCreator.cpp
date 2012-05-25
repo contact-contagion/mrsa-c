@@ -38,8 +38,9 @@ void PlaceCreator::run(const string& file, vector<Place*>& places) {
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
 		string type = vec[TYPE_IDX];
-		// lower case the type for easier, less type prone comparisons
+		// lower case the type for easier, less error prone comparisons
 		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+		vec[TYPE_IDX] = type;
 		Place* place = 0;
 		if (type == SCHOOL_TYPE) {
 			place = new School(vec);

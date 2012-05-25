@@ -28,26 +28,15 @@ public:
 	SelectiveTransmissionPlace(std::vector<std::string>& vec, float risk, int uncp_count);
 	virtual ~SelectiveTransmissionPlace();
 
-	/**
-	 * Adds a person to this SelectiveTransmissionPlace
-	 *
-	 * @param person the person to add
-	 */
-	virtual void addPerson(Person* person);
 
 	/**
 	 * Runs the SelectiveTransmissionPlace transmission algorithm.
 	 */
 	virtual void runTransmission();
 
-	/**
-	 * Resets this SelectiveTransmissionPlace to an unoccupied state.
-	 */
-	virtual void reset();
 
 private:
 	unsigned int uncp_count;
-	std::vector<Person*> unc_persons, other_persons;
 };
 
 } /* namespace mrsa */

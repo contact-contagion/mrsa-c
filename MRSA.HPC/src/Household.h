@@ -24,25 +24,10 @@ public:
 	virtual ~Household();
 
 	/**
-	 * Adds a person to this household place.
-	 *
-	 * @param person the person to add
-	 */
-	virtual void addPerson(Person* person);
-
-	/**
 	 * Runs the household transmission algorithm.
 	 */
 	virtual void runTransmission();
 
-	/**
-	 * Resets this household to an unoccupied state.
-	 */
-	virtual void reset();
-
-private:
-	// vector of persons currently in this place
-	std::vector<Person*> persons;
 };
 
 } /* namespace mrsa */

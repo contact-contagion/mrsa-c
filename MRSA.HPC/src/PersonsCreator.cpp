@@ -20,15 +20,15 @@ using namespace repast;
 const string RND_INDEX_NAME = "household.index";
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration) :
-		reader(file), places(map), min_infection_duration_(min_infection_duration), households() {
+		float min_infection_duration, float seek_care_fraction) :
+		reader(file), places(map), min_infection_duration_(min_infection_duration), households(), seek_care_fraction_(
+				seek_care_fraction) {
 
 	init();
 
 	for (std::map<string, Place*>::iterator iter = map->begin(); iter != map->end(); ++iter) {
 		Place* p = iter->second;
 		string type = p->placeType();
-		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
 		if (type == HOUSEHOLD_TYPE)
 			households.push_back(p);
 	}
@@ -43,7 +43,8 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_), households(creator.households) {
+				creator.min_infection_duration_), households(creator.households), seek_care_fraction_(
+				creator.seek_care_fraction_) {
 	init();
 }
 
@@ -95,8 +96,11 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		other_home = households[(int) gen->next()];
 	}
 
+	bool seek_care = repast::Random::instance()->nextDouble() <= seek_care_fraction_;
+
 	// create the Person
-	return new Person(id, obs, vec, home, other_home, group_quarters, work, school, min_infection_duration_);
+	return new Person(id, obs, vec, home, other_home, group_quarters, work, school,
+			min_infection_duration_, seek_care);
 }
 
 }

@@ -44,13 +44,18 @@ public:
 	 */
 	virtual void setup(repast::Properties& props);
 
+	/**
+	 * Calculates the yearly stats.
+	 */
+	void calcYearlyStats();
+
 private:
 
 	int personType;
 
-	Statistics* stats;
 	std::vector<Place*> places;
 	repast::relogo::AgentSet<Person>* people_;
+	std::string summary_output_file;
 
 	/**
 	 * Load the activities and assign them to persons.
@@ -58,9 +63,18 @@ private:
 	void initializeActivities(repast::Properties& props);
 
 	/**
-	 * Setup the data collection.
+	 * Setup the hourly data collection.
+	 *
+	 * @param file the file to write the hourly output to
 	 */
-	void initializeDataCollection();
+	void initializeHourlyDataCollection(const std::string& file);
+
+	/**
+	 * Setup the yearly data collection.
+	 *
+	 * @param file the file to write yearly output to
+	 */
+	void initializeYearlyDataCollection(const std::string& file);
 
 	/**
 	 * Creates the persons from the persons file.

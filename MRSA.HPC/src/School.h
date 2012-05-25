@@ -12,6 +12,7 @@
 
 #include "Person.h"
 #include "Place.h"
+#include "AbstractPlace.h"
 #include "TransmissionAlgorithm.h"
 
 namespace mrsa {
@@ -20,33 +21,19 @@ namespace mrsa {
  * A group of persons of the same age in a school. Transmission
  * occurs between members of an AgeGroup.
  */
-class AgeGroup {
+class AgeGroup : public AbstractPlace {
 
 public:
-	AgeGroup();
+	AgeGroup(std::string id, std::string type, float risk);
 	virtual ~AgeGroup();
 
 	/**
-	 * Resets this AgeGroup for another iteration.
-	 *
+	 * Runs the transmission algorithm on the members of this age group.
 	 */
-	void reset();
-
-	/**
-	 * Adds a person to this AgeGroup.
-	 *
-	 * @param person the person to add
-	 */
-	void addPerson(Person* person);
-	/**
-	 * Processes all the persons in this age group for transmission.
-	 */
-	void processPeople(TransmissionAlgorithm* ta, float risk);
+	virtual void runTransmission();
 
 private:
 	AgeGroup(const AgeGroup& other);
-	unsigned int infected, colonized;
-	std::vector<Person*> persons;
 };
 
 

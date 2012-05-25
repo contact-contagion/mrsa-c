@@ -14,7 +14,9 @@ namespace mrsa {
 TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
 TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
-		a_(a), b_(b), c_(c), d_(d), e_(e),  newly_colonized(0), newly_infected(0) {
+		a_(a), b_(b), c_(c), d_(d), e_(e),  newly_colonized(0), newly_infected(0),
+		colonized_from_infection(0), colonized_from_colonization(0),
+		colonized_per_infected(0), colonized_per_colonization(0) {
 }
 
 void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
@@ -31,6 +33,8 @@ TransmissionAlgorithm::~TransmissionAlgorithm() {
 
 void TransmissionAlgorithm::resetCounts() {
 	newly_infected = newly_colonized = 0;
+	colonized_from_infection = colonized_from_colonization = 0;
+	colonized_per_infected = colonized_per_colonization = 0;
 }
 
 TransmissionAlgorithm* TransmissionAlgorithm::instance() {
@@ -39,21 +43,6 @@ TransmissionAlgorithm* TransmissionAlgorithm::instance() {
 				"TransmissionAlgorithm must be initialized before instance() is called");
 	}
 	return instance_;
-}
-
-// run the algorithm
-DiseaseStatus TransmissionAlgorithm::run(unsigned int infected, unsigned int colonized,
-		DiseaseStatus currentStatus, float risk) {
-	// depending on the status, run the algorithm for uncolonized, colonized or infected persons.
-	if (currentStatus == UNCOLONIZED) {
-		return runUncolonized(risk, infected, colonized);
-	} else if (currentStatus == COLONIZED) {
-		return runColonized();
-	} else if (currentStatus == INFECTED) {
-		return runInfected();
-	}
-
-	return currentStatus;
 }
 
 // the algorithm for uncolonized persons.
@@ -67,13 +56,19 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++newly_colonized;
+		if (ret == COLONIZED) {
+			++newly_colonized;
+			++colonized_from_infection;
+		}
 	} else if (colonized > 0) {
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++newly_colonized;
+		if (ret == COLONIZED) {
+			++newly_colonized;
+			++colonized_from_colonization;
+		}
 	}
 
 	//std::cout << "fc: " << from_colonization << std::endl;
@@ -99,14 +94,17 @@ DiseaseStatus TransmissionAlgorithm::runColonized() {
 	return ret;
 }
 
-DiseaseStatus TransmissionAlgorithm::runInfected() {
+DiseaseStatus TransmissionAlgorithm::runInfected(float seek_care_modifier) {
+
+	double d = d_ * seek_care_modifier;
+	double c = c_ * seek_care_modifier;
 
 	DiseaseStatus ret(INFECTED);
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= d_)
+	if (draw <= d)
 		// move from infected to uncolonized with a probability of d_
 		ret = UNCOLONIZED;
-	else if (draw <= d_ + c_) {
+	else if (draw <= d + c) {
 		// move from infected to uncolonized with a probability of c_
 		// we already tested for <= d_ so only get here if > d_ but
 		// <= c_.

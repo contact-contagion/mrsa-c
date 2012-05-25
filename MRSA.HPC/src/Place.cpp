@@ -22,7 +22,7 @@ const int LAT_IDX = 4;
 const int LON_IDX = 5;
 
 // creates a Place from the data in the vector and with the specified risk.
-Place::Place(std::vector<std::string>& vec, float risk) : id(vec[PLACE_ID_IDX]), type(vec[PLACE_TYPE_IDX]),
+Place::Place(std::vector<std::string>& vec, float risk) : id_(vec[PLACE_ID_IDX]), type_(vec[PLACE_TYPE_IDX]),
 		longitude(0), latitude(0), risk_(risk) {
 
 	std::string val = vec[LAT_IDX];
@@ -36,11 +36,13 @@ Place::Place(std::vector<std::string>& vec, float risk) : id(vec[PLACE_ID_IDX]),
 		longitude = strToDouble(val);
 }
 
+Place::Place(std::string id, std::string type, float risk) : id_(id), type_(type), longitude(0), latitude(0), risk_(risk) {}
+
 Place::~Place() {
 }
 
 std::ostream& operator<<(std::ostream& os, const Place& place) {
-	os << "Place[" << place.id << ", " << place.type << "]";
+	os << "Place[" << place.id_ << ", " << place.type_ << "]";
 	return os;
 }
 

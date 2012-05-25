@@ -2,18 +2,27 @@ random.seed = 1
 
 # hours
 # month = 720
-# 10 years = 86400
-stop.at = 86400.5
+# 1 year = 8760.5
+# 5 years = 43800.5
+# 10 years = 87600.5
 
-# per process
+stop.at = 87600.5
+
 persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
 places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv 
 activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv 
 
-initial.colonization.fraction = 0.03
-initial.infected.count = 34;
+hourly.output.file = ./output/base_line_hourly_data.csv
+yearly.output.file = ./output/base_line_yearly_data.csv
+summary.output.file = ./output/base_line_summary_stats.txt
 
-minimum.infection.period = 7
+seek.care.fraction = 1f
+
+initial.colonization.fraction = 0.03
+initial.infected.count = 34
+
+# 7 days (24 x 7)
+minimum.infection.period = 168
 
 # older default
 #a = 6.85270E-05

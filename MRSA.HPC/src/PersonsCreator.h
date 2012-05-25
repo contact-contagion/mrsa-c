@@ -30,7 +30,8 @@ public:
 	 * specified file and using the specified map to
 	 * look up the Persons' places.
 	 */
-	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration);
+	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration,
+			float seek_care_fraction_);
 	PersonsCreator(const PersonsCreator& creator);
 	virtual ~PersonsCreator();
 
@@ -44,6 +45,7 @@ private:
 	std::map<std::string, Place*>* places;
 	float min_infection_duration_;
 	std::vector<Place*> households;
+	float seek_care_fraction_;
 
 	/**
 	 * Finds the named place.
