@@ -52,7 +52,7 @@ unit_tests: $(objects)
 	
 .PHONY: clean
 clean:
-	$(RM) $(objects) $(program) $(libraries) \
+	$(RM) $(objects) $(bin_dir)/$(program) $(libraries) \
 	$(dependencies) $(extra_clean)
 
 ifeq "$(MAKECMDGOALS)" "clean"

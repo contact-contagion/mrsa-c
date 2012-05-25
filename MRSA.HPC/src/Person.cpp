@@ -114,10 +114,10 @@ void Person::performActivity(int time, bool isWeekday) {
 			changePlace(_household);
 		} else if (place_type == "Workplace") {
 			changePlace(_work);
+
 		} else if (place_type == "Other Household") {
 			//std::cout << "going to other household" << std::endl;
 			changePlace(other_household);
-
 		} else if (place_type == "School") {
 			changePlace(_school);
 		} else if (place_type == "Group Quarters") {

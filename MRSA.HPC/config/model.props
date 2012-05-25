@@ -1,9 +1,9 @@
-#random.seed = 1
+random.seed = 1
 
 # hours
 # month = 720
-# year = 86400
-stop.at = 720.5
+# 10 years = 86400
+stop.at = 86400.5
 
 # per process
 persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
@@ -15,7 +15,9 @@ initial.infected.count = 34;
 
 minimum.infection.period = 7
 
-a = 6.85270E-05
+# older default
+#a = 6.85270E-05
+a = 1.85270E-04
 b = 2.84505E-04
 c = 2.37945E-03
 d = 2.67532E-02

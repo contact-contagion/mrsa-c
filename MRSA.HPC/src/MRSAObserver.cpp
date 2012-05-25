@@ -109,6 +109,9 @@ void MRSAObserver::go() {
 		// reset the place for the next iteration
 		place->reset();
 	}
+
+	person_stats->calculateR0Values();
+	TransmissionAlgorithm::instance()->resetCounts();
 }
 
 // load the activities and match them to the persons
@@ -154,8 +157,6 @@ void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap
 		placeMap->insert(pair<string, Place*>(place->placeId(), place));
 	}
 }
-
-
 
 // Creates the Persons. The Persons are turtles and
 // so must be created by the Observer using a functor.
@@ -254,12 +255,31 @@ void MRSAObserver::initializeDataCollection() {
 	TotalSum* tSum = new TotalSum(person_stats);
 	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
 
+	IOverIR0* iiR0 = new IOverIR0(person_stats);
+	builder.addDataSource(repast::createSVDataSource("newly_infected_over_total_infected_r0", iiR0, std::plus<double>()));
+
+	IOverCR0* icR0 = new IOverCR0(person_stats);
+	builder.addDataSource(repast::createSVDataSource("newly_infected_over_total_colonized_r0", icR0, std::plus<double>()));
+
+	COverIR0* ciR0 = new COverIR0(person_stats);
+	builder.addDataSource(repast::createSVDataSource("newly_colonized_over_total_infected_r0", ciR0, std::plus<double>()));
+
+	COverCR0* ccR0 = new COverCR0(person_stats);
+	builder.addDataSource(repast::createSVDataSource("newly_colonized_over_total_colonized_r0", ccR0, std::plus<double>()));
+
+	TCOverPTC* ptc = new TCOverPTC(person_stats);
+	builder.addDataSource(repast::createSVDataSource("current_colonized_over_prev_colonized", ptc, std::plus<double>()));
+
+	TIOverPTI* pti = new TIOverPTI(person_stats);
+	builder.addDataSource(repast::createSVDataSource("current_infected_over_prev_infected", pti, std::plus<double>()));
+
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.
 	addDataSet(builder.createDataSet());
 }
 
 void MRSAObserver::atEnd() {
+	person_stats->avg();
 	SummaryInfectionStats stats;
 	stats.gatherStats(*people_);
 	std::cout << stats << std::endl;
@@ -310,6 +330,10 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
+	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
+		Person* person = (*people_)[i];
+		person_stats->countPerson(person);
+	}
 
 	// schedule MRSAObserver::atEnd() to be called with the sim terminates.
 	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();

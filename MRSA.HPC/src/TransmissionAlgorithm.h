@@ -35,46 +35,12 @@ public:
 	 */
 	static TransmissionAlgorithm* instance();
 
-	/**
-	 * Gets the number of persons who transitioned
-	 * from uncolonized to colonized as the result
-	 * of colocation with infected person(s).
-	 */
-	const long colonizationFromInfectionCount() const {
-		return colonization_from_infection;
+	const long newlyColonizedCount() const {
+		return newly_colonized;
 	}
 
-	/**
-	 * Gets the number of persons who transitioned
-	 * from uncolonized to colonized as the result
-	 * of colocation with colonized person(s).
-	 */
-	const long colonizationFromColonizationCount() const {
-		return colonization_from_colonization;
-	}
-
-	/**
-	 * Gets the number of persons who transitioned
-	 * from colonization to infection.
-	 */
-	const long infectionFromColonizationCount() const {
-		return infection_from_colonization;
-	}
-
-	/**
-	 * Gets the number of persons who remained in
-	 * infection.
-	 */
-	const long infectionFromInfectionCount() const {
-		return infection_from_infection;
-	}
-
-	/**
-	 * Increments the number of persons who remained
-	 * in infection state during a transition.
-	 */
-	void incrementInfectionFromInfectionCount() {
-		++infection_from_infection;
+	const long newlyInfectedCount() const {
+		return newly_infected;
 	}
 
 	/**
@@ -89,14 +55,19 @@ public:
 	DiseaseStatus run(unsigned int infected, unsigned int colonized, DiseaseStatus currentStatus,
 			float risk);
 
+	/**
+	 * Resets the transmission counts.
+	 */
+	void resetCounts();
+
 private:
 	static TransmissionAlgorithm* instance_;
 	double a_, b_, c_, d_, e_;
+
 	// counts the number of persons who were
-	// colonized from contact with infected persons,
-	// and from colonized persons.
-	long colonization_from_infection, colonization_from_colonization;
-	long infection_from_infection, infection_from_colonization;
+	// are newly_colonized and newly_infected
+	long newly_colonized, newly_infected;
+	//long infected_to_infected, colonized_to_infected;
 
 	/**
 	 * Run the transmission algorithm for an uncolonized person, returning the result as a

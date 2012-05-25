@@ -21,6 +21,18 @@ namespace mrsa {
  * to each iteration
  */
 class PersonStats {
+
+	friend class ColonizedSum;
+	friend class InfectionSum;
+	friend class TotalSum;
+	friend class UnColonizedSum;
+	friend class COverCR0;
+	friend class COverIR0;
+	friend class IOverCR0;
+	friend class IOverIR0;
+	friend class TIOverPTI;
+	friend class TCOverPTC;
+
 public:
 	PersonStats();
 	virtual ~PersonStats();
@@ -29,7 +41,11 @@ public:
 	 * Clears the counts.
 	 */
 	void clear() {
+		prev_total_colonized = total_colonized;
+		prev_total_infected = total_infected;
 		total_infected = total_colonized = total_uncolonized = 0;
+		ni_over_ti = ni_over_tc = nc_over_ti = nc_over_tc = 0;
+		ti_over_pti = tc_over_ptc = 0;
 	}
 
 	/**
@@ -39,30 +55,102 @@ public:
 	 */
 	void countPerson(Person* person);
 
-	/**
-	 * Gets the total number of infected persons.
-	 */
-	const long totalInfected() const {
-		return total_infected;
-	}
+	void calculateR0Values();
 
-	/**
-	 * Gets the total number of colonized persons.
-	 */
-	const long totalColonized() const {
-		return total_colonized;
-	}
+	void avg() {
+		std::cout << "newly_infected_over_total_infected_r0: " << (ni_over_ti_sum / count) << std::endl
+				<< "newly_infected_over_total_colonized_r0: " << (ni_over_tc_sum / count) << std::endl
+				<< "newly_colonized_over_total_infected_r0: " << (nc_over_ti_sum / count) << std::endl
+				<< "newly_colonized_over_total_colonized_r0: " << (nc_over_tc_sum / count) << std::endl
 
-	/**
-	 * Gets the total number of uncolonized persons.
-	 */
-	const long totalUnColonized() const {
-		return total_uncolonized;
+				<< "avg. total infected over prev total infected: " << (ti_over_pti_sum / count) << std::endl
+				<< "avg. total colonized over prev total colonized: " << (tc_over_ptc_sum / count) << std::endl;
+
 	}
 
 private:
 	long total_infected, total_colonized, total_uncolonized;
+	long prev_total_infected, prev_total_colonized;
+	double ni_over_ti, ni_over_tc, nc_over_ti, nc_over_tc;
+	double ti_over_pti, tc_over_ptc;
+	long count;
+	double ni_over_tc_sum, nc_over_tc_sum, nc_over_ti_sum, ni_over_ti_sum;
+	double ti_over_pti_sum, tc_over_ptc_sum;
 };
+
+class TIOverPTI: public repast::TDataSource<double> {
+
+public:
+	TIOverPTI(PersonStats* stats);
+	virtual ~TIOverPTI();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+class TCOverPTC: public repast::TDataSource<double> {
+
+public:
+	TCOverPTC(PersonStats* stats);
+	virtual ~TCOverPTC();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+class IOverIR0: public repast::TDataSource<double> {
+
+public:
+	IOverIR0(PersonStats* stats);
+	virtual ~IOverIR0();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+class IOverCR0: public repast::TDataSource<double> {
+
+public:
+	IOverCR0(PersonStats* stats);
+	virtual ~IOverCR0();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+class COverCR0: public repast::TDataSource<double> {
+
+public:
+	COverCR0(PersonStats* stats);
+	virtual ~COverCR0();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+class COverIR0: public repast::TDataSource<double> {
+
+public:
+	COverIR0(PersonStats* stats);
+	virtual ~COverIR0();
+
+	double getData();
+
+private:
+	PersonStats* stats_;
+};
+
+
 
 /**
  * Repast HPC Data source implementation for

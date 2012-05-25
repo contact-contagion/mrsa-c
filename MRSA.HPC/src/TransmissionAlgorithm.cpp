@@ -14,8 +14,7 @@ namespace mrsa {
 TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
 TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
-		a_(a), b_(b), c_(c), d_(d), e_(e), colonization_from_infection(0), colonization_from_colonization(0), infection_from_infection (0),
-		infection_from_colonization (0){
+		a_(a), b_(b), c_(c), d_(d), e_(e),  newly_colonized(0), newly_infected(0) {
 }
 
 void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
@@ -28,6 +27,10 @@ void TransmissionAlgorithm::initialize(double a, double b, double c, double d, d
 }
 
 TransmissionAlgorithm::~TransmissionAlgorithm() {
+}
+
+void TransmissionAlgorithm::resetCounts() {
+	newly_infected = newly_colonized = 0;
 }
 
 TransmissionAlgorithm* TransmissionAlgorithm::instance() {
@@ -64,13 +67,13 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++colonization_from_infection;
+		if (ret == COLONIZED) ++newly_colonized;
 	} else if (colonized > 0) {
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
 		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
-		if (ret == COLONIZED) ++colonization_from_colonization;
+		if (ret == COLONIZED) ++newly_colonized;
 	}
 
 	//std::cout << "fc: " << from_colonization << std::endl;
@@ -86,7 +89,7 @@ DiseaseStatus TransmissionAlgorithm::runColonized() {
 	if (draw <= b_) {
 		// move from colonized to infected with a probability of b_
 		ret = INFECTED;
-		++infection_from_colonization;
+		++newly_infected;
 	} else if (draw <= e_ + b_)
 		// move from colonized to infected with a probability of e_
 		// we already tested for <= b_ so only get here if > b_ but
@@ -103,16 +106,12 @@ DiseaseStatus TransmissionAlgorithm::runInfected() {
 	if (draw <= d_)
 		// move from infected to uncolonized with a probability of d_
 		ret = UNCOLONIZED;
-	else if (draw <= d_ + c_)
+	else if (draw <= d_ + c_) {
 		// move from infected to uncolonized with a probability of c_
 		// we already tested for <= d_ so only get here if > d_ but
 		// <= c_.
 		ret = COLONIZED;
-	else {
-		// default ret status is INFECTION so we don't need to
-		// set that here, just increment the count of persons
-		// who stayed in infection from infection.
-		++infection_from_infection;
+		++newly_colonized;
 	}
 
 	return ret;
