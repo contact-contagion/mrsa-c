@@ -19,7 +19,7 @@ namespace mrsa {
  */
 class DiseaseStatusUpdater {
 
-	friend class SummaryInfectionStats;
+	friend class Statistics;
 
 public:
 	DiseaseStatusUpdater(float min_infection_duration);

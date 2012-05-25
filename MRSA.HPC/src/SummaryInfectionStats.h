@@ -13,6 +13,7 @@
 #include "relogo/AgentSet.h"
 
 #include "Person.h"
+#include "PersonStats.h"
 
 namespace mrsa {
 
@@ -33,6 +34,14 @@ public:
 	 * stats then used to calculate the summary stats.
 	 */
 	void gatherStats(repast::relogo::AgentSet<Person>& people);
+
+	/**
+	 * Writes out the stats to the specified file, including the
+	 * summarys stats from PersonStats.
+	 *
+	 * @param file the path of the file to write the stats to
+	 */
+	void write(Statistics* p_stats, const std::string& file) const;
 
 	/**
 	 * Gets the total number of infected persons.
@@ -61,6 +70,8 @@ public:
 	const double avgColonizedDuration() const {
 		return colonization_duration;
 	}
+
+
 
 private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;

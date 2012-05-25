@@ -4,7 +4,6 @@ SOURCES = CSVReader.cpp \
           DiseaseStatusUpdater.cpp \
           Person.cpp \
           PersonsCreator.cpp \
-          SummaryInfectionStats.cpp \
           Place.cpp \
           SelectiveTransmissionPlace.cpp \
           AbstractPlace.cpp \
@@ -14,7 +13,7 @@ SOURCES = CSVReader.cpp \
           DefaultPlace.cpp \
           PlaceCreator.cpp \
           ActivityCreator.cpp \
-          PersonStats.cpp \
+          Statistics.cpp \
           MRSAObserver.cpp 
           
           

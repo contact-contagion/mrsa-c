@@ -13,7 +13,7 @@
 
 #include "Place.h";
 #include "Person.h";
-#include "PersonStats.h"
+#include "Statistics.h"
 
 namespace mrsa {
 
@@ -48,7 +48,7 @@ private:
 
 	int personType;
 
-	PersonStats* person_stats;
+	Statistics* stats;
 	std::vector<Place*> places;
 	repast::relogo::AgentSet<Person>* people_;
 
