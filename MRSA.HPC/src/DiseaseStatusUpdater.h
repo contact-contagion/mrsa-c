@@ -14,9 +14,15 @@
 
 namespace mrsa {
 
+// tracks info about an individual's
+// colonization or infection
 struct StatusStats {
+	// the disease status
 	DiseaseStatus status;
+	// the number of other colonized persons attributable
+	// to this infection / colonization
 	float colonized_persons;
+	// the duration of the infection / colonization
 	float duration;
 };
 
@@ -54,7 +60,12 @@ public:
 	 */
 	bool canStatusChange();
 
-	void clearYearlyCounts();
+
+	/**
+	 * Resets any yearly counts, perparing this DiseaseStatusUpdater
+	 * for capturing new yearly data.
+	 */
+	void resetYearlyCounts();
 
 	/**
 	 * Gets the current status.
@@ -73,7 +84,9 @@ private:
 
 	DiseaseStatus status_;
 
+	// the current years infections / colonization stats
 	std::list<StatusStats> yearly_status_stats;
+	// all preceeding years infections / colonization stats
 	std::list<StatusStats> total_status_stats;
 
 };

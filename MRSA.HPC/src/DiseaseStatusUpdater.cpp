@@ -16,6 +16,8 @@ DiseaseStatusUpdater::DiseaseStatusUpdater(float min_infection_duration) :
 		colonized_count(0), status_(UNCOLONIZED), yearly_status_stats() {
 }
 
+// increments the number of colonizations caused by this disease
+// state
 void DiseaseStatusUpdater::incrementColonizationsCaused(float colonization_caused) {
 	// get the current StatusStats and increment its colonized_persons count
 	StatusStats& stats = yearly_status_stats.back();
@@ -76,7 +78,7 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
 	status_ = status;
 }
 
-void DiseaseStatusUpdater::clearYearlyCounts() {
+void DiseaseStatusUpdater::resetYearlyCounts() {
 	std::list<StatusStats>::iterator iter;
 	for (iter = yearly_status_stats.begin(); iter != yearly_status_stats.end(); ++iter) {
 		if (iter->duration == 0) {

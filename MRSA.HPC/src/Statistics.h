@@ -10,12 +10,18 @@
 
 namespace mrsa {
 
-// Used to aggregate Stats from individual persons
+// struct used to aggregate inidividual stats
+// over all persons.
 struct PersonStats {
+	// the infection / colonized counts
 	long infection_count, colonized_count;
+	// durations
 	double infection_duration, colonization_duration;
+	// number of colonizations attributable colonization and infection
 	double from_colonization, from_infection;
+	// avergage r0 values
 	double avg_infection_r0, avg_colonization_r0;
+	// infected / colonized counts
 	long infected_person_count, colonized_person_count;
 };
 
@@ -37,7 +43,7 @@ public:
 	static Statistics* getInstance();
 
 	/**
-	 * Clears the counts.
+	 * Clears the hourly counts.
 	 */
 	void resetHourlyStats() {
 		//prev_total_colonized = total_colonized;
@@ -47,6 +53,10 @@ public:
 		//ti_over_pti = tc_over_ptc = 0;
 	}
 
+	/**
+	 * Clears yearly counts. This should be called before
+	 * starting yearly counts.
+	 */
 	void resetYearlyStats() {
 		yearly_infected = yearly_colonized = 0;
 		yearly_c_from_c = yearly_c_from_i = 0;
@@ -68,14 +78,15 @@ public:
 	void countPerson(Person* person);
 
 	/**
-	 * Calculates the hourly stats.
+	 * Gathers / calculates any stats at the end of an hour.
 	 */
-	void calculateHourlyStats();
+	void hourEnded();
 
 	/**
-	 * Calculate the yearly stats from the set of Persons.
+	 * Calculate stats at the end of a year using the set of
+	 * persons.
 	 */
-	void calculateYearlyStats(repast::relogo::AgentSet<Person>& people);
+	void yearEnded(repast::relogo::AgentSet<Person>& people);
 
 	/**
 	 * Calculates the summary stats and writes them to the specified file.
@@ -95,23 +106,16 @@ private:
 	// private constructor
 	Statistics();
 
+	// increments the histogram hist for the specified key 'count'
 	void addToHistogram(unsigned int count, std::map<unsigned int, unsigned long>& hist);
+	// updates the PersonStats struct using data from the vector
 	void updateCountsFromStatsVector(std::list<StatusStats> vec, PersonStats& p_stats);
 
 	// hourly infected etc. totals
 	long hourly_infected, hourly_colonized, hourly_uncolonized;
 
-	/*
-	 long prev_total_infected, prev_total_colonized;
-	 double ni_over_ti, ni_over_tc, nc_over_ti, nc_over_tc;
-	 double ti_over_pti, tc_over_ptc;
-
-	 long count;
-	 double ni_over_tc_sum, nc_over_tc_sum, nc_over_ti_sum, ni_over_ti_sum;
-	 double ti_over_pti_sum, tc_over_ptc_sum;
-	 */
-
-	// exposes yearly r0 for data collection
+	// these vars are calculated then exposed via the TDataSource API
+	// in order to log them using RepastHPC data collection.
 	double yearly_infected_r0, yearly_colonized_r0;
 	long yearly_infected, yearly_colonized;
 	double yearly_infection_duration, yearly_colonization_duration;
@@ -168,6 +172,11 @@ private:
 	Statistics* stats_;
 };
 
+/**
+ * Adapts map double values to the TDataSource API. The constructor
+ * takes a map key and a map. getData returns the current value
+ * for that key.
+ */
 class PlaceCount: public repast::TDataSource<double> {
 
 public:

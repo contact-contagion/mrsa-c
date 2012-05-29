@@ -18,6 +18,11 @@ namespace fs = boost::filesystem;
 
 using namespace repast::relogo;
 
+/**
+ * Attempts to find an unused file name. If the specified file
+ * exists then this appends a _N (where N is a number) to the
+ * non-extension part of the file, increasing N until a non-existent file is found.
+ */
 std::string findFreeFile(const std::string& file) {
 	fs::path filepath(file);
 	if (!fs::exists(filepath.parent_path()))
@@ -47,14 +52,9 @@ Statistics* Statistics::getInstance() {
 
 Statistics::Statistics() :
 
-		hourly_infected(0), hourly_colonized(0), hourly_uncolonized(0), yearly_infected_r0(0), yearly_colonized_r0(
-				0),
-
-		/* prev_total_infected(0), prev_total_colonized(
-		 0), ni_over_ti(0), ni_over_tc(0), nc_over_ti(0), nc_over_tc(0), ti_over_pti(0), tc_over_ptc(
-		 0), count(0), ni_over_tc_sum(0), nc_over_tc_sum(0), nc_over_ti_sum(0), ni_over_ti_sum(
-		 0), ti_over_pti_sum(0), tc_over_ptc_sum(0),*/yearly_infected(0), yearly_colonized(0), yearly_infection_duration(
-				0), yearly_colonization_duration(0), yearly_c_from_i(0), yearly_c_from_c(0), colonization_count_map() {
+		hourly_infected(0), hourly_colonized(0), hourly_uncolonized(0), yearly_infected_r0(0),
+		yearly_colonized_r0(0),yearly_infected(0), yearly_colonized(0), yearly_infection_duration(0),
+		yearly_colonization_duration(0), yearly_c_from_i(0), yearly_c_from_c(0), colonization_count_map() {
 }
 
 Statistics::~Statistics() {
@@ -81,33 +81,14 @@ void Statistics::countPerson(Person* person) {
 		hourly_infected++;
 }
 
-void Statistics::calculateHourlyStats() {
+void Statistics::hourEnded() {
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-
 	yearly_c_from_i += ta->colonizedFromInfectionCount();
 	yearly_c_from_c += ta->colonizedFromColonizationCount();
-
-	/*
-	 ni_over_tc = newly_infected / total_colonized;
-	 nc_over_tc = newly_colonized / total_colonized;
-	 nc_over_ti = newly_colonized / total_infected;
-	 ni_over_ti = newly_infected / total_infected;
-
-	 ti_over_pti = total_infected / ((double) prev_total_infected);
-	 tc_over_ptc = total_colonized / ((double) prev_total_colonized);
-
-	 ++count;
-	 ni_over_tc_sum += ni_over_tc;
-	 nc_over_tc_sum += nc_over_tc;
-	 nc_over_ti_sum += nc_over_ti;
-	 ni_over_ti_sum += ni_over_ti;
-
-	 ti_over_pti_sum += ti_over_pti;
-	 tc_over_ptc_sum += tc_over_ptc;
-	 */
 }
 
-// replace params with a struct, pass by referece
+// StatusStats tracks the DiseaseStat, colonization count of other persons attributable to
+// that state, and the duration of that state.
 void Statistics::updateCountsFromStatsVector(std::list<StatusStats> vec, PersonStats& p_stats) {
 
 	int i_count = 0, c_count = 0;
@@ -138,7 +119,8 @@ void Statistics::updateCountsFromStatsVector(std::list<StatusStats> vec, PersonS
 				}
 			}
 		} else {
-			// is still in this state so don't count
+			// if the duration is 0, then this state is still active
+			// so we don't have complete data on it yet.
 			break;
 		}
 	}
@@ -153,19 +135,24 @@ void Statistics::updateCountsFromStatsVector(std::list<StatusStats> vec, PersonS
 
 }
 
-void Statistics::calculateYearlyStats(repast::relogo::AgentSet<Person>& people) {
+void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people) {
 	PersonStats p_stats = { 0L, 0L, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0L, 0L};
 
+	// get yearly stats from each person.
 	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
 		Person* p = (*iter);
 		updateCountsFromStatsVector(p->status_.yearly_status_stats, p_stats);
-		p->status_.clearYearlyCounts();
+		p->status_.resetYearlyCounts();
 	}
 
 	yearly_infection_duration = yearly_colonization_duration = 0;
 
+	// average infection duration over all persons
+	// = total duratio / number of times infected
 	if (p_stats.infection_count != 0)
 		yearly_infection_duration = p_stats.infection_duration / p_stats.infection_count;
+	// average colonization duration over all persons
+	// = total duration / number of time colonized
 	if (p_stats.colonized_count != 0)
 		yearly_colonization_duration = p_stats.colonization_duration / p_stats.colonized_count;
 
@@ -179,12 +166,16 @@ void Statistics::calculateYearlyStats(repast::relogo::AgentSet<Person>& people) 
 	yearly_colonized = p_stats.colonized_count;
 	yearly_infected = p_stats.infection_count;
 
+	// get the total number of colonizations by summing the
+	// colonization at X place counts
 	double total = 0;
 	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
 			++iter) {
 		total += iter->second;
 	}
 
+	// for each place in the colonizaiton_count_map, get the fraction of colonizations
+	// that occured in that place
 	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
 			++iter) {
 		double val = iter->second;
@@ -206,7 +197,10 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 		// of them.
 		p->updateStatus(UNCOLONIZED);
 		// update the status lists with the latest info
-		p->status_.clearYearlyCounts();
+		// this will copy the yearly into the total
+		p->status_.resetYearlyCounts();
+		// update the counts from vector containing all the status stats
+		// rather than the yearly one.
 		updateCountsFromStatsVector(p->status_.total_status_stats, p_stats);
 
 		addToHistogram(p->status_.infected_count, infection_hist);
@@ -217,6 +211,7 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 
 	out.open(findFreeFile(file).c_str());
 
+	// write the stats out to the file
 	out << "total infections: " << p_stats.infection_count << std::endl << "total colonization: "
 			<< p_stats.colonized_count << std::endl << "total from infection: "
 			<< p_stats.from_infection << std::endl << "total from colonization: "
@@ -229,17 +224,6 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 			<< std::endl << "avg. colonized_r0: "
 			<< (p_stats.avg_colonization_r0 / p_stats.colonized_count) << std::endl;
 
-	/*
-	 out << "newly_infected_over_total_infected_r0: " << (ni_over_ti_sum / count) << std::endl
-	 << "newly_infected_over_total_colonized_r0: " << (ni_over_tc_sum / count) << std::endl
-	 << "newly_colonized_over_total_infected_r0: " << (nc_over_ti_sum / count) << std::endl
-	 << "newly_colonized_over_total_colonized_r0: " << (nc_over_tc_sum / count) << std::endl
-
-	 << "avg. total infected over prev total infected: " << (ti_over_pti_sum / count)
-	 << std::endl << "avg. total colonized over prev total colonized: "
-	 << (tc_over_ptc_sum / count) << std::endl;
-	 */
-
 	for (ConstHistIter iter = infection_hist.begin(); iter != infection_hist.end(); ++iter) {
 		out << "" << iter->second << " persons infected " << iter->first << " times" << std::endl;
 	}
@@ -249,7 +233,6 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 	}
 
 	out.close();
-
 }
 
 void Statistics::addToHistogram(unsigned int count, std::map<unsigned int, unsigned long>& hist) {

@@ -114,7 +114,7 @@ void MRSAObserver::go() {
 		place->reset();
 	}
 
-	stats->calculateHourlyStats();
+	stats->hourEnded();
 	// this has to be called last so that we capture the
 	// initial infection counts that were set during setup.
 	TransmissionAlgorithm::instance()->resetCounts();
@@ -237,7 +237,7 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 }
 
 void MRSAObserver::calcYearlyStats() {
-	Statistics::getInstance()->calculateYearlyStats(*people_);
+	Statistics::getInstance()->yearEnded(*people_);
 }
 
 void MRSAObserver::initializeYearlyDataCollection(const string& file) {
