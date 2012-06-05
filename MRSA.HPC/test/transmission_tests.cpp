@@ -3,13 +3,13 @@
 
 #include <boost/test/unit_test.hpp>
 
-#include <repast_hpc/RepastProcess.h>
+#include "repast_hpc/RepastProcess.h"
+#include "repast_hpc/Properties.h"
 
 #include "../src/TransmissionAlgorithm.h"
 #include "../src/PlaceCreator.h"
 #include "../src/PersonsCreator.h"
 #include "../src/ActivityCreator.h"
-#include "../src/SummaryInfectionStats.h"
 
 #include "ObserverSetup.h"
 
@@ -27,20 +27,20 @@ BOOST_AUTO_TEST_CASE(uncolonized) {
 	// a is 0, so starting with UNCOLONIZED should always return UNCOLONIZED
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, UNCOLONIZED, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->runUncolonized(0, 0, 0) == UNCOLONIZED);
 	}
 
 	TransmissionAlgorithm::initialize(1, 0, 0.0, 0, 0);
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(1, 0, UNCOLONIZED, 1) == COLONIZED);
+		BOOST_REQUIRE(ta->runUncolonized(1, 0, 1) == COLONIZED);
 	}
 
 	TransmissionAlgorithm::initialize(0.5, 0, 0.0, 0, 0);
 	// a is .5 and risk is 2 so double a is one so always move to colonized.
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(1, 0, UNCOLONIZED, 2) == COLONIZED);
+		BOOST_REQUIRE(ta->runUncolonized(2, 1, 0) == COLONIZED);
 	}
 
 }
@@ -49,11 +49,10 @@ BOOST_AUTO_TEST_CASE(colonized) {
 
 	double b = 1;
 	TransmissionAlgorithm::initialize(0, b, 0.0, 0, 0);
-	DiseaseStatus status(COLONIZED);
 	// b is one so should always move from colonized to infected
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, status, 0) == INFECTED);
+		BOOST_REQUIRE(ta->runColonized() == INFECTED);
 	}
 
 	b = 0;
@@ -62,7 +61,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 	// b is 0 and e is one so should always return to uncolonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, status, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->runColonized() == UNCOLONIZED);
 	}
 }
 
@@ -71,11 +70,10 @@ BOOST_AUTO_TEST_CASE(infected) {
 	double c = 0;
 	double d = 1;
 	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
-	DiseaseStatus status(INFECTED);
 	// d is one so should always move from infected to uncolonized
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, status, 0) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->runInfected() == UNCOLONIZED);
 	}
 
 	c = 1;
@@ -84,7 +82,7 @@ BOOST_AUTO_TEST_CASE(infected) {
 	// c is 1 and d is 0 so should move to colonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->run(0, 0, status, 0) == COLONIZED);
+		BOOST_REQUIRE(ta->runInfected() == COLONIZED);
 	}
 }
 
@@ -114,7 +112,7 @@ void createPersons(Observer* obs, AgentSet<Person>& persons, std::vector<Place*>
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2, 1.0f);
 	obs->create<Person>(count, pCreator);
 	obs->get(persons);
 }
@@ -168,7 +166,7 @@ BOOST_AUTO_TEST_CASE(school) {
 	}
 
 	Place* place = *(find_if(places.begin(), places.end(), PlacePredicate("170993001118")));
-	BOOST_REQUIRE(place->placeType() == "School");
+	BOOST_REQUIRE(place->placeType() == "school");
 
 	(twelves[0])->updateStatus(INFECTED);
 	for (vector<Person*>::iterator iter = forties.begin(); iter != forties.end(); ++iter) {
@@ -236,6 +234,9 @@ BOOST_AUTO_TEST_CASE(household) {
 
 	Place* hh = *(find_if(places.begin(), places.end(), PlacePredicate("2038461")));
 
+	repast::Properties props;
+	mrsa::Parameters::initialize(props);
+
 	// household now has one uncolonized and one infected person.
 	hh->addPerson(p1);
 	hh->addPerson(p2);
@@ -298,7 +299,7 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 		p->goToHome();
 		for (int i = 0; i <= 24; ++i) {
 			p->performActivity(i, true);
-			BOOST_REQUIRE_EQUAL(p->currentPlace()->placeType(), "Household");
+			BOOST_REQUIRE_EQUAL(p->currentPlace()->placeType(), "household");
 		}
 	}
 
@@ -321,22 +322,22 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 	BOOST_REQUIRE(p2 != 0);
 
 	p1->performActivity(14, true);
-	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "School");
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "school");
 	// gone back home
 	p1->performActivity(17, true);
-	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "Household");
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "household");
 	// go to work
 	p1->performActivity(19, true);
-	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "Workplace");
+	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "workplace");
 
 	p2->performActivity(14, false);
-	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "School");
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "school");
 	// gone back home
 	p2->performActivity(17, false);
-	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "Household");
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "household");
 	// go to work
 	p2->performActivity(19, false);
-	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "Workplace");
+	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "workplace");
 
 	deletePlaces(places);
 }
@@ -366,14 +367,6 @@ BOOST_AUTO_TEST_CASE(disease_update_test) {
 	p1->updateStatus(UNCOLONIZED);
 	p2->updateStatus(INFECTED);
 	p3->updateStatus(UNCOLONIZED);
-
-	SummaryInfectionStats stats;
-	stats.gatherStats(persons);
-
-	BOOST_REQUIRE_EQUAL(stats.infectedCount(), 2);
-	BOOST_REQUIRE_EQUAL(stats.avgInfectedDuration(), 1);
-	BOOST_REQUIRE_EQUAL(stats.colonizedCount(), 2);
-	BOOST_REQUIRE_EQUAL(stats.avgColonizedDuration(), 2);
 
 	deletePlaces(places);
 }

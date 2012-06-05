@@ -15,6 +15,8 @@
 #include "relogo/Patch.h"
 #include "repast_hpc/Properties.h"
 
+#include "../src/Parameters.h"
+
 class MyObserver: public repast::relogo::Observer {
 	void go() {
 	}
@@ -38,7 +40,10 @@ public:
 		vec.push_back(1);
 		obs = creator.createWorld<MyObserver, repast::relogo::Patch>(def, vec);
 		repast::Properties props;
+		props.putProperty(mrsa::SEEK_AND_DESTROY_CURE_FRACTION, 0);
+		mrsa::Parameters::initialize(props);
 		obs->_setup(props);
+
 	}
 
 	~ObserverSetup() {

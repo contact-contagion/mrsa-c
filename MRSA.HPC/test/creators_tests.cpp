@@ -33,9 +33,9 @@ BOOST_AUTO_TEST_CASE(place_creator) {
 		"1703101010000020", "170993001101", "170993001102", "170993001104", "170993001118", "2038461", "2038468",
 		"G170313904001C01", "G170314103001C01"};
 
-	std::string types[] = {"Hospital", "Hospital", "Hospital", "Workplace", "Workplace",
-		"School", "School", "School", "School", "Household", "Household", "College Dorm",
-		"College Dorm"
+	std::string types[] = {"hospital", "hospital", "hospital", "workplace", "workplace",
+		"school", "school", "school", "school", "household", "household", "college dorm",
+		"college dorm"
 	};
 
 	for (unsigned int i = 0; i < 13; ++i) {
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(people_creator) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7.0f);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7.0f, 1.0f);
 	obs->create<Person>(14, pCreator);
 
 	AgentSet<Person> persons;
