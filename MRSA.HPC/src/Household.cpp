@@ -8,12 +8,13 @@
 
 #include "Household.h"
 #include "TransmissionAlgorithm.h"
+#include "Parameters.h"
 
 namespace mrsa {
 
 // 14 x 24
 const int FOURTEEN_DAYS = 336;
-const double CURE_PROB = 0.83;
+//const double CURE_PROB = 0;
 
 // sets the risk 2.0
 Household::Household(std::vector<std::string>& vec) :
@@ -54,12 +55,13 @@ void Household::runTransmission() {
 
 void Household::seekAndDestroy() {
 
+	double cure_probability = Parameters::instance()->getDoubleParameter(SEEK_AND_DESTROY_CURE_FRACTION);
 	std::random_shuffle(members.begin(), members.end(), repast::uni_random);
 	for (PersonIter iter = members.begin(); iter != members.end(); ++iter) {
 		Person* p = *iter;
-		if (p->status() != UNCOLONIZED && p != source_infectee && repast::Random::instance()->nextDouble() <= CURE_PROB) {
-			//std::cout << "uncolonizing " << placeId() << ": timestamp = " << sd_timestamp << ", current time = " <<
-			//			repast::RepastProcess::instance()->getScheduleRunner().currentTick() << std::endl;
+		if (p->status() != UNCOLONIZED && p != source_infectee && repast::Random::instance()->nextDouble() <= cure_probability) {
+			std::cout << "uncolonizing " << placeId() << ": timestamp = " << sd_timestamp << ", current time = " <<
+						repast::RepastProcess::instance()->getScheduleRunner().currentTick() << std::endl;
 			p->updateStatus(UNCOLONIZED);
 		}
 	}

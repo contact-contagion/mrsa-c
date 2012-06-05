@@ -17,31 +17,13 @@
 #include "PlaceCreator.h"
 #include "ActivityCreator.h"
 #include "TransmissionAlgorithm.h"
+#include "Parameters.h"
 
 namespace mrsa {
 
 using namespace repast::relogo;
 using namespace repast;
 using namespace std;
-
-// property constants, used to look up
-// property values from the model properties file.
-const string PERSONS_FILE = "persons.file";
-const string PLACES_FILE = "places.file";
-const string ACTIVITIES_FILE = "activities.file";
-
-const string HOURLY_OUTPUT_FILE = "hourly.output.file";
-const string YEARLY_OUTPUT_FILE = "yearly.output.file";
-const string SUMMARY_OUTPUT_FILE = "summary.output.file";
-
-const string COLONIZATION_FRAC = "initial.colonization.fraction";
-const string INITIAL_INFECTION_COUNT = "initial.infected.count";
-const string INFECTION_PERIOD = "minimum.infection.period";
-const string FASTER_SCALING = "faster.response.scaling.factor";
-const string SEEK_CARE_FRACTION = "seek.care.fraction";
-
-const string MIN_INFECT_PERIOD = "minimum.infection.period";
-const string SEEK_AND_DESTROY_AT = "seek.and.destroy.at";
 
 // counts the number of lines in the specified file.
 // We need to know this because we have to tell the Observer how
@@ -385,12 +367,15 @@ void MRSAObserver::atEnd() {
 }
 
 void MRSAObserver::activateSeekAndDestroy() {
-	SEEK_AND_DESTROY = true;
+	Parameters::instance()->activateSeekAndDestroy();
 	std::cout << "seek and destroy activated" << std::endl;
 }
 
 // entry point for model setup.
 void MRSAObserver::setup(Properties& props) {
+	Parameters::initialize(props);
+	Parameters* params = Parameters::instance();
+
 	// time stamp to mark start of setup
 	std::string time;
 	repast::timestamp(time);
@@ -398,11 +383,11 @@ void MRSAObserver::setup(Properties& props) {
 
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
-	double a = strToDouble(props.getProperty("a"));
-	double b = strToDouble(props.getProperty("b"));
-	double c = strToDouble(props.getProperty("c"));
-	double d = strToDouble(props.getProperty("d"));
-	double e = strToDouble(props.getProperty("e"));
+	double a = params->getDoubleParameter("a");
+	double b = params->getDoubleParameter("b");
+	double c = params->getDoubleParameter("c");
+	double d = params->getDoubleParameter("d");
+	double e = params->getDoubleParameter("e");
 
 	TransmissionAlgorithm::initialize(a, b, c, d, e);
 
@@ -426,10 +411,10 @@ void MRSAObserver::setup(Properties& props) {
 	people.ask(&Person::goToHome);
 
 	// initialize the hourly data collection
-	initializeHourlyDataCollection(props.getProperty(HOURLY_OUTPUT_FILE));
+	initializeHourlyDataCollection(params->getStringParameter(HOURLY_OUTPUT_FILE));
 	// initialize yearly data collection
-	initializeYearlyDataCollection(props.getProperty(YEARLY_OUTPUT_FILE));
-	summary_output_file = props.getProperty(SUMMARY_OUTPUT_FILE);
+	initializeYearlyDataCollection(params->getStringParameter(YEARLY_OUTPUT_FILE));
+	summary_output_file = params->getStringParameter(SUMMARY_OUTPUT_FILE);
 
 	// get a permanent set of people so we don't have to retrieve
 	// them each iteration which will be slow. We do this here because
@@ -448,13 +433,15 @@ void MRSAObserver::setup(Properties& props) {
 					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
 
 	// schedule turning on seek and destroy
-	double at = strToDouble(props.getProperty(SEEK_AND_DESTROY_AT));
+	double at = params->getDoubleParameter(SEEK_AND_DESTROY_AT);
 	if (at > 0) {
 		std::cout << "scheduling seek and destroy for " << at << std::endl;
+
 		runner.scheduleEvent(at,
 				Schedule::FunctorPtr(
 						new MethodFunctor<MRSAObserver>(this,
 								&MRSAObserver::activateSeekAndDestroy)));
+
 	}
 
 	repast::timestamp(time);

@@ -9,6 +9,7 @@
 #include "DiseaseStatus.h"
 #include "Person.h"
 #include "Statistics.h"
+#include "Parameters.h"
 
 namespace mrsa {
 
@@ -67,7 +68,6 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
 	if (person->canStatusChange()) {
-		//float mod = person->seeksCare() ? 1.0f : 0.7f;
 		person->updateStatus(ta->runInfected());
 	}
 }
@@ -76,7 +76,8 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
 	person->updateStatus(ta->runColonized());
-	if (SEEK_AND_DESTROY && person->status() == INFECTED && person->seeksCare()) {
+
+	if (Parameters::instance()->seekAndDestroyActivated() && person->status() == INFECTED && person->seeksCare()) {
 		// seek and destroy
 		person->initSeekAndDestroy();
 	}
