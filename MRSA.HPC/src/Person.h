@@ -112,6 +112,11 @@ public:
 	}
 
 	/**
+	 * Initializes seek and destroy within this Person's household.
+	 */
+	void initSeekAndDestroy();
+
+	/**
 	 * Makes this Person, go home. This typically sets the current place for this
 	 * Person to its household, but it may move it to other places, such as
 	 * general quarters etc.

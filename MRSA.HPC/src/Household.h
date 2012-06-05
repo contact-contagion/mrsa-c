@@ -28,6 +28,26 @@ public:
 	 */
 	virtual void runTransmission();
 
+	/**
+	 * Adds the specified Person as a member of this Household.
+	 */
+	void addMember(Person* person);
+
+	/**
+	 * Initialize seek and destroy behavior with the
+	 * specified person as the source infectee.
+	 */
+	void initSeekAndDestroy(Person* person);
+
+private:
+	std::vector<Person*> members;
+	// first person infected in a house of
+	// uninfected members
+	Person* source_infectee;
+	double sd_timestamp;
+
+	void seekAndDestroy();
+
 };
 
 } /* namespace mrsa */

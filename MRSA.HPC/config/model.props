@@ -3,20 +3,21 @@ random.seed = 1
 # hours
 # month = 720
 # 1 year = 8760.5
+# 2 years = 17520.5
 # 5 years = 43800.5
 # 10 years = 87600.5
 
-stop.at = 87600.5
+stop.at = 17520.5
 
 persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
 places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv 
 activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv 
 
-hourly.output.file = ./output/base_line_hourly_data.csv
-yearly.output.file = ./output/base_line_yearly_data.csv
-summary.output.file = ./output/base_line_summary_stats.txt
+hourly.output.file = ./output/hourly_data.csv
+yearly.output.file = ./output/yearly_data.csv
+summary.output.file = ./output/summary_stats.txt
 
-seek.care.fraction = 1f
+seek.care.fraction = 0.5f
 
 initial.colonization.fraction = 0.03
 initial.infected.count = 34
@@ -24,13 +25,11 @@ initial.infected.count = 34
 # 7 days (24 x 7)
 minimum.infection.period = 168
 
-# older default
-#a = 6.85270E-05
-a = 1.85270E-04
-b = 2.84505E-04
-c = 2.37945E-03
-d = 2.67532E-02
-e = 5.83117E-05
+a = 9.2635e-05
+b = 7.112625e-05
+c = 0.001189725
+d = 0.0133766
+e = 0.0001166234
 
 # world definition props
 min.x = -100

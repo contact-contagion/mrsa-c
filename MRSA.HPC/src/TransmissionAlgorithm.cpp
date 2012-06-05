@@ -13,6 +13,8 @@ namespace mrsa {
 
 TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
+//int attempts = 0;
+
 TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
 		a_(a), b_(b), c_(c), d_(d), e_(e),  newly_colonized(0), newly_infected(0),
 		colonized_from_infection(0), colonized_from_colonization(0),
@@ -32,6 +34,8 @@ TransmissionAlgorithm::~TransmissionAlgorithm() {
 }
 
 void TransmissionAlgorithm::resetCounts() {
+	//std::cout << "" << attempts << "," << newly_infected << std::endl;
+	//attempts = 0;
 	newly_infected = newly_colonized = 0;
 	colonized_from_infection = colonized_from_colonization = 0;
 	colonized_per_infected = colonized_per_colonization = 0;
@@ -80,6 +84,7 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 // the algorithm for colonized persons.
 DiseaseStatus TransmissionAlgorithm::runColonized() {
 	DiseaseStatus ret(COLONIZED);
+	//++attempts;
 	double draw = repast::Random::instance()->nextDouble();
 	if (draw <= b_) {
 		// move from colonized to infected with a probability of b_
@@ -94,17 +99,14 @@ DiseaseStatus TransmissionAlgorithm::runColonized() {
 	return ret;
 }
 
-DiseaseStatus TransmissionAlgorithm::runInfected(float seek_care_modifier) {
-
-	double d = d_ * seek_care_modifier;
-	double c = c_ * seek_care_modifier;
+DiseaseStatus TransmissionAlgorithm::runInfected() {
 
 	DiseaseStatus ret(INFECTED);
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= d)
+	if (draw <= d_)
 		// move from infected to uncolonized with a probability of d_
 		ret = UNCOLONIZED;
-	else if (draw <= d + c) {
+	else if (draw <= d_ + c_) {
 		// move from infected to uncolonized with a probability of c_
 		// we already tested for <= d_ so only get here if > d_ but
 		// <= c_.

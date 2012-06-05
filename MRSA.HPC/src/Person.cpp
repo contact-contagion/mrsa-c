@@ -10,6 +10,7 @@
 #include "repast_hpc/Utilities.h"
 
 #include "Person.h"
+#include "Household.h"
 
 namespace mrsa {
 
@@ -41,6 +42,10 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	val = trim(val);
 	if (val.length() > 0)
 		age_ = strToInt(val);
+
+	if (_household != 0) {
+		((Household*)_household)->addMember(this);
+	}
 }
 
 Person::~Person() {
@@ -168,6 +173,12 @@ void Person::changePlace(Place* place) {
 	// status counts etc. cleared prior to people changing place,
 	// we need to add this person back to the current place.
 	current->addPerson(this);
+}
+
+void Person::initSeekAndDestroy() {
+	if (_household != 0) {
+		((Household*)_household)->initSeekAndDestroy(this);
+	}
 }
 
 std::ostream& operator<<(std::ostream& os, const Person& person) {

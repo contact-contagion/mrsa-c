@@ -19,6 +19,10 @@ using namespace repast;
 
 const string RND_INDEX_NAME = "household.index";
 
+// don't seek care so infected extra 5 days
+const int NO_CARE_EXTRA_HOURS = 120;
+
+
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 		float min_infection_duration, float seek_care_fraction) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration), households(), seek_care_fraction_(
@@ -98,9 +102,12 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 
 	bool seek_care = repast::Random::instance()->nextDouble() <= seek_care_fraction_;
 
+	float min_infection_dur = min_infection_duration_;
+	if (!seek_care) min_infection_dur += NO_CARE_EXTRA_HOURS;
+
 	// create the Person
 	return new Person(id, obs, vec, home, other_home, group_quarters, work, school,
-			min_infection_duration_, seek_care);
+			min_infection_dur, seek_care);
 }
 
 }

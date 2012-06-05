@@ -222,16 +222,18 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 	people.shuffle();
 	unsigned int infected = strToUInt(props.getProperty(INITIAL_INFECTION_COUNT));
 	infected = infected > people.size() - colonized ? people.size() - colonized : infected;
-	unsigned int count = 0;
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-		Person* p = (*iter);
-		// infect if colonized
-		if (p->status() == UNCOLONIZED) {
-			p->updateStatus(INFECTED);
-			++count;
-			// enough colonized so break.
-			if (count == infected)
-				break;
+	if (infected > 0) {
+		unsigned int count = 0;
+		for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
+			Person* p = (*iter);
+			// infect if colonized
+			if (p->status() == UNCOLONIZED) {
+				p->updateStatus(INFECTED);
+				++count;
+				// enough colonized so break.
+				if (count == infected)
+					break;
+			}
 		}
 	}
 }
@@ -254,11 +256,23 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 			createSVDataSource("colonized_count", new LDataSourceAdapter(&stats->yearly_colonized),
 					std::plus<double>()));
 
-	builder.addDataSource(createSVDataSource("colonizations_from_infection", new LDataSourceAdapter(&stats->yearly_c_from_i),
-					std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("colonizations_from_infection",
+					new LDataSourceAdapter(&stats->yearly_c_from_i), std::plus<double>()));
 
-	builder.addDataSource(createSVDataSource("colonizations_from_colonization", new LDataSourceAdapter(&stats->yearly_c_from_c),
-			std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("colonizations_from_colonization",
+					new LDataSourceAdapter(&stats->yearly_c_from_c), std::plus<double>()));
+
+	builder.addDataSource(
+				createSVDataSource("avg_seek_care_infection_duration",
+						new DDataSourceAdapter(&stats->yearly_seek_infection_duration),
+						std::plus<double>()));
+
+	builder.addDataSource(
+				createSVDataSource("avg_no_seek_care_infection_duration",
+						new DDataSourceAdapter(&stats->yearly_no_seek_infection_duration),
+						std::plus<double>()));
 
 	builder.addDataSource(
 			createSVDataSource("avg_infection_duration",
@@ -269,17 +283,25 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 					new DDataSourceAdapter(&stats->yearly_colonization_duration),
 					std::plus<double>()));
 
+	builder.addDataSource(
+			repast::createSVDataSource("infected_r0",
+					new DDataSourceAdapter(&stats->yearly_infected_r0), std::plus<double>()));
 
-	builder.addDataSource(repast::createSVDataSource("infected_r0", new DDataSourceAdapter(&stats->yearly_infected_r0),
-			std::plus<double>()));
+	builder.addDataSource(
+			repast::createSVDataSource("colonized_r0",
+					new DDataSourceAdapter(&stats->yearly_colonized_r0), std::plus<double>()));
 
-	builder.addDataSource(repast::createSVDataSource("colonized_r0", new DDataSourceAdapter(&stats->yearly_colonized_r0),
-				std::plus<double>()));
+	//builder.addDataSource(
+	//			repast::createSVDataSource("combined_r0",
+	//					new DDataSourceAdapter(&stats->yearly_r0), std::plus<double>()));
 
-	string place_names[] = {"household", "hospital", "school", "workplace", "gym", "nursing home", "college dorm", "prison"};
+	string place_names[] = { "household", "hospital", "school", "workplace", "gym", "nursing home",
+			"college dorm", "prison" };
 	for (int i = 0; i < 8; i++) {
 		std::string header = place_names[i] + "_colonization_fraction";
-		builder.addDataSource(createSVDataSource(header, new PlaceCount(&stats->colonization_count_map, place_names[i]),
+		builder.addDataSource(
+				createSVDataSource(header,
+						new PlaceCount(&stats->colonization_count_map, place_names[i]),
 						std::plus<double>()));
 	}
 
@@ -336,31 +358,21 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 	TotalSum* tSum = new TotalSum(stats);
 	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
 
-	/*
-	 builder.addDataSource(
-	 repast::createSVDataSource("newly_infected_over_total_infected_r0",
-	 new DDataSourceAdapter(&stats->ni_over_ti), std::plus<double>()));
+	builder.addDataSource(
+			repast::createSVDataSource("newly_infected",
+					new LDataSourceAdapter(&stats->newly_infected), std::plus<double>()));
 
-	 builder.addDataSource(
-	 repast::createSVDataSource("newly_infected_over_total_colonized_r0",
-	 new DDataSourceAdapter(&stats->ni_over_tc), std::plus<double>()));
+	builder.addDataSource(
+			repast::createSVDataSource("newly_colonized",
+					new LDataSourceAdapter(&stats->newly_colonized), std::plus<double>()));
 
-	 builder.addDataSource(
-	 repast::createSVDataSource("newly_colonized_over_total_infected_r0",
-	 new DDataSourceAdapter(&stats->nc_over_ti), std::plus<double>()));
+	builder.addDataSource(
+				repast::createSVDataSource("running_total_infected",
+						new DDataSourceAdapter(&stats->total_infected), std::plus<double>()));
 
-	 builder.addDataSource(
-	 repast::createSVDataSource("newly_colonized_over_total_colonized_r0",
-	 new DDataSourceAdapter(&stats->nc_over_tc), std::plus<double>()));
-
-	 builder.addDataSource(
-	 repast::createSVDataSource("current_colonized_over_prev_colonized",
-	 new DDataSourceAdapter(&stats->tc_over_ptc), std::plus<double>()));
-
-	 builder.addDataSource(
-	 repast::createSVDataSource("current_infected_over_prev_infected",
-	 new DDataSourceAdapter(&stats->ti_over_pti), std::plus<double>()));
-	 */
+	builder.addDataSource(
+					repast::createSVDataSource("running_total_colonized",
+							new DDataSourceAdapter(&stats->total_colonized), std::plus<double>()));
 
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.
@@ -407,7 +419,6 @@ void MRSAObserver::setup(Properties& props) {
 	initializeDiseaseStatus(props, people);
 	people.ask(&Person::goToHome);
 
-
 	// initialize the hourly data collection
 	initializeHourlyDataCollection(props.getProperty(HOURLY_OUTPUT_FILE));
 	// initialize yearly data collection
@@ -420,11 +431,9 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
+
 	Statistics* stats = Statistics::getInstance();
-	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
-		Person* person = (*people_)[i];
-		stats->countPerson(person);
-	}
+	stats->setInitialCounts(*people_);
 
 	// schedule MRSAObserver::atEnd() to be called with the sim terminates.
 	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();

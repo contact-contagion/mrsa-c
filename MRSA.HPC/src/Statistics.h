@@ -10,19 +10,32 @@
 
 namespace mrsa {
 
+// captures yearly averages, used
+// to compute the total averages.
+struct YearlyAvg {
+	double yearly_infected_r0, yearly_colonized_r0;
+	double yearly_infection_duration, yearly_colonization_duration;
+	// infection duration for those don't and do seek care
+	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
+	int count;
+};
+
 // struct used to aggregate inidividual stats
 // over all persons.
 struct PersonStats {
 	// the infection / colonized counts
 	long infection_count, colonized_count;
+	long seek_infection_count, no_seek_infection_count;
 	// durations
 	double infection_duration, colonization_duration;
+	// infection duration for those don't and do seek care
+	double no_seek_infection_duration, seek_infection_duration;
 	// number of colonizations attributable colonization and infection
 	double from_colonization, from_infection;
 	// avergage r0 values
-	double avg_infection_r0, avg_colonization_r0;
+	double avg_infection_r0, avg_colonization_r0, avg_r0;
 	// infected / colonized counts
-	long infected_person_count, colonized_person_count;
+	long infected_person_count, colonized_person_count, i_or_c_count;
 };
 
 /**
@@ -64,6 +77,13 @@ public:
 		colonization_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
 	}
+
+	/**
+	 * Set the initial counts using the specified AgentSet of persons.
+	 * This counts people whose disease status is set as part of setup
+	 * rather than through the TA algorithm.
+	 */
+	void setInitialCounts(repast::relogo::AgentSet<Person>& people);
 
 	/**
 	 * Increments the colonization count for the specified place type.
@@ -108,20 +128,26 @@ private:
 
 	// increments the histogram hist for the specified key 'count'
 	void addToHistogram(unsigned int count, std::map<unsigned int, unsigned long>& hist);
-	// updates the PersonStats struct using data from the vector
-	void updateCountsFromStatsVector(std::list<StatusStats> vec, PersonStats& p_stats);
+	// updates the PersonStats struct using data from the person
+	void updateCountsFromStatsVector(Person* p, PersonStats& p_stats);
 
 	// hourly infected etc. totals
 	long hourly_infected, hourly_colonized, hourly_uncolonized;
+	long newly_infected, newly_colonized;
 
 	// these vars are calculated then exposed via the TDataSource API
 	// in order to log them using RepastHPC data collection.
-	double yearly_infected_r0, yearly_colonized_r0;
+	double yearly_infected_r0, yearly_colonized_r0, yearly_r0;
 	long yearly_infected, yearly_colonized;
+	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
 	long yearly_c_from_i, yearly_c_from_c;
 
+	long total_c_from_i, total_c_from_c;
+	double total_infected, total_colonized;
+
 	std::map<std::string, double> colonization_count_map;
+	YearlyAvg averages;
 };
 
 /**

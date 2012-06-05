@@ -73,7 +73,7 @@ public:
 	 * Run the transmission algorithm for an infected person, returning the result as a
 	 * DiseaseStatus.
 	 */
-	DiseaseStatus runInfected(float seek_care_modifier);
+	DiseaseStatus runInfected();
 
 	/**
 	 * Resets the transmission counts.
