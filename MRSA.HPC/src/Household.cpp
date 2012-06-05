@@ -53,11 +53,13 @@ void Household::runTransmission() {
 }
 
 void Household::seekAndDestroy() {
-	std::cout << placeId() << " seek and destroy " << std::endl;
+
 	std::random_shuffle(members.begin(), members.end(), repast::uni_random);
 	for (PersonIter iter = members.begin(); iter != members.end(); ++iter) {
 		Person* p = *iter;
 		if (p->status() != UNCOLONIZED && p != source_infectee && repast::Random::instance()->nextDouble() <= CURE_PROB) {
+			//std::cout << "uncolonizing " << placeId() << ": timestamp = " << sd_timestamp << ", current time = " <<
+			//			repast::RepastProcess::instance()->getScheduleRunner().currentTick() << std::endl;
 			p->updateStatus(UNCOLONIZED);
 		}
 	}
