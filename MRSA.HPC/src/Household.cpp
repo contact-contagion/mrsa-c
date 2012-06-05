@@ -1,3 +1,4 @@
+
 /*
  * Household.cpp
  *
@@ -18,7 +19,7 @@ const int FOURTEEN_DAYS = 336;
 
 // sets the risk 2.0
 Household::Household(std::vector<std::string>& vec) :
-		AbstractPlace(vec, 2.0f), members(0), source_infectee(0), sd_timestamp(0) {
+		AbstractPlace(vec, 2.0f), members(), source_infectee(0), sd_timestamp(0) {
 }
 
 Household::~Household() {
