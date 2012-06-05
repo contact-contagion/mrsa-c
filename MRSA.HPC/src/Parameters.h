@@ -32,7 +32,6 @@ extern const std::string MIN_INFECT_PERIOD;
 extern const std::string SEEK_AND_DESTROY_AT;
 extern const std::string SEEK_AND_DESTROY_CURE_FRACTION;
 
-
 /**
  * Parameters singleton that contains the model properties.
  *
@@ -53,20 +52,52 @@ public:
 	 */
 	static Parameters* instance();
 
+	/**
+	 * Gets the named parameter as a string.
+	 *
+	 * @return the named parameter.
+	 */
 	std::string getStringParameter(const std::string& prop_name) const;
 
+	/**
+	 * Gets the named parameter as an int.
+	 *
+	 * @return the named parameter.
+	 */
 	int getIntParameter(const std::string& prop_name) const;
 
+	/**
+	 * Gets the named parameter as a double.
+	 *
+	 * @return the named parameter.
+	 */
 	double getDoubleParameter(const std::string& prop_name) const;
 
+	/**
+	 * Puts the named parameter into this Parameters object.
+	 *
+	 * @param key the parameter's name
+	 * @param value the parameter's value.
+	 */
 	void putParameter(const std::string& key, bool value);
 
+	/**
+	 * Gets the named parameter as a boolean.
+	 *
+	 * @return the named parameter.
+	 */
 	bool getBooleanParameter(const std::string& prop_name) const;
 
+	/**
+	 * Switches the seek and destroy flag to on.
+	 */
 	void activateSeekAndDestroy() {
 		seek_and_destroy_on = true;
 	}
 
+	/**
+	 * Gets whether or not the seek and destroy flag is on.
+	 */
 	bool seekAndDestroyActivated() const {
 		return seek_and_destroy_on;
 	}
