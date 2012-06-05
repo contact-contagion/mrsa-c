@@ -8,6 +8,7 @@ random.seed = 1
 # 10 years = 87600.5
 
 stop.at = 17520.5
+seek.and.destroy.at = 52560.8
 
 persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
 places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv 

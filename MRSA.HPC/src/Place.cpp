@@ -10,6 +10,8 @@
 
 namespace mrsa {
 
+bool SEEK_AND_DESTROY = false;
+
 using namespace repast;
 
 const int PLACE_ID_IDX = 0;

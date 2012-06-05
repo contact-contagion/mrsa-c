@@ -12,8 +12,6 @@
 
 namespace mrsa {
 
-const bool SEEK_AND_DESTROY = false;
-
 AbstractPlace::AbstractPlace(std::vector<std::string>& vec, float risk) :
 		Place(vec, risk), infected(), colonized(), uncolonized() {
 }
@@ -80,7 +78,6 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	person->updateStatus(ta->runColonized());
 	if (SEEK_AND_DESTROY && person->status() == INFECTED && person->seeksCare()) {
 		// seek and destroy
-		std::cout << "init seek and destroy" << std::endl;
 		person->initSeekAndDestroy();
 	}
 }

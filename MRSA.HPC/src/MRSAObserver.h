@@ -49,6 +49,11 @@ public:
 	 */
 	void calcYearlyStats();
 
+	/**
+	 * Turns seek and destroy behavior on.
+	 */
+	void activateSeekAndDestroy();
+
 private:
 
 	int personType;

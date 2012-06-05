@@ -41,6 +41,7 @@ const string FASTER_SCALING = "faster.response.scaling.factor";
 const string SEEK_CARE_FRACTION = "seek.care.fraction";
 
 const string MIN_INFECT_PERIOD = "minimum.infection.period";
+const string SEEK_AND_DESTROY_AT = "seek.and.destroy.at";
 
 // counts the number of lines in the specified file.
 // We need to know this because we have to tell the Observer how
@@ -265,14 +266,14 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 					new LDataSourceAdapter(&stats->yearly_c_from_c), std::plus<double>()));
 
 	builder.addDataSource(
-				createSVDataSource("avg_seek_care_infection_duration",
-						new DDataSourceAdapter(&stats->yearly_seek_infection_duration),
-						std::plus<double>()));
+			createSVDataSource("avg_seek_care_infection_duration",
+					new DDataSourceAdapter(&stats->yearly_seek_infection_duration),
+					std::plus<double>()));
 
 	builder.addDataSource(
-				createSVDataSource("avg_no_seek_care_infection_duration",
-						new DDataSourceAdapter(&stats->yearly_no_seek_infection_duration),
-						std::plus<double>()));
+			createSVDataSource("avg_no_seek_care_infection_duration",
+					new DDataSourceAdapter(&stats->yearly_no_seek_infection_duration),
+					std::plus<double>()));
 
 	builder.addDataSource(
 			createSVDataSource("avg_infection_duration",
@@ -367,12 +368,12 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 					new LDataSourceAdapter(&stats->newly_colonized), std::plus<double>()));
 
 	builder.addDataSource(
-				repast::createSVDataSource("running_total_infected",
-						new DDataSourceAdapter(&stats->total_infected), std::plus<double>()));
+			repast::createSVDataSource("running_total_infected",
+					new DDataSourceAdapter(&stats->total_infected), std::plus<double>()));
 
 	builder.addDataSource(
-					repast::createSVDataSource("running_total_colonized",
-							new DDataSourceAdapter(&stats->total_colonized), std::plus<double>()));
+			repast::createSVDataSource("running_total_colonized",
+					new DDataSourceAdapter(&stats->total_colonized), std::plus<double>()));
 
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.
@@ -381,6 +382,11 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 
 void MRSAObserver::atEnd() {
 	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file);
+}
+
+void MRSAObserver::activateSeekAndDestroy() {
+	SEEK_AND_DESTROY = true;
+	std::cout << "seek and destroy activated" << std::endl;
 }
 
 // entry point for model setup.
@@ -440,6 +446,16 @@ void MRSAObserver::setup(Properties& props) {
 	runner.scheduleEndEvent(
 			Schedule::FunctorPtr(
 					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
+
+	// schedule turning on seek and destroy
+	double at = strToDouble(props.getProperty(SEEK_AND_DESTROY_AT));
+	if (at > 0) {
+		std::cout << "scheduling seek and destroy for " << at << std::endl;
+		runner.scheduleEvent(at,
+				Schedule::FunctorPtr(
+						new MethodFunctor<MRSAObserver>(this,
+								&MRSAObserver::activateSeekAndDestroy)));
+	}
 
 	repast::timestamp(time);
 	std::cout << "Setup Finished at " << time << std::endl;

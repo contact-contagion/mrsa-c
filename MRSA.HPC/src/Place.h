@@ -14,6 +14,8 @@
 
 namespace mrsa {
 
+extern bool SEEK_AND_DESTROY;
+
 // forward declaration
 class Person;
 
