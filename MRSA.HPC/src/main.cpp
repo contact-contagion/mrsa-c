@@ -61,22 +61,38 @@ void runModel(std::string propsFile, int argc, char ** argv) {
 		if (world.rank() == 0) {
 			std::vector<std::string> keysToWrite;
 			keysToWrite.push_back("run.number");
-			keysToWrite.push_back("date_time.run");
-			keysToWrite.push_back("process.count");
+                 keysToWrite.push_back("date_time.run");
+			keysToWrite.push_back("run.time");
 			keysToWrite.push_back("random.seed");
+                 keysToWrite.push_back("stop.at");
+                 keysToWrite.push_back("seek.and.destroy.at");
+                 keysToWrite.push_back("seek.and.destroy.cure.fraction");
+                 keysToWrite.push_back("persons.file");
+                 keysToWrite.push_back("places.file");
+                 keysToWrite.push_back("activities.file");
+                 keysToWrite.push_back("hourly.output.file");
+                 keysToWrite.push_back("yearly.output.file");
+                 keysToWrite.push_back("summary.output.file");
+                 keysToWrite.push_back("seek.care.fraction");
+                 keysToWrite.push_back("initial.colonization.fraction");
+                 keysToWrite.push_back("initial.infected.count");
+                 keysToWrite.push_back("minimum.infection.period");
+                 keysToWrite.push_back("a");
+                 keysToWrite.push_back("b");
+                 keysToWrite.push_back("c");
+                 keysToWrite.push_back("d");
+                 keysToWrite.push_back("e");
 			keysToWrite.push_back("min.x");
 			keysToWrite.push_back("min.y");
 			keysToWrite.push_back("max.x");
 			keysToWrite.push_back("max.y");
+			keysToWrite.push_back("grid.buffer");
 			keysToWrite.push_back("proc.per.x");
 			keysToWrite.push_back("proc.per.y");
-			keysToWrite.push_back("grid.buffer");
-			keysToWrite.push_back("init.time");
-			keysToWrite.push_back("stop.at");
+			keysToWrite.push_back("process.count");
 			keysToWrite.push_back("run.time");
 			props.log("root");
 			props.writeToSVFile("mrsa_model.csv", keysToWrite);
-
 		}
 	}
 	catch (std::exception& exp) {
