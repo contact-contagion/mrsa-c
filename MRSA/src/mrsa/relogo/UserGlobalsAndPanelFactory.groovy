@@ -77,19 +77,15 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for person input files.
 		addChooserWL('personsInputFile', 'Persons Input File:',
 			['None',
-			'../MRSA Inputs/subsets/60615/60615_people_sample.csv',
-			'../MRSA Inputs/subsets/60615/60615_people.csv',
-			'../MRSA Inputs/subsets/60615_60653/60615_60653_people.csv',
-			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_people.csv',],
+			'data/60615/60615_people_sample.csv',
+			'data/60615/60615_people.csv'],
 			defaultDataSetIndex)
 		
 		// Add a chooser for place input files.
 		addChooserWL('placesInputFile', 'Places Input File:',
 			['None',
-			'../MRSA Inputs/subsets/60615/60615_places_sample.csv',
-			'../MRSA Inputs/subsets/60615/60615_places.csv',
-			'../MRSA Inputs/subsets/60615_60653/60615_60653_places.csv',
-			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_places.csv'],
+			'data/60615/60615_places_sample.csv',
+			'data/60615/60615_places.csv'],
 			defaultDataSetIndex)
 
 		// Add a chooser for place input files.
