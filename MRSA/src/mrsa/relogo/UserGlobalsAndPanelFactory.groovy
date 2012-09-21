@@ -64,14 +64,12 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for showing person movement.
 		addChooserWL('showPersonMovement', 'Show Person Movement:',
 			['Yes',
-			'No'], 1)
+			'No'], 0)
 		
 		// Declare the default data set index.
 		int None                  = 0
 		int ZIP_60615_sample      = 1
 		int ZIP_60615             = 2
-		int ZIP_60615_60653       = 3
-		int ZIP_60615_60653_60609 = 4
 		int defaultDataSetIndex   = ZIP_60615
 				
 		// Add a chooser for person input files.
@@ -91,10 +89,8 @@ public class UserGlobalsAndPanelFactory extends AbstractReLogoGlobalsAndPanelFac
 		// Add a chooser for place input files.
 		addChooserWL('activitiesInputFile', 'Activities Input File:',
 			['None',
-			'../MRSA Inputs/subsets/60615/60615_activities_sample.csv',
-			'../MRSA Inputs/subsets/60615/60615_activities.csv',
-			'../MRSA Inputs/subsets/60615_60653/60615_60653_activities.csv',
-			'../MRSA Inputs/subsets/60615_60653_60609/60615_60653_60609_activities.csv'],
+			'data/60615/60615_activities_sample.csv',
+			'data/60615/60615_activities.csv'],
 			defaultDataSetIndex)
 
 		// The transmission parameter ranges are taken from an email
