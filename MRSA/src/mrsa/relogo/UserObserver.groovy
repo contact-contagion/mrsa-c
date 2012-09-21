@@ -77,7 +77,7 @@ class UserObserver extends BaseObserver {
 
 		// Normalize the place coordinates.
 		//Timer.start()
-		//normalizePlaceCoordinates()
+		normalizePlaceCoordinates()
 		//Timer.stop()
 		//Timer.show()
 
