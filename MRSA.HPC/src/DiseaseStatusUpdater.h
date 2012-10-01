@@ -44,6 +44,10 @@ public:
 	 */
 	void updateStatus(DiseaseStatus status);
 
+	void setMinInfectionDuration(float min_infection_duration) {
+		min_infection_duration_ = min_infection_duration;
+	}
+
 	/**
 	 * Increment the number colonization caused by this person by the specified
 	 * amount.

@@ -367,8 +367,39 @@ void MRSAObserver::atEnd() {
 }
 
 void MRSAObserver::activateSeekAndDestroy() {
+	updateSeeksCare();
 	Parameters::instance()->activateSeekAndDestroy();
 	std::cout << "seek and destroy activated" << std::endl;
+}
+
+void MRSAObserver::updateSeeksCare() {
+
+	float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
+
+	typedef repast::relogo::AgentSet<Person>::as_iterator Iter;
+	std::vector<Person*> no_cares;
+
+	for (Iter iter = people_->begin(); iter != people_->end(); ++iter) {
+		Person* person = *iter;
+		if (!person->seeksCare()) {
+			no_cares.push_back(person);
+		}
+	}
+
+	// hard coded to make half of those that don't seek care
+	// now seek care
+	double count = 0;
+	for (std::vector<Person*>::iterator iter = no_cares.begin(); iter != no_cares.end(); ++iter) {
+		bool seek_care = repast::Random::instance()->nextDouble() <= 0.5;
+		Person* person = *iter;
+		if (seek_care) {
+			person->setSeeksCare(true);
+			person->setMinInfectionDuration(min_infection_duration);
+			count++;
+		}
+	}
+
+	std::cout << "seek care fraction: " << ((people_->size() - no_cares.size() + count) / people_->size()) << std::endl;
 }
 
 // entry point for model setup.

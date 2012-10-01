@@ -69,6 +69,14 @@ public:
 		return seek_care_;
 	}
 
+	void setSeeksCare(bool seek_care) {
+		seek_care_ = seek_care;
+	}
+
+	void setMinInfectionDuration(float min_infection_duration) {
+		status_.setMinInfectionDuration(min_infection_duration);
+	}
+
 	/**
 	 * Update this Person's disease status to the specified status.
 	 */
