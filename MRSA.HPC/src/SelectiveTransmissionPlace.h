@@ -25,7 +25,7 @@ public:
 	 * Creates a SelectiveTransmissionPlace from the specified vector of parameters with
 	 * the specified risk and count of uncolonized persons to the algorithm on.
 	 */
-	SelectiveTransmissionPlace(std::vector<std::string>& vec, float risk, int uncp_count);
+	SelectiveTransmissionPlace(std::vector<std::string>& vec, Risk risk, int uncp_count);
 	virtual ~SelectiveTransmissionPlace();
 
 

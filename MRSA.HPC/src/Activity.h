@@ -12,6 +12,8 @@
 #include <string>
 #include <iostream>
 
+#include "Places.h"
+
 namespace mrsa {
 
 /**
@@ -27,10 +29,10 @@ public:
 	virtual ~Activity();
 
 	/**
-	 * Gets the risk associated with this activity.
+	 * Gets the activity type associated with this activity.
 	 */
-	float risk() const {
-		return activity_risk + place_risk;
+	int activityType() const {
+		return activity_type;
 	}
 
 	/**
@@ -48,13 +50,6 @@ public:
 	}
 
 	/**
-	 * Gets the place risk associated with this activity.
-	 */
-	const float getPlaceRisk() const {
-		return place_risk;
-	}
-
-	/**
 	 * Gets whether or not the time space of this activity
 	 * contains the specified time.
 	 *
@@ -65,14 +60,20 @@ public:
 		return start_time <= time && end_time > time;
 	}
 
+	/**
+	 * Selects the place appropriate to this activity from the Places.
+	 *
+	 * @return the place appropriate to this activity from the Places.
+	 */
+	Place* selectPlace(Places& places) const;
+
 	// assignment operator
 	Activity& operator=(const Activity&);
 
 private:
 	std::string tucase_id, place_type;
 	int start_time, end_time;
-	int activity_risk;
-	float place_risk;
+	int activity_type;
 
 };
 

@@ -14,6 +14,24 @@
 
 namespace mrsa {
 
+struct Risk {
+
+	// a risk multiplier for activity type 0 and activity type 1
+	float a0_, a1_;
+	float b0_, b1_;
+
+	Risk() : a0_(1), a1_(1),
+			b0_(1), b1_(1) {}
+
+
+	Risk(float a0, float a1, float b0, float b1) : a0_(a0), a1_(a1),
+			b0_(b0), b1_(b1) {}
+
+	Risk(const Risk& r) : a0_(r.a0_), a1_(r.a1_),
+			b0_(r.b0_), b1_(r.b1_) {}
+
+};
+
 
 // forward declaration
 class Person;
@@ -33,12 +51,12 @@ public:
 	/**
 	 * Creates the place based on the values in the vector, and with the specified risk.
 	 */
-	Place(std::vector<std::string>& vec, float risk);
+	Place(std::vector<std::string>& vec, Risk risk);
 
 	/**
 	 * Creates a place with just a risk and an id.
 	 */
-	Place(std::string id, std::string type, float risk_);
+	Place(std::string id, std::string type, Risk risk);
 
 	virtual ~Place();
 
@@ -47,7 +65,7 @@ public:
 	 *
 	 * @param person the person to add.
 	 */
-	virtual void addPerson(Person* person) = 0;
+	virtual void addPerson(Person* person, int activity_type) = 0;
 
 	/**
 	 * Runs the transmission algorithm appropriate to this place.
@@ -79,7 +97,7 @@ protected:
 	std::string id_, type_;
 	// place location
 	double longitude, latitude;
-	float risk_;
+	Risk risk_;
 };
 
 std::ostream& operator<<(std::ostream& os, const Place& place);

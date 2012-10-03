@@ -44,7 +44,6 @@ private:
 	CSVReader reader;
 	std::map<std::string, Place*>* places;
 	float min_infection_duration_;
-	std::vector<Place*> households;
 	float seek_care_fraction_;
 
 	/**

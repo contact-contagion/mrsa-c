@@ -50,7 +50,7 @@ TransmissionAlgorithm* TransmissionAlgorithm::instance() {
 }
 
 // the algorithm for uncolonized persons.
-DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int infected,
+DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk_multiplier, unsigned int infected,
 		unsigned int colonized) {
 
 	// default return value.
@@ -59,7 +59,7 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_ * 2
 		double draw = repast::Random::instance()->nextDouble();
-		ret = draw <= (2 * risk * a_) ? COLONIZED : UNCOLONIZED;
+		ret = draw <= (2 * risk_multiplier * a_) ? COLONIZED : UNCOLONIZED;
 		if (ret == COLONIZED) {
 			++newly_colonized;
 			++colonized_from_infection;
@@ -68,7 +68,7 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 		// set the return value based on the results of a random draw
 		// vs. the risk and a_
 		double draw = repast::Random::instance()->nextDouble();
-		ret = draw <= (risk * a_) ? COLONIZED : UNCOLONIZED;
+		ret = draw <= (risk_multiplier * a_) ? COLONIZED : UNCOLONIZED;
 		if (ret == COLONIZED) {
 			++newly_colonized;
 			++colonized_from_colonization;
@@ -82,15 +82,15 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk, unsigned int inf
 }
 
 // the algorithm for colonized persons.
-DiseaseStatus TransmissionAlgorithm::runColonized() {
+DiseaseStatus TransmissionAlgorithm::runColonized(float risk_multiplier) {
 	DiseaseStatus ret(COLONIZED);
 	//++attempts;
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= b_) {
+	if (draw <= (b_ * risk_multiplier)) {
 		// move from colonized to infected with a probability of b_
 		ret = INFECTED;
 		++newly_infected;
-	} else if (draw <= e_ + b_)
+	} else if (draw <= e_ + (b_ * risk_multiplier))
 		// move from colonized to infected with a probability of e_
 		// we already tested for <= b_ so only get here if > b_ but
 		// <= e_.

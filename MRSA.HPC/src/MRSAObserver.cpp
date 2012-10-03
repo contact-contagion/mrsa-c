@@ -18,6 +18,7 @@
 #include "ActivityCreator.h"
 #include "TransmissionAlgorithm.h"
 #include "Parameters.h"
+#include "Constants.h"
 
 namespace mrsa {
 
@@ -133,10 +134,11 @@ void MRSAObserver::initializeActivities(Properties& props) {
 // Place so they can be easily shared among persons.
 void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap) {
 	const string placesFile = props.getProperty(PLACES_FILE);
+	const string riskFile = props.getProperty(RISK_FILE);
 
 	// create the places.
 	PlaceCreator placeCreator;
-	placeCreator.run(placesFile, places);
+	placeCreator.run(placesFile, riskFile, places);
 
 	// put the places in a map. Key is the place id
 	// so that the PersonsCreator can easily look up
@@ -162,9 +164,8 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	float seek_care_fraction = (float) strToDouble(props.getProperty(SEEK_CARE_FRACTION));
 	std::cout << "seek care fraction: " << seek_care_fraction << std::endl;
 
-	// A PersonsCreator is used a functor to create the persons
+	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
-
 	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, seek_care_fraction);
 	// First line is the header info so we create one less
 	// than the number of lines in the file.
@@ -412,6 +413,11 @@ void MRSAObserver::setup(Properties& props) {
 	repast::timestamp(time);
 	std::cout << "Setup Started at " << time << std::endl;
 
+	// create a random distribution used by Person-s to
+	// choose which "other household" to go to
+	_IntUniformGenerator gen(Random::instance()->engine(), boost::uniform_int<>(0, 3));
+	Random::instance()->putGenerator(OH_DIST, new DefaultNumberGenerator<_IntUniformGenerator>(gen));
+
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
 	double a = params->getDoubleParameter("a");
@@ -439,7 +445,7 @@ void MRSAObserver::setup(Properties& props) {
 
 	// initialize the disease status for each person.
 	initializeDiseaseStatus(props, people);
-	people.ask(&Person::goToHome);
+	//people.ask(&Person::goToHome);
 
 	// initialize the hourly data collection
 	initializeHourlyDataCollection(params->getStringParameter(HOURLY_OUTPUT_FILE));
@@ -453,6 +459,7 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
+
 
 	Statistics* stats = Statistics::getInstance();
 	stats->setInitialCounts(*people_);

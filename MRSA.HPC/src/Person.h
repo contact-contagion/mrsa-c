@@ -13,7 +13,7 @@
 #include "relogo/Turtle.h"
 
 #include "DiseaseStatusUpdater.h"
-#include "Place.h"
+#include "Places.h"
 #include "Activity.h"
 
 namespace mrsa {
@@ -26,8 +26,13 @@ const int AGE_IDX = 4;
 const int GQ_ID_IDX = 5;
 const int SCHOOL_ID_IDX = 6;
 const int WORK_ID_IDX = 7;
-const int TUCASE_ID_WEEKEND_IDX = 8;
-const int TUCASE_ID_WEEKDAY_IDX = 9;
+const int TUCASE_ID_WEEKEND_IDX = 9;
+const int TUCASE_ID_WEEKDAY_IDX = 8;
+const int DAYCARE_ID_IDX = 10;
+const int GYM_ID_IDX = 11;
+const int HOSPITAL_ID_IDX = 12;
+const int OTHER_H_START_IDX = 13;
+const int OTHER_H_END_IDX = 16;
 
 
 class Person : public repast::relogo::Turtle {
@@ -37,9 +42,7 @@ class Person : public repast::relogo::Turtle {
 
 public:
 
-	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Place* home,
-			Place* other_home, Place* group_quarters,
-			Place* work, Place* school, float min_infection_duration,
+	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Places places, float min_infection_duration,
 			bool seek_care);
 	virtual ~Person();
 
@@ -116,7 +119,7 @@ public:
 	 * Gets the Place where this Person is currently.
 	 */
 	const Place* currentPlace() const {
-		return current;
+		return places_.current;
 	}
 
 	/**
@@ -142,10 +145,9 @@ private:
 	typedef std::vector<Activity>::const_iterator ActivityIter;
 
 	std::string person_id;
-	Place* _household, *other_household, *_group_quarters, *_work, *_school, *current;
+	Places places_;
 	std::string tucaseid_weekday, tucaseid_weekend;
 	int relate, sex, age_;
-
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
 
@@ -155,7 +157,7 @@ private:
 	/**
 	 * Changes this Person's place to the specified place.
 	 */
-	void changePlace(Place* place);
+	void changePlace(Place* place, int activity_type);
 };
 
 std::ostream& operator<<(std::ostream& os, const Person& id);

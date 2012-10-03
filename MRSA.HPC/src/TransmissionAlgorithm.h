@@ -63,11 +63,12 @@ public:
 	 * DiseaseStatus.
 	 */
 	DiseaseStatus runUncolonized(float risk, unsigned int infected, unsigned int colonized);
+
 	/**
 	 * Run the transmission algorithm for a colonized person, returning the result as a
 	 * DiseaseStatus.
 	 */
-	DiseaseStatus runColonized();
+	DiseaseStatus runColonized(float risk_multiplier);
 
 	/**
 	 * Run the transmission algorithm for an infected person, returning the result as a

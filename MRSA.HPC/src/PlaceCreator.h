@@ -21,6 +21,11 @@ namespace mrsa {
  *
  */
 class PlaceCreator {
+private:
+
+	void setRisk(Risk& risk, int act_type, float a, float b);
+	void loadRisk(const std::string& risk_file, std::map<std::string, Risk>& map);
+
 public:
 	PlaceCreator();
 	PlaceCreator(const PlaceCreator& creator);
@@ -34,7 +39,7 @@ public:
 	 * @param file the path to the places file
 	 * @param places the vector to put the created places in
 	 */
-	void run(const std::string& file, std::vector<Place*>& places);
+	void run(const std::string& places_file, const std::string& risk_file, std::vector<Place*>& places);
 };
 
 } /* namespace mrsa */

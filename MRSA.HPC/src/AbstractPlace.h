@@ -22,8 +22,8 @@ namespace mrsa {
 class AbstractPlace: public Place {
 
 public:
-	AbstractPlace(std::vector<std::string>& vec, float risk);
-	AbstractPlace(std::string id, std::string type, float risk);
+	AbstractPlace(std::vector<std::string>& vec, Risk risk);
+	AbstractPlace(std::string id, std::string type, Risk risk);
 	virtual ~AbstractPlace();
 
 	/**
@@ -31,7 +31,7 @@ public:
 	 *
 	 * @param person the person to add.
 	 */
-	virtual void addPerson(Person* person);
+	virtual void addPerson(Person* person, int activity_type);
 
 	/**
 	 * Runs the transmission algorithm appropriate to this place.
@@ -49,6 +49,7 @@ protected:
 	typedef std::vector<Person*>::iterator PersonIter;
 	// number of colonized, and infected persons in this
 	// place.
+	int activity_type_;
 	std::vector<Person*> infected, colonized, uncolonized;
 
 	/**

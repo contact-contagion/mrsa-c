@@ -19,6 +19,7 @@ using namespace repast;
 const std::string PERSONS_FILE = "persons.file";
 const std::string PLACES_FILE = "places.file";
 const std::string ACTIVITIES_FILE = "activities.file";
+const std::string RISK_FILE = "risk.file";
 
 const std::string HOURLY_OUTPUT_FILE = "hourly.output.file";
 const std::string YEARLY_OUTPUT_FILE = "yearly.output.file";
@@ -42,6 +43,7 @@ Parameters::Parameters(repast::Properties& props) : props_(props), seek_and_dest
 }
 
 Parameters::~Parameters() {
+
 }
 
 void Parameters::initialize(Properties& props) {

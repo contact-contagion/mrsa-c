@@ -19,7 +19,7 @@ namespace mrsa {
 class Workplace: public SelectiveTransmissionPlace {
 
 public:
-	Workplace(std::vector<std::string>& vec);
+	Workplace(std::vector<std::string>& vec, Risk risk);
 	virtual ~Workplace();
 };
 

@@ -20,7 +20,7 @@ namespace mrsa {
 class Household : public mrsa::AbstractPlace {
 
 public:
-	Household(std::vector<std::string>& vec);
+	Household(std::vector<std::string>& vec, Risk risk);
 	virtual ~Household();
 
 	/**

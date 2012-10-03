@@ -17,6 +17,7 @@ namespace mrsa {
 extern const std::string PERSONS_FILE;
 extern const std::string PLACES_FILE;
 extern const std::string ACTIVITIES_FILE;
+extern const std::string RISK_FILE;
 
 extern const std::string HOURLY_OUTPUT_FILE;
 extern const std::string YEARLY_OUTPUT_FILE;

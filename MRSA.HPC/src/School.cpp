@@ -14,7 +14,7 @@ namespace mrsa {
 
 using namespace std;
 
-AgeGroup::AgeGroup(std::string id, std::string type, float risk) :
+AgeGroup::AgeGroup(std::string id, std::string type, Risk risk) :
 		AbstractPlace(id, type, risk) {
 
 }
@@ -42,8 +42,8 @@ void AgeGroup::runTransmission() {
 }
 
 // low risk = 1f
-School::School(std::vector<std::string>& vec) :
-		Place(vec, 1.0f), person_map() {
+School::School(std::vector<std::string>& vec, Risk risk) :
+		Place(vec,  risk), person_map() {
 }
 
 School::~School() {
@@ -54,7 +54,7 @@ School::~School() {
 }
 
 // adds the person to the age group for that person.
-void School::addPerson(Person* person) {
+void School::addPerson(Person* person, int activity_type) {
 
 	int age = person->age();
 	// find the AgeGroup for age.
@@ -63,12 +63,12 @@ void School::addPerson(Person* person) {
 		// create a new AgeGroup and
 		// add the person to it.
 		AgeGroup* grp = new AgeGroup(id_, type_, risk_);
-		grp->addPerson(person);
+		grp->addPerson(person, activity_type);
 		// put the AgeGroup in the map.
 		person_map.insert(pair<int, AgeGroup*>(age, grp));
 	} else {
 		// add the person to found AgeGroup.s
-		iter->second->addPerson(person);
+		iter->second->addPerson(person, activity_type);
 	}
 }
 

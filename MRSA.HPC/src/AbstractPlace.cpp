@@ -13,16 +13,17 @@
 
 namespace mrsa {
 
-AbstractPlace::AbstractPlace(std::vector<std::string>& vec, float risk) :
-		Place(vec, risk), infected(), colonized(), uncolonized() {
+AbstractPlace::AbstractPlace(std::vector<std::string>& vec, Risk risk) :
+		Place(vec, risk), activity_type_(0), infected(), colonized(), uncolonized() {
 }
 
-AbstractPlace::AbstractPlace(std::string id, std::string type, float risk) : Place(id, type, risk) {}
+AbstractPlace::AbstractPlace(std::string id, std::string type, Risk risk) : Place(id, type, risk),
+		 activity_type_(0), infected(), colonized(), uncolonized() {}
 
 AbstractPlace::~AbstractPlace() {
 }
 
-void AbstractPlace::addPerson(Person* person) {
+void AbstractPlace::addPerson(Person* person, int activity_type) {
 	// increments the disease status counts
 	// based on the person's status
 	DiseaseStatus status = person->status();
@@ -33,17 +34,22 @@ void AbstractPlace::addPerson(Person* person) {
 	} else {
 		infected.push_back(person);
 	}
+	if (activity_type > activity_type_) activity_type_ = activity_type;
 }
 
 // sets the status counts to 0
 void AbstractPlace::reset() {
+	activity_type_ = 0;
 	infected.clear();
 	colonized.clear();
 	uncolonized.clear();
 }
 
 void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
-	person->updateStatus(ta->runUncolonized(risk_, infected.size(), colonized.size()));
+	float risk_multiplier = 1;
+	if (activity_type_ == 0) risk_multiplier = risk_.a0_;
+	else risk_multiplier = risk_.a1_;
+	person->updateStatus(ta->runUncolonized(risk_multiplier, infected.size(), colonized.size()));
 	if (person->status() == COLONIZED) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
@@ -73,9 +79,12 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 }
 
 void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) {
+	float risk_multiplier = 1;
+	if (activity_type_ == 0) risk_multiplier = risk_.b0_;
+	else risk_multiplier = risk_.b1_;
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
-	person->updateStatus(ta->runColonized());
+	person->updateStatus(ta->runColonized(risk_multiplier));
 
 	if (Parameters::instance()->seekAndDestroyActivated() && person->status() == INFECTED && person->seeksCare()) {
 		// seek and destroy
