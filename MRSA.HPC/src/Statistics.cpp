@@ -120,7 +120,6 @@ void Statistics::hourEnded() {
 void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 
 	std::list<StatusStats>& vec = p->status_.yearly_status_stats;
-	bool seek_care = p->seeksCare();
 
 	int i_count = 0, c_count = 0;
 	double p_from_infection = 0, p_from_colonization = 0;
@@ -131,7 +130,7 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 				++i_count;
 				++(p_stats.infection_count);
 				p_stats.infection_duration += stats.duration;
-				if (seek_care) {
+				if (stats.infection_status == SEEK_CARE) {
 					p_stats.seek_infection_duration += stats.duration;
 					++(p_stats.seek_infection_count);
 				} else {

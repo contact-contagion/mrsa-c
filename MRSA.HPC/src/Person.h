@@ -34,16 +34,15 @@ const int HOSPITAL_ID_IDX = 12;
 const int OTHER_H_START_IDX = 13;
 const int OTHER_H_END_IDX = 16;
 
-
-class Person : public repast::relogo::Turtle {
+class Person: public repast::relogo::Turtle {
 
 	friend std::ostream& operator<<(std::ostream& os, const Person& id);
 	friend class Statistics;
 
 public:
 
-	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Places places, float min_infection_duration,
-			bool seek_care);
+	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
+			Places places, float min_infection_duration);
 	virtual ~Person();
 
 	/**
@@ -63,21 +62,6 @@ public:
 	 */
 	const std::string& personId() const {
 		return person_id;
-	}
-
-	/**
-	 * Gets whether or not this Person seeks care when infected.
-	 */
-	const bool seeksCare() const {
-		return seek_care_;
-	}
-
-	void setSeeksCare(bool seek_care) {
-		seek_care_ = seek_care;
-	}
-
-	void setMinInfectionDuration(float min_infection_duration) {
-		status_.setMinInfectionDuration(min_infection_duration);
 	}
 
 	/**
@@ -116,6 +100,18 @@ public:
 	}
 
 	/**
+	 * Gets the current infection status.
+	 */
+	InfectionStatus infectionStatus() const {
+		return status_.infectionStatus();
+	}
+
+	/**
+	 * Updates this Person's current infection status.
+	 */
+	void updateInfectionStatus(InfectionStatus);
+
+	/**
 	 * Gets the Place where this Person is currently.
 	 */
 	const Place* currentPlace() const {
@@ -123,9 +119,9 @@ public:
 	}
 
 	/**
-	 * Initializes seek and destroy within this Person's household.
+	 * Initializes treatment within this Person's household.
 	 */
-	void initSeekAndDestroy();
+	void initHouseholdTreatment();
 
 	/**
 	 * Makes this Person, go home. This typically sets the current place for this
@@ -152,7 +148,6 @@ private:
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
-	bool seek_care_;
 
 	/**
 	 * Changes this Person's place to the specified place.

@@ -22,9 +22,8 @@ const int NO_CARE_EXTRA_HOURS = 120;
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration, float seek_care_fraction) :
-		reader(file), places(map), min_infection_duration_(min_infection_duration), seek_care_fraction_(
-				seek_care_fraction) {
+		float min_infection_duration) :
+		reader(file), places(map), min_infection_duration_(min_infection_duration) {
 
 	init();
 }
@@ -32,7 +31,7 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_), seek_care_fraction_(creator.seek_care_fraction_) {
+				creator.min_infection_duration_) {
 	init();
 }
 
@@ -94,13 +93,8 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
-	bool seek_care = repast::Random::instance()->nextDouble() <= seek_care_fraction_;
-
-	float min_infection_dur = min_infection_duration_;
-	if (!seek_care) min_infection_dur += NO_CARE_EXTRA_HOURS;
-
 	// create the Person
-	return new Person(id, obs, vec, places, min_infection_dur, seek_care);
+	return new Person(id, obs, vec, places, min_infection_duration_);
 }
 
 }

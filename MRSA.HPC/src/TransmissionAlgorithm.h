@@ -12,6 +12,11 @@
 
 namespace mrsa {
 
+struct TAParameters {
+	double a, b, e, alpha, beta, gamma, rho;
+};
+
+
 /**
  * Implements the algorithm for transitioning
  * from one disease state to another. This is implemented
@@ -26,7 +31,7 @@ public:
 	 * Initialize the TransmissionAlgorithm singleton with the
 	 * a, b, c, d, and e parameters.
 	 */
-	static void initialize(double a, double b, double c, double d, double e);
+	static void initialize(TAParameters& params);
 
 	/**
 	 * Gets singleton instance. If it has not been initialized, an exception
@@ -71,10 +76,22 @@ public:
 	DiseaseStatus runColonized(float risk_multiplier);
 
 	/**
-	 * Run the transmission algorithm for an infected person, returning the result as a
-	 * DiseaseStatus.
+	 * Run the transmission algorithm for an initially infected person.
+	 * This determines whether or not they seek care.
 	 */
-	DiseaseStatus runInfected();
+	InfectionStatus runInfected();
+
+	/**
+	 * Runs the transmission algorithm for an infected person
+	 * who is under going "self care".
+	 */
+	DiseaseStatus runInfectedSelfCare();
+
+	/**
+	 * Runs the transmission algorithm for an infected person
+	 * who is seeking care.
+	 */
+	DiseaseStatus runInfectedSeekCare();
 
 	/**
 	 * Resets the transmission counts.
@@ -84,7 +101,7 @@ public:
 private:
 
 	static TransmissionAlgorithm* instance_;
-	double a_, b_, c_, d_, e_;
+	double a_, b_, e_, alpha_, beta_, gamma_, rho_;
 
 	// counts the number of persons who were
 	// are newly_colonized and newly_infected
@@ -95,7 +112,7 @@ private:
 	/**
 	 * Private constructor.
 	 */
-	TransmissionAlgorithm(double a, double b, double c, double d, double e);
+	TransmissionAlgorithm(TAParameters& params);
 
 };
 

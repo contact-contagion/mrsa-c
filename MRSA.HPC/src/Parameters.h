@@ -30,6 +30,8 @@ extern const std::string FASTER_SCALING;
 extern const std::string SEEK_CARE_FRACTION;
 
 extern const std::string MIN_INFECT_PERIOD;
+extern const std::string SEEK_CARE_INFECT_PERIOD;
+extern const std::string SELF_CARE_INFECT_PERIOD;
 extern const std::string SEEK_AND_DESTROY_AT;
 extern const std::string SEEK_AND_DESTROY_CURE_FRACTION;
 

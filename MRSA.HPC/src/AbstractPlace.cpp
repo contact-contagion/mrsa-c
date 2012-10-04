@@ -71,10 +71,19 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 }
 
 void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
-	// updates the status of the specified person given the current
-	// disease status counts in this place.
 	if (person->canStatusChange()) {
-		person->updateStatus(ta->runInfected());
+		InfectionStatus status = person->infectionStatus();
+		if (status == NONE)
+			person->updateInfectionStatus(ta->runInfected());
+
+		else if (status == SELF_CARE) {
+			person->updateStatus(ta->runInfectedSelfCare());
+		} else if (status == SEEK_CARE) {
+			DiseaseStatus disease_status = ta->runInfectedSeekCare();
+			person->updateStatus(disease_status);
+			if (disease_status == UNCOLONIZED)
+				person->initHouseholdTreatment();
+		}
 	}
 }
 
@@ -85,11 +94,6 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
 	person->updateStatus(ta->runColonized(risk_multiplier));
-
-	if (Parameters::instance()->seekAndDestroyActivated() && person->status() == INFECTED && person->seeksCare()) {
-		// seek and destroy
-		person->initSeekAndDestroy();
-	}
 }
 
 } /* namespace mrsa */

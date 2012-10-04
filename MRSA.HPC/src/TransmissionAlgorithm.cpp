@@ -15,19 +15,20 @@ TransmissionAlgorithm* TransmissionAlgorithm::instance_ = 0;
 
 //int attempts = 0;
 
-TransmissionAlgorithm::TransmissionAlgorithm(double a, double b, double c, double d, double e) :
-		a_(a), b_(b), c_(c), d_(d), e_(e),  newly_colonized(0), newly_infected(0),
+TransmissionAlgorithm::TransmissionAlgorithm(TAParameters& params) :
+		a_(params.a), b_(params.b), e_(params.e), alpha_(params.alpha), beta_(params.beta),
+		gamma_(params.gamma), rho_(params.rho), newly_colonized(0), newly_infected(0),
 		colonized_from_infection(0), colonized_from_colonization(0),
 		colonized_per_infected(0), colonized_per_colonization(0) {
 }
 
-void TransmissionAlgorithm::initialize(double a, double b, double c, double d, double e) {
+void TransmissionAlgorithm::initialize(TAParameters& params) {
 	// if the instance exists, delete the old one.
 	if (instance_ != 0) {
 		delete instance_;
 	}
 	// create the one.
-	instance_ = new TransmissionAlgorithm(a, b, c, d, e);
+	instance_ = new TransmissionAlgorithm(params);
 }
 
 TransmissionAlgorithm::~TransmissionAlgorithm() {
@@ -99,22 +100,23 @@ DiseaseStatus TransmissionAlgorithm::runColonized(float risk_multiplier) {
 	return ret;
 }
 
-DiseaseStatus TransmissionAlgorithm::runInfected() {
-
-	DiseaseStatus ret(INFECTED);
+InfectionStatus TransmissionAlgorithm::runInfected() {
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= d_)
-		// move from infected to uncolonized with a probability of d_
-		ret = UNCOLONIZED;
-	else if (draw <= d_ + c_) {
-		// move from infected to uncolonized with a probability of c_
-		// we already tested for <= d_ so only get here if > d_ but
-		// <= c_.
-		ret = COLONIZED;
-		++newly_colonized;
-	}
-
-	return ret;
+	if (draw <= alpha_) return SEEK_CARE;
+	return SELF_CARE;
 }
+
+DiseaseStatus TransmissionAlgorithm::runInfectedSelfCare() {
+	double draw = repast::Random::instance()->nextDouble();
+	if (draw <= rho_) return UNCOLONIZED;
+	return COLONIZED;
+}
+
+DiseaseStatus TransmissionAlgorithm::runInfectedSeekCare() {
+	double draw = repast::Random::instance()->nextDouble();
+	if (draw <= beta_) return UNCOLONIZED;
+	return COLONIZED;
+}
+
 
 } /* namespace mrsa */

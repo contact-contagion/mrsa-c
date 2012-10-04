@@ -11,6 +11,7 @@
 
 #include "Person.h"
 #include "Household.h"
+#include "Parameters.h"
 
 namespace mrsa {
 
@@ -19,11 +20,10 @@ using namespace repast;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Places
-		places, float min_infection_duration,
-		bool seek_care) :
+		places, float min_infection_duration) :
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration), seek_care_(seek_care) {
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -157,9 +157,22 @@ void Person::changePlace(Place* place, int activity_type) {
 		places_.current->addPerson(this, activity_type);
 }
 
-void Person::initSeekAndDestroy() {
+void Person::updateInfectionStatus(InfectionStatus status) {
+	status_.updateInfectionStatus(status);
+	if (status == SEEK_CARE) {
+		float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
+		float seek_care_duration = (float)Parameters::instance()->getDoubleParameter(SEEK_CARE_INFECT_PERIOD);
+		status_.setMinInfectionDuration(min_infection_duration + seek_care_duration);
+	} else if (status == SELF_CARE) {
+		float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
+		float self_care_duration = (float)Parameters::instance()->getDoubleParameter(SELF_CARE_INFECT_PERIOD);
+		status_.setMinInfectionDuration(min_infection_duration + self_care_duration);
+	}
+}
+
+void Person::initHouseholdTreatment() {
 	if (places_.household != 0) {
-		((Household*)places_.household)->initSeekAndDestroy(this);
+		((Household*)places_.household)->initHouseholdTreatment(this);
 	}
 }
 
