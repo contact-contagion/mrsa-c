@@ -17,9 +17,6 @@ namespace mrsa {
 using namespace std;
 using namespace repast;
 
-// don't seek care so infected extra 5 days
-const int NO_CARE_EXTRA_HOURS = 120;
-
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 		float min_infection_duration) :
