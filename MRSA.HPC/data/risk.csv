@@ -1,0 +1,15 @@
+place_type, activity_type, risk_a, risk_b
+Hospital, 0, 1, 1
+Hospital, 1, 1, 1
+Workplace, 0, 0.1, 1
+Workplace, 1, 0.1, 1
+Household, 0, 2, 1
+Household, 1, 2, 1
+School, 0, 1, 1
+School, 1, 1, 1
+Gym, 0, 1, 1
+Gym, 1, 1, 1
+Nursing Home, 0, 1, 1
+Nursing Home, 1, 1, 1
+Prison, 0, 1, 1
+Prison, 1, 1, 1

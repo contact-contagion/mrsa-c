@@ -31,11 +31,11 @@ BOOST_AUTO_TEST_CASE(place_creator) {
 
 	std::string ids[] = {"10049883", "10051140", "10052705", "1703101010000001",
 		"1703101010000020", "170993001101", "170993001102", "170993001104", "170993001118", "2038461", "2038468",
-		"G170313904001C01", "G170314103001C01"};
+		"G170313904001C01", "4196117"};
 
 	std::string types[] = {"hospital", "hospital", "hospital", "workplace", "workplace",
 		"school", "school", "school", "school", "household", "household", "college dorm",
-		"college dorm"
+		"gym"
 	};
 
 	for (unsigned int i = 0; i < 13; ++i) {
@@ -54,7 +54,7 @@ BOOST_AUTO_TEST_CASE(people_creator) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 7.0f, 1.0f);
+	PersonsCreator pCreator("../test_data/people1.csv", &placeMap, 7.0f, 1.0f);
 	obs->create<Person>(14, pCreator);
 
 	AgentSet<Person> persons;
@@ -79,6 +79,7 @@ BOOST_AUTO_TEST_CASE(people_creator) {
 }
 
 BOOST_AUTO_TEST_CASE(activity_creator) {
+
 	typedef map<string, vector<Activity> >::iterator MapIter;
 	ActivityCreator creator;
 	map<string, vector<Activity> > map;

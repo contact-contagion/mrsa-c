@@ -8,12 +8,14 @@ random.seed = 1
 # 10 years = 87600.5
 
 stop.at = 8760.5
-seek.and.destroy.at = 2.8
+seek.and.destroy.at = 4380
 seek.and.destroy.cure.fraction = 0.83
 
-persons.file = ../../MRSA Inputs/subsets/60615/60615_people.csv 
-places.file = ../../MRSA Inputs/subsets/60615/60615_places.csv 
-activities.file = ../../MRSA Inputs/subsets/60615/60615_activities.csv 
+persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+risk.file = ../data/risk.csv 
+
 
 hourly.output.file = ./output/hourly_data.csv
 yearly.output.file = ./output/yearly_data.csv
@@ -27,11 +29,11 @@ initial.infected.count = 34
 # 7 days (24 x 7)
 minimum.infection.period = 168
 
-a = 9.2635e-05
-b = 7.112625e-05
-c = 0.001189725
-d = 0.0133766
-e = 0.0001166234
+a = 2.59e-05
+b = 2.58e-05
+c = 3.04e-04
+d = 2.98e-03
+e = 2.40e-05
 
 # world definition props
 min.x = -100

@@ -24,7 +24,7 @@ public:
 	/**
 	 * Creates this DefaultPlace from the data in the vector.
 	 */
-	DefaultPlace(std::vector<std::string>& vec);
+	DefaultPlace(std::vector<std::string>& vec, Risk risk);
 	virtual ~DefaultPlace();
 };
 

@@ -9,7 +9,7 @@
 
 namespace mrsa {
 
-SelectiveTransmissionPlace::SelectiveTransmissionPlace(std::vector<std::string>& vec, float risk,
+SelectiveTransmissionPlace::SelectiveTransmissionPlace(std::vector<std::string>& vec, Risk risk,
 		int uncolonized_count) :
 		AbstractPlace(vec, risk), uncp_count(uncolonized_count) {
 }
@@ -43,6 +43,11 @@ void SelectiveTransmissionPlace::runTransmission() {
 		repast::IntUniformGenerator gen = repast::Random::instance()->createUniIntGenerator(0,
 				(int) uncolonized.size() - 1);
 		// for "uncp_count" times:
+		//std::cout << uncolonized.size() << std::endl;
+		//std::cout << "uncp_count: " << uncp_count << std::endl;
+		//for (int i = 0; i < uncolonized.size(); i++) {
+		//	std::cout << "i: " << i << " " << uncolonized[i] << " " << (*uncolonized[i]) << std::endl;
+		//}
 		for (unsigned int i = 0; i < uncp_count; ++i) {
 			// get a person at random
 			Person* person = uncolonized[(int) gen.next()];
@@ -50,9 +55,11 @@ void SelectiveTransmissionPlace::runTransmission() {
 			// do the draw again, until we get an unprocessed person.
 			PersonIter iter = std::find(processed.begin(), processed.end(), person);
 			while (iter != processed.end()) {
-				person = uncolonized[(int) gen.next()];
+				int idx = (int)gen.next();
+				person = uncolonized[idx];
 				iter = std::find(processed.begin(), processed.end(), person);
 			}
+
 
 			// process (run the transmission algorithm on) the person.
 			processUncolonized(person, ta);

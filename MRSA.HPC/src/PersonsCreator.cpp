@@ -17,38 +17,22 @@ namespace mrsa {
 using namespace std;
 using namespace repast;
 
-const string RND_INDEX_NAME = "household.index";
-
 // don't seek care so infected extra 5 days
 const int NO_CARE_EXTRA_HOURS = 120;
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 		float min_infection_duration, float seek_care_fraction) :
-		reader(file), places(map), min_infection_duration_(min_infection_duration), households(), seek_care_fraction_(
+		reader(file), places(map), min_infection_duration_(min_infection_duration), seek_care_fraction_(
 				seek_care_fraction) {
 
 	init();
-
-	for (std::map<string, Place*>::iterator iter = map->begin(); iter != map->end(); ++iter) {
-		Place* p = iter->second;
-		string type = p->placeType();
-		if (type == HOUSEHOLD_TYPE)
-			households.push_back(p);
-	}
-
-	_IntUniformGenerator gen(repast::Random::instance()->engine(),
-			boost::uniform_int<>(0, households.size() - 1));
-	repast::Random::instance()->putGenerator(RND_INDEX_NAME,
-			new DefaultNumberGenerator<_IntUniformGenerator>(gen));
-
 }
 
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_), households(creator.households), seek_care_fraction_(
-				creator.seek_care_fraction_) {
+				creator.min_infection_duration_), seek_care_fraction_(creator.seek_care_fraction_) {
 	init();
 }
 
@@ -56,7 +40,6 @@ void PersonsCreator::init() {
 	// skip the header line, so the first line read is a person.
 	vector<string> vec;
 	reader.next(vec);
-
 }
 
 PersonsCreator::~PersonsCreator() {
@@ -65,7 +48,7 @@ PersonsCreator::~PersonsCreator() {
 Place* PersonsCreator::findPlace(const string id) {
 	string val = trim(id);
 	// if the id is valid then look up the place.
-	if (val.length() > 0) {
+	if (val.length() > 0 && val != "NA") {
 		map<string, Place*>::iterator iter = places->find(val);
 		if (iter != places->end()) {
 			return iter->second;
@@ -81,23 +64,34 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	// read the line into the vector.
 	reader.next(vec);
 
+	Places places;
+
 	// look up the Persons' places in the map.
 	const string& hh_id = vec[HH_ID_IDX];
-	Place* home = findPlace(hh_id);
-	const string& school_id = vec[SCHOOL_ID_IDX];
-	Place* school = findPlace(school_id);
-	const string& gq_id = vec[GQ_ID_IDX];
-	Place* group_quarters = findPlace(gq_id);
-	const string& work_id = vec[WORK_ID_IDX];
-	Place* work = findPlace(work_id);
+	places.household = findPlace(hh_id);
 
-	NumberGenerator* gen = repast::Random::instance()->getGenerator(RND_INDEX_NAME);
-	// randomly select a household from the list of households
-	// as the "other_home"
-	Place* other_home = households[(int) gen->next()];
-	// make sure other_home is not home.
-	while (other_home == home) {
-		other_home = households[(int) gen->next()];
+	/*
+	if (places.household == 0) {
+			std::cout << "0 hh id for " << vec[0] << std::endl;
+	}
+	*/
+
+	const string& school_id = vec[SCHOOL_ID_IDX];
+	places.school = findPlace(school_id);
+	const string& gq_id = vec[GQ_ID_IDX];
+	places.group_quarters = findPlace(gq_id);
+	const string& work_id = vec[WORK_ID_IDX];
+	places.work = findPlace(work_id);
+	const string& gym_id = vec[GYM_ID_IDX];
+	places.gym = findPlace(gym_id);
+	const string& daycare_id = vec[DAYCARE_ID_IDX];
+	places.daycare = findPlace(daycare_id);
+	const string& hosp_id = vec[HOSPITAL_ID_IDX];
+	places.hospital = findPlace(hosp_id);
+
+	for (int i = OTHER_H_START_IDX; i <= OTHER_H_END_IDX; ++i) {
+		const string& other_hh_id = vec[i];
+		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
 	bool seek_care = repast::Random::instance()->nextDouble() <= seek_care_fraction_;
@@ -106,8 +100,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	if (!seek_care) min_infection_dur += NO_CARE_EXTRA_HOURS;
 
 	// create the Person
-	return new Person(id, obs, vec, home, other_home, group_quarters, work, school,
-			min_infection_dur, seek_care);
+	return new Person(id, obs, vec, places, min_infection_dur, seek_care);
 }
 
 }

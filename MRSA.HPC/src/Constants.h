@@ -18,6 +18,11 @@ namespace mrsa {
 const std::string SCHOOL_TYPE = "school";
 const std::string WORKPLACE_TYPE = "workplace";
 const std::string HOUSEHOLD_TYPE = "household";
+const std::string GYM_TYPE = "gym";
+const std::string HOSPITAL_TYPE = "hospital";
+
+// name of the random dist used to draw other households.
+const std::string OH_DIST = "other.household.random.dist";
 
 }
 

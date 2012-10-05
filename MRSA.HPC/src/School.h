@@ -24,7 +24,7 @@ namespace mrsa {
 class AgeGroup : public AbstractPlace {
 
 public:
-	AgeGroup(std::string id, std::string type, float risk);
+	AgeGroup(std::string id, std::string type, Risk risk);
 	virtual ~AgeGroup();
 
 	/**
@@ -44,7 +44,7 @@ private:
  */
 class School: public Place {
 public:
-	School(std::vector<std::string>& vec);
+	School(std::vector<std::string>& vec, Risk risk);
 	virtual ~School();
 
 	/**
@@ -52,7 +52,7 @@ public:
 	 *
 	 * @param person the person to add.
 	 */
-	virtual void addPerson(Person* person);
+	virtual void addPerson(Person* person, int activity_type);
 
 	/**
 	 * Runs school mrsa transmission algorithm.

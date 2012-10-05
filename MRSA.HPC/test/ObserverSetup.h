@@ -41,9 +41,12 @@ public:
 		obs = creator.createWorld<MyObserver, repast::relogo::Patch>(def, vec);
 		repast::Properties props;
 		props.putProperty(mrsa::SEEK_AND_DESTROY_CURE_FRACTION, 0);
-		mrsa::Parameters::initialize(props);
+		try {
+			// this will throw an exception if we try to reinit
+			// so we can ignore that.
+			mrsa::Parameters::initialize(props);
+		} catch (std::exception& exp) {}
 		obs->_setup(props);
-
 	}
 
 	~ObserverSetup() {
