@@ -31,6 +31,10 @@ const std::string INFECTION_PERIOD = "minimum.infection.period";
 const std::string FASTER_SCALING = "faster.response.scaling.factor";
 const std::string SEEK_CARE_FRACTION = "seek.care.fraction";
 
+const std::string HOSPITALIZED_PROBABILITY = "hospital.stay.probability";
+const std::string HOSPITAL_STAY_DURATION_MEAN = "hospital.stay.duration.mean";
+const std::string HOSPITAL_STAY_DURATION_SD = "hospital.stay.duration.sd";
+
 const std::string MIN_INFECT_PERIOD = "minimum.infection.period";
 const std::string SEEK_CARE_INFECT_PERIOD = "seek.care.infection.period";
 const std::string SELF_CARE_INFECT_PERIOD = "self.care.infection.period";

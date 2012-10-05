@@ -29,6 +29,10 @@ extern const std::string INFECTION_PERIOD;
 extern const std::string FASTER_SCALING;
 extern const std::string SEEK_CARE_FRACTION;
 
+extern const std::string HOSPITALIZED_PROBABILITY;
+extern const std::string HOSPITAL_STAY_DURATION_MEAN;
+extern const std::string HOSPITAL_STAY_DURATION_SD;
+
 extern const std::string MIN_INFECT_PERIOD;
 extern const std::string SEEK_CARE_INFECT_PERIOD;
 extern const std::string SELF_CARE_INFECT_PERIOD;

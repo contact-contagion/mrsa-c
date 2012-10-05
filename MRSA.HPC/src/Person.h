@@ -148,11 +148,15 @@ private:
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
+	float hospital_stay_start, hospital_stay_duration;
 
 	/**
 	 * Changes this Person's place to the specified place.
 	 */
 	void changePlace(Place* place, int activity_type);
+
+	// checks whether this person should go to the hospital
+	bool hospitalCheck(int time);
 };
 
 std::ostream& operator<<(std::ostream& os, const Person& id);

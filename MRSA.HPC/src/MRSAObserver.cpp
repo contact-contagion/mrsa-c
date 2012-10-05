@@ -380,6 +380,11 @@ void MRSAObserver::setup(Properties& props) {
 	_IntUniformGenerator gen(Random::instance()->engine(), boost::uniform_int<>(0, 3));
 	Random::instance()->putGenerator(OH_DIST, new DefaultNumberGenerator<_IntUniformGenerator>(gen));
 
+	double duration_mean = params->getDoubleParameter(HOSPITAL_STAY_DURATION_MEAN);
+	double duration_sd = params->getDoubleParameter(HOSPITAL_STAY_DURATION_SD);
+	_NormalGenerator ngen(Random::instance()->engine(), boost::normal_distribution<>(duration_mean, duration_sd));
+	Random::instance()->putGenerator(HOSPITAL_STAY_DURATION, new DefaultNumberGenerator<_NormalGenerator>(ngen));
+
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
 	TAParameters taParams;

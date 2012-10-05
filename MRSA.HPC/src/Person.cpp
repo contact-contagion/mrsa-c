@@ -12,6 +12,7 @@
 #include "Person.h"
 #include "Household.h"
 #include "Parameters.h"
+#include "Constants.h"
 
 namespace mrsa {
 
@@ -19,11 +20,12 @@ using namespace repast::relogo;
 using namespace repast;
 using namespace std;
 
-Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec, Places
-		places, float min_infection_duration) :
+Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
+		Places places, float min_infection_duration) :
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(min_infection_duration) {
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
+				min_infection_duration), hospital_stay_start(0), hospital_stay_duration(0) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -43,10 +45,10 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 		age_ = strToInt(val);
 
 	if (places.household != 0) {
-		((Household*)places.household)->addMember(this);
+		((Household*) places.household)->addMember(this);
 	}
 
-	//std::cout << places.current << std::endl;
+	//std::cout << hospital_stay_duration << std::endl;
 }
 
 Person::~Person() {
@@ -54,7 +56,8 @@ Person::~Person() {
 
 void Person::validate() {
 	// remove this person from the model if it has no places
-	if (places_.school == 0 && places_.household == 0 && places_.work == 0 && places_.group_quarters == 0)
+	if (places_.school == 0 && places_.household == 0 && places_.work == 0
+			&& places_.group_quarters == 0)
 		die();
 	//if (places_.household == 0)
 	//	die();
@@ -91,33 +94,66 @@ bool Person::initializeActivities(map<string, vector<Activity> >& map) {
 	return true;
 }
 
+bool Person::hospitalCheck(int time) {
+	bool retVal = false;
+	if (hospital_stay_duration > 0.0f) {
+		if (RepastProcess::instance()->getScheduleRunner().currentTick() - hospital_stay_start
+				<= hospital_stay_duration) {
+			changePlace(places_.hospital, 0);
+			retVal = true;
+
+		} else {
+			hospital_stay_duration = 0;
+			hospital_stay_start = 0;
+		}
+	} else if (time == 0 && places_.hospital != 0) {
+		// not in hosptial, start of day, so do check
+		double val = Parameters::instance()->getDoubleParameter(HOSPITALIZED_PROBABILITY);
+		if (Random::instance()->nextDouble() <= val) {
+			hospital_stay_start = RepastProcess::instance()->getScheduleRunner().currentTick();
+			hospital_stay_duration = repast::Random::instance()->getGenerator(
+					HOSPITAL_STAY_DURATION)->next();
+			// stay 5 hours at the least
+			if (hospital_stay_duration <= 0) hospital_stay_duration = 5;
+			changePlace(places_.hospital, 0);
+			retVal = true;
+		}
+	}
+	return retVal;
+}
+
 // peform the activity for this time and day.
 void Person::performActivity(int time, bool isWeekday) {
 
-	// iterate through the activity list and find the activity
-	// whose time span contains the specified time.
-	const Activity* act(0);
-	// use the weekday or weekend list depending.
-	// Using a reference here speeds up the model by a lot.
-	const ActivityList& list = isWeekday ? weekday_acts : weekend_acts;
-	for (ActivityIter iter = list.begin(); iter != list.end(); ++iter) {
-		if (iter->contains(time)) {
-			act = &(*iter);
-			break;
+	// check if person has made a random hospital visit, overrides the
+	// scheduled activites
+	if (!hospitalCheck(time)) {
+		// iterate through the activity list and find the activity
+		// whose time span contains the specified time.
+		const Activity* act(0);
+		// use the weekday or weekend list depending.
+		// Using a reference here speeds up the model by a lot.
+		const ActivityList& list = isWeekday ? weekday_acts : weekend_acts;
+		for (ActivityIter iter = list.begin(); iter != list.end(); ++iter) {
+			if (iter->contains(time)) {
+				act = &(*iter);
+				break;
+			}
+		}
+
+		// if we don't find an activity for this time, go to a household
+		// if it exists or to the group_quarters as a household stand-in.
+		if (act == 0) {
+			//std::cout << "no activity so going to household" << std::endl;
+			if (places_.household != 0)
+				changePlace(places_.household, 0);
+			else
+				changePlace(places_.group_quarters, 0);
+		} else {
+			changePlace(act->selectPlace(places_), act->activityType());
 		}
 	}
 
-	// if we don't find an activity for this time, go to a household
-	// if it exists or to the group_quarters as a household stand-in.
-	if (act == 0) {
-		//std::cout << "no activity so going to household" << std::endl;
-		if (places_.household != 0)
-			changePlace(places_.household, 0);
-		else
-			changePlace(places_.group_quarters, 0);
-	} else {
-		changePlace(act->selectPlace(places_),act->activityType());
-	}
 }
 
 void Person::incrementColonizationsCaused(float colonization_caused) {
@@ -160,25 +196,30 @@ void Person::changePlace(Place* place, int activity_type) {
 void Person::updateInfectionStatus(InfectionStatus status) {
 	status_.updateInfectionStatus(status);
 	if (status == SEEK_CARE) {
-		float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
-		float seek_care_duration = (float)Parameters::instance()->getDoubleParameter(SEEK_CARE_INFECT_PERIOD);
+		float min_infection_duration = (float) Parameters::instance()->getDoubleParameter(
+				MIN_INFECT_PERIOD);
+		float seek_care_duration = (float) Parameters::instance()->getDoubleParameter(
+				SEEK_CARE_INFECT_PERIOD);
 		status_.setMinInfectionDuration(min_infection_duration + seek_care_duration);
 	} else if (status == SELF_CARE) {
-		float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
-		float self_care_duration = (float)Parameters::instance()->getDoubleParameter(SELF_CARE_INFECT_PERIOD);
+		float min_infection_duration = (float) Parameters::instance()->getDoubleParameter(
+				MIN_INFECT_PERIOD);
+		float self_care_duration = (float) Parameters::instance()->getDoubleParameter(
+				SELF_CARE_INFECT_PERIOD);
 		status_.setMinInfectionDuration(min_infection_duration + self_care_duration);
 	}
 }
 
 void Person::initHouseholdTreatment() {
 	if (places_.household != 0) {
-		((Household*)places_.household)->initHouseholdTreatment(this);
+		((Household*) places_.household)->initHouseholdTreatment(this);
 	}
 }
 
 std::ostream& operator<<(std::ostream& os, const Person& person) {
 	const std::string& sid = person.places_.school == 0 ? "null" : person.places_.school->placeId();
-	const std::string& hid = person.places_.household == 0 ? "null" : person.places_.household->placeId();
+	const std::string& hid =
+			person.places_.household == 0 ? "null" : person.places_.household->placeId();
 	const std::string& wid = person.places_.work == 0 ? "null" : person.places_.work->placeId();
 	const std::string& gid =
 			person.places_.group_quarters == 0 ? "null" : person.places_.group_quarters->placeId();

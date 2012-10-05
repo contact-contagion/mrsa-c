@@ -42,6 +42,15 @@ gamma = 0.5
 # probability of self-care infected to uncolonized, else colonized
 rho = 0.5
 
+# probabilty of a random stay in a hospital
+hospital.stay.probability = 0.01
+# mean of the normal distribution from which the length
+# of a hospital stay is drawn IN HOURS. 
+hospital.stay.duration.mean = 72
+# standard deviation of the normal distribution from which the length
+# of a hospital stay is drawn IN HOURS. 
+hospital.stay.duration.sd = 24
+
 # world definition props
 min.x = -100
 min.y = -100
