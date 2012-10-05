@@ -55,7 +55,14 @@ Place* Activity::selectPlace(Places& places) const {
 		NumberGenerator* gen = repast::Random::instance()->getGenerator(OH_DIST);
 		//std::cout << gen << std::endl;
 		//std::cout << places_.other_households.size() << std::endl;
-		return places.other_households[(int) gen->next()];
+		Place* place = places.other_households[(int) gen->next()];
+		// one of the "other households" may be 0 if we are running
+		// on a subset of the data
+		if (place == 0) {
+			if (places.household != 0) place = places.household;
+			else place = places.group_quarters;
+		}
+		return place;
 	}
 	else if (place_type == "School") {
 		if (places.school != 0) return places.school;
