@@ -17,6 +17,10 @@ enum DiseaseStatus {
 	UNCOLONIZED, COLONIZED, INFECTED
 };
 
+enum InfectionStatus {
+	NONE, SELF_CARE, SEEK_CARE
+};
+
 }
 
 #endif /* DISEASESTATUS_H_ */

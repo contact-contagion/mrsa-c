@@ -34,10 +34,10 @@ public:
 	void addMember(Person* person);
 
 	/**
-	 * Initialize seek and destroy behavior with the
-	 * specified person as the source infectee.
+	 * Initialize treatment of the person's in this household
+	 * with the specified person as the infectee.
 	 */
-	void initSeekAndDestroy(Person* person);
+	void initHouseholdTreatment(Person* person);
 
 private:
 	std::vector<Person*> members;
@@ -46,7 +46,7 @@ private:
 	Person* source_infectee;
 	double sd_timestamp;
 
-	void seekAndDestroy();
+	void treatHousehold();
 
 };
 

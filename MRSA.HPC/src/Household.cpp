@@ -49,18 +49,17 @@ void Household::runTransmission() {
 
 	if (source_infectee != 0
 			&& repast::RepastProcess::instance()->getScheduleRunner().currentTick() - sd_timestamp >= FOURTEEN_DAYS) {
-		seekAndDestroy();
+		treatHousehold();
 	}
 }
 
-void Household::seekAndDestroy() {
-	double cure_probability = Parameters::instance()->getDoubleParameter(SEEK_AND_DESTROY_CURE_FRACTION);
+void Household::treatHousehold() {
+	double cure_probability = Parameters::instance()->getDoubleParameter("gamma");
 	std::random_shuffle(members.begin(), members.end(), repast::uni_random);
 	for (PersonIter iter = members.begin(); iter != members.end(); ++iter) {
 		Person* p = *iter;
+		// if draw fails then status remains as it was
 		if (p->status() != UNCOLONIZED && p != source_infectee && repast::Random::instance()->nextDouble() <= cure_probability) {
-			//std::cout << "uncolonizing " << placeId() << ": timestamp = " << sd_timestamp << ", current time = " <<
-			//			repast::RepastProcess::instance()->getScheduleRunner().currentTick() << std::endl;
 			p->updateStatus(UNCOLONIZED);
 		}
 	}
@@ -68,7 +67,7 @@ void Household::seekAndDestroy() {
 	source_infectee = 0;
 }
 
-void Household::initSeekAndDestroy(Person* person) {
+void Household::initHouseholdTreatment(Person* person) {
 	if (source_infectee == 0) {
 		source_infectee = person;
 		sd_timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();

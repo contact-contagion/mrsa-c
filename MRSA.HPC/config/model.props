@@ -8,32 +8,39 @@ random.seed = 1
 # 10 years = 87600.5
 
 stop.at = 8760.5
-seek.and.destroy.at = 4380
-seek.and.destroy.cure.fraction = 0.83
 
 persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
 places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
 activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
 risk.file = ../data/risk.csv 
 
-
 hourly.output.file = ./output/hourly_data.csv
 yearly.output.file = ./output/yearly_data.csv
 summary.output.file = ./output/summary_stats.txt
-
-seek.care.fraction = 0.5f
 
 initial.colonization.fraction = 0.03
 initial.infected.count = 34
 
 # 7 days (24 x 7)
 minimum.infection.period = 168
+# an additional 7 days after the minimum
+seek.care.infection.period = 168
+# an additional 12 days after the minimum
+self.care.infection.period = 288
 
 a = 2.59e-05
 b = 2.58e-05
-c = 3.04e-04
-d = 2.98e-03
 e = 2.40e-05
+
+# probability of seeking care or not once infected
+alpha = 0.5
+# probability of seeking care infected to uncolonized, else colonized
+beta = 0.5
+# probability of each household member of seeking care infected
+# moving to uncolonized, else colonized
+gamma = 0.5
+# probability of self-care infected to uncolonized, else colonized
+rho = 0.5
 
 # world definition props
 min.x = -100

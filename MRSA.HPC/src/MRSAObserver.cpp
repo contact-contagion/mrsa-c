@@ -161,12 +161,10 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 		throw invalid_argument("Error opening: " + personsFile);
 
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
-	float seek_care_fraction = (float) strToDouble(props.getProperty(SEEK_CARE_FRACTION));
-	std::cout << "seek care fraction: " << seek_care_fraction << std::endl;
 
 	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, seek_care_fraction);
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration);
 	// First line is the header info so we create one less
 	// than the number of lines in the file.
 	personType = create<Person>(lines - 1, pCreator);
@@ -367,42 +365,6 @@ void MRSAObserver::atEnd() {
 	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file);
 }
 
-void MRSAObserver::activateSeekAndDestroy() {
-	updateSeeksCare();
-	Parameters::instance()->activateSeekAndDestroy();
-	std::cout << "seek and destroy activated" << std::endl;
-}
-
-void MRSAObserver::updateSeeksCare() {
-
-	float min_infection_duration = (float)Parameters::instance()->getDoubleParameter(MIN_INFECT_PERIOD);
-
-	typedef repast::relogo::AgentSet<Person>::as_iterator Iter;
-	std::vector<Person*> no_cares;
-
-	for (Iter iter = people_->begin(); iter != people_->end(); ++iter) {
-		Person* person = *iter;
-		if (!person->seeksCare()) {
-			no_cares.push_back(person);
-		}
-	}
-
-	// hard coded to make half of those that don't seek care
-	// now seek care
-	double count = 0;
-	for (std::vector<Person*>::iterator iter = no_cares.begin(); iter != no_cares.end(); ++iter) {
-		bool seek_care = repast::Random::instance()->nextDouble() <= 0.5;
-		Person* person = *iter;
-		if (seek_care) {
-			person->setSeeksCare(true);
-			person->setMinInfectionDuration(min_infection_duration);
-			count++;
-		}
-	}
-
-	std::cout << "seek care fraction: " << ((people_->size() - no_cares.size() + count) / people_->size()) << std::endl;
-}
-
 // entry point for model setup.
 void MRSAObserver::setup(Properties& props) {
 	Parameters::initialize(props);
@@ -420,13 +382,16 @@ void MRSAObserver::setup(Properties& props) {
 
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
-	double a = params->getDoubleParameter("a");
-	double b = params->getDoubleParameter("b");
-	double c = params->getDoubleParameter("c");
-	double d = params->getDoubleParameter("d");
-	double e = params->getDoubleParameter("e");
+	TAParameters taParams;
+	taParams.a = params->getDoubleParameter("a");
+	taParams.b = params->getDoubleParameter("b");
+	taParams.e = params->getDoubleParameter("e");
+	taParams.alpha = params->getDoubleParameter("alpha");
+	taParams.beta = params->getDoubleParameter("beta");
+	taParams.gamma = params->getDoubleParameter("gamma");
+	taParams.rho = params->getDoubleParameter("rho");
 
-	TransmissionAlgorithm::initialize(a, b, c, d, e);
+	TransmissionAlgorithm::initialize(taParams);
 
 	// create the persons and places
 	// use a pointer because it is eventually passed
@@ -469,18 +434,6 @@ void MRSAObserver::setup(Properties& props) {
 	runner.scheduleEndEvent(
 			Schedule::FunctorPtr(
 					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
-
-	// schedule turning on seek and destroy
-	double at = params->getDoubleParameter(SEEK_AND_DESTROY_AT);
-	if (at > 0) {
-		std::cout << "scheduling seek and destroy for " << at << std::endl;
-
-		runner.scheduleEvent(at,
-				Schedule::FunctorPtr(
-						new MethodFunctor<MRSAObserver>(this,
-								&MRSAObserver::activateSeekAndDestroy)));
-
-	}
 
 	repast::timestamp(time);
 	std::cout << "Setup Finished at " << time << std::endl;

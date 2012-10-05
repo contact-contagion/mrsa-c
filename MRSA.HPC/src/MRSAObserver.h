@@ -97,7 +97,6 @@ private:
 	 */
 	void initializeDiseaseStatus(repast::Properties& props, repast::relogo::AgentSet<Person>& people);
 
-	void updateSeeksCare();
 };
 
 } /* namespace mrsa */

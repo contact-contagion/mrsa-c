@@ -14,10 +14,10 @@ dependencies = $(subst .cpp,.d,$(sources))
 include_dirs := $(BOOST_INCLUDE)  src
 
 # un-opt flags
-#CPPFLAGS += $(addprefix -I, $(include_dirs)) -O0 -g3 -Wall -c -fmessage-length=0
+CPPFLAGS += $(addprefix -I, $(include_dirs)) -O0 -g3 -Wall -c -fmessage-length=0
 
 # opt flags
-CPPFLAGS += $(addprefix -I, $(include_dirs)) -O3 -g0 -Wall -c -fmessage-length=0
+#CPPFLAGS += $(addprefix -I, $(include_dirs)) -O3 -g0 -Wall -c -fmessage-length=0
 #vpath %.h $(include_dirs)
 
 RM := rm -f

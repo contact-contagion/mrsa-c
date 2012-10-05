@@ -32,6 +32,8 @@ const std::string FASTER_SCALING = "faster.response.scaling.factor";
 const std::string SEEK_CARE_FRACTION = "seek.care.fraction";
 
 const std::string MIN_INFECT_PERIOD = "minimum.infection.period";
+const std::string SEEK_CARE_INFECT_PERIOD = "seek.care.infection.period";
+const std::string SELF_CARE_INFECT_PERIOD = "self.care.infection.period";
 const std::string SEEK_AND_DESTROY_AT = "seek.and.destroy.at";
 const std::string SEEK_AND_DESTROY_CURE_FRACTION = "seek.and.destroy.cure.fraction";
 

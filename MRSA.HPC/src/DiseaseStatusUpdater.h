@@ -19,6 +19,7 @@ namespace mrsa {
 struct StatusStats {
 	// the disease status
 	DiseaseStatus status;
+	InfectionStatus infection_status;
 	// the number of other colonized persons attributable
 	// to this infection / colonization
 	float colonized_persons;
@@ -43,6 +44,11 @@ public:
 	 * Update the disease status to new status.
 	 */
 	void updateStatus(DiseaseStatus status);
+
+	/**
+	 * Updates the infection status.
+	 */
+	void updateInfectionStatus(InfectionStatus status);
 
 	void setMinInfectionDuration(float min_infection_duration) {
 		min_infection_duration_ = min_infection_duration;
@@ -78,8 +84,16 @@ public:
 		return status_;
 	}
 
+	/**
+	 * Gets the current infection status.
+	 */
+	InfectionStatus infectionStatus() const {
+		return infection_status_;
+	}
+
+
 private:
-	float min_infection_duration_;
+	float min_infection_duration_, default_infection_duration_;
 	// records the time at which a status change occured, the
 	// total time spent infected, and the total time spent colonized.
 	unsigned int timestamp;
@@ -87,6 +101,7 @@ private:
 	unsigned int infected_count, colonized_count;
 
 	DiseaseStatus status_;
+	InfectionStatus infection_status_;
 
 	// the current years infections / colonization stats
 	std::list<StatusStats> yearly_status_stats;
