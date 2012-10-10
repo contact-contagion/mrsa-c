@@ -280,7 +280,8 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 	string place_names[] = { "household", "hospital", "school", "workplace", "gym", "nursing home",
 			"college dorm", "prison" };
 	for (int i = 0; i < 8; i++) {
-		std::string header = place_names[i] + "_colonization_fraction";
+		std::string prefix = place_names[i] == "gym" ? "sports_facilities" : place_names[i];
+		std::string header = prefix + "_colonization_fraction";
 		builder.addDataSource(
 				createSVDataSource(header,
 						new PlaceCount(&stats->colonization_count_map, place_names[i]),
