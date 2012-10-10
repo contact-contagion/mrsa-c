@@ -1,12 +1,5 @@
 random.seed = 1
 
-# hours
-# month = 720
-# 1 year = 8760.5
-# 2 years = 17520.5
-# 5 years = 43800.5
-# 10 years = 87600.5
-
 stop.at = 8760.5
 
 persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
@@ -52,17 +45,14 @@ hospital.stay.duration.mean = 72
 hospital.stay.duration.sd = 24
 
 # world definition props
-min.x = -100
-min.y = -100
-max.x = 99
-max.y = 99 
-grid.buffer = 2
+min.x = 0
+min.y = 0
+max.x = 0
+max.y = 0
+grid.buffer = 0
 
 # these must multiply to total number of processes
 proc.per.x = 1
 proc.per.y = 1
-
-# named random number distributions
-#distribution.zombie_move = int_uniform, 0, 2
 
 

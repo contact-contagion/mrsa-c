@@ -11,6 +11,7 @@ SOURCES = CSVReader.cpp \
           School.cpp \
           Household.cpp \
           Workplace.cpp \
+          Hospital.cpp \
           DefaultPlace.cpp \
           PlaceCreator.cpp \
           ActivityCreator.cpp \
