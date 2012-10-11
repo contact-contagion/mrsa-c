@@ -389,13 +389,13 @@ void MRSAObserver::setup(Properties& props) {
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
 	TAParameters taParams;
-	taParams.a = params->getDoubleParameter("a");
-	taParams.b = params->getDoubleParameter("b");
-	taParams.e = params->getDoubleParameter("e");
-	taParams.alpha = params->getDoubleParameter("alpha");
-	taParams.beta = params->getDoubleParameter("beta");
-	taParams.gamma = params->getDoubleParameter("gamma");
-	taParams.rho = params->getDoubleParameter("rho");
+	taParams.a = params->getDoubleParameter(A);
+	taParams.b = params->getDoubleParameter(B);
+	taParams.e = params->getDoubleParameter(E);
+	taParams.alpha = params->getDoubleParameter(ALPHA);
+	taParams.beta = params->getDoubleParameter(THETA);
+	taParams.gamma = params->getDoubleParameter(GAMMA);
+	taParams.rho = params->getDoubleParameter(Z);
 
 	TransmissionAlgorithm::initialize(taParams);
 

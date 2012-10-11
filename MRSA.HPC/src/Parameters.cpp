@@ -41,6 +41,15 @@ const std::string SELF_CARE_INFECT_PERIOD = "self.care.infection.period";
 const std::string SEEK_AND_DESTROY_AT = "seek.and.destroy.at";
 const std::string SEEK_AND_DESTROY_CURE_FRACTION = "seek.and.destroy.cure.fraction";
 
+ const std::string A = "a";
+ const std::string B = "b";
+ const std::string E = "e";
+ const std::string ALPHA ="alpha";
+ const std::string THETA = "theta";
+ const std::string GAMMA = "gamma";
+ const std::string Z = "z";
+
+
 
 Parameters* Parameters::instance_ = 0;
 

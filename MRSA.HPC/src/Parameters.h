@@ -39,6 +39,15 @@ extern const std::string SELF_CARE_INFECT_PERIOD;
 extern const std::string SEEK_AND_DESTROY_AT;
 extern const std::string SEEK_AND_DESTROY_CURE_FRACTION;
 
+extern const std::string A;
+extern const std::string B;
+extern const std::string E;
+extern const std::string ALPHA;
+extern const std::string THETA;
+extern const std::string GAMMA;
+extern const std::string Z;
+
+
 /**
  * Parameters singleton that contains the model properties.
  *

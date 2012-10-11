@@ -128,10 +128,6 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		// skip to the next line to read
 		reader.skip(world.size() - 1);
 	}
-
-	for (int i = 0; i < 10; i++) {
-		std::cout << world.rank() << ": " <<  (*(places[i])) << std::endl;
-	}
 }
 
 }
