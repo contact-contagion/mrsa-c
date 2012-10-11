@@ -15,6 +15,7 @@
 #include "CSVReader.h"
 #include "Household.h"
 #include "School.h"
+#include "Hospital.h"
 #include "Workplace.h"
 #include "DefaultPlace.h"
 #include "Constants.h"
@@ -78,8 +79,11 @@ void PlaceCreator::loadRisk(const string& risk_file, std::map<string, Risk>& map
 	//}
 }
 
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> refs/heads/development
 // reads the file and fills the vector of places with the created places.
 void PlaceCreator::run(const string& places_file, const string& risk_file, vector<Place*>& places) {
 	std::map<string, Risk> map;
@@ -101,7 +105,7 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		Risk& risk = iter->second;
 
 		Place* place = 0;
-		if (type == SCHOOL_TYPE || type == GYM_TYPE || type == HOSPITAL_TYPE) {
+		if (type == SCHOOL_TYPE || type == GYM_TYPE) {
 			place = new School(vec, risk);
 			///std::cout << "making a school" << std::endl;
 		} else if (type == HOUSEHOLD_TYPE) {
@@ -110,6 +114,9 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		} else if (type == WORKPLACE_TYPE) {
 			place = new Workplace(vec, risk);
 			//std::cout << "making a workplace" << std::endl;
+		} else if (type == HOSPITAL_TYPE) {
+			place = new Hospital(vec, risk);
+			//std::cout << "making a hospital" << std::endl;
 		} else {
 			// if the type is not one we have a specific place for
 			// yet, then create a DefaultPlace.
