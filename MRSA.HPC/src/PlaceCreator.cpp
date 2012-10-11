@@ -79,11 +79,6 @@ void PlaceCreator::loadRisk(const string& risk_file, std::map<string, Risk>& map
 	//}
 }
 
-<<<<<<< HEAD
-
-
-=======
->>>>>>> refs/heads/development
 // reads the file and fills the vector of places with the created places.
 void PlaceCreator::run(const string& places_file, const string& risk_file, vector<Place*>& places) {
 	std::map<string, Risk> map;
