@@ -21,10 +21,6 @@ namespace mrsa {
  *
  */
 class PlaceCreator {
-private:
-
-	void setRisk(Risk& risk, int act_type, float a, float b);
-	void loadRisk(const std::string& risk_file, std::map<std::string, Risk>& map);
 
 public:
 	PlaceCreator();

@@ -27,8 +27,9 @@ using namespace std;
 const int TYPE_IDX = 1;
 const int RISK_PLACE_TYPE_IDX = 0;
 const int RISK_ACT_TYPE_IDX = 1;
-const int RISK_A_IDX = 2;
-const int RISK_B_IDX = 3;
+const int RISK_PAR_IDX = 2;
+const int RISK_TIP_IDX = 3;
+const int RISK_AIP_IDX = 3;
 
 PlaceCreator::PlaceCreator() {
 }
@@ -36,7 +37,7 @@ PlaceCreator::PlaceCreator() {
 PlaceCreator::~PlaceCreator() {
 }
 
-void PlaceCreator::setRisk(Risk& risk, int act_type, float a, float b) {
+void setRisk(Risk& risk, int act_type, float a, float b) {
 	if (act_type == 0) {
 		risk.a0_ = a;
 		risk.b0_ = b;
@@ -46,7 +47,7 @@ void PlaceCreator::setRisk(Risk& risk, int act_type, float a, float b) {
 	}
 }
 
-void PlaceCreator::loadRisk(const string& risk_file, std::map<string, Risk>& map) {
+void loadRisk(const string& risk_file, std::map<string, Risk>& map) {
 	CSVReader reader(risk_file);
 	vector<string> vec;
 	// skip the first header line.
@@ -55,8 +56,9 @@ void PlaceCreator::loadRisk(const string& risk_file, std::map<string, Risk>& map
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
 		int act_type = repast::strToInt(vec[RISK_ACT_TYPE_IDX]);
-		float a = (float) repast::strToDouble(vec[RISK_A_IDX]);
-		float b = (float) repast::strToDouble(vec[RISK_B_IDX]);
+		float par = (float) repast::strToDouble(vec[RISK_PAR_IDX]);
+		float tip = (float) repast::strToDouble(vec[RISK_TIP_IDX]);
+		float aip = (float) repast::strToDouble(vec[RISK_AIP_IDX]);
 
 		string type = vec[RISK_PLACE_TYPE_IDX];
 		// lower case the type for easier, less error prone comparisons
@@ -64,19 +66,21 @@ void PlaceCreator::loadRisk(const string& risk_file, std::map<string, Risk>& map
 		std::map<string, Risk>::iterator iter = map.find(type);
 		if (iter == map.end()) {
 			Risk risk;
-			setRisk(risk, act_type, a, b);
+			setRisk(risk, act_type, par * tip, aip);
 			map.insert(std::make_pair(type, risk));
 		} else {
 			Risk& risk = iter->second;
-			setRisk(risk, act_type, a, b);
+			setRisk(risk, act_type, par * tip, aip);
 		}
 	}
 
-	//for (std::map<string, Risk>::iterator iter = map.begin(); iter != map.end(); ++iter) {
-	//	Risk& risk = iter->second;
-	//	std::cout << iter->first << ": a0 = " << risk.a0_ << ", a1 = " << risk.a1_ << ", b0 = "
-	//			<< risk.b0_  << ", b1= " << risk.b1_ << std::endl;
-	//}
+	/*
+	for (std::map<string, Risk>::iterator iter = map.begin(); iter != map.end(); ++iter) {
+		Risk& risk = iter->second;
+		std::cout << iter->first << ": a0 = " << risk.a0_ << ", a1 = " << risk.a1_ << ", b0 = "
+				<< risk.b0_  << ", b1= " << risk.b1_ << std::endl;
+	}
+	*/
 }
 
 // reads the file and fills the vector of places with the created places.
@@ -101,6 +105,7 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		vec[TYPE_IDX] = type;
 
 		std::map<string, Risk>::iterator iter = map.find(type);
+		if (iter == map.end()) throw std::domain_error("Missing risk values for place type '" + type + "'");
 		Risk& risk = iter->second;
 
 		Place* place = 0;
