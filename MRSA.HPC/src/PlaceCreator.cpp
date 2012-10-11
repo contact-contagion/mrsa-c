@@ -92,7 +92,11 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 	CSVReader reader(places_file);
 	vector<string> vec;
 	// skip the first header line.
-	reader.next(vec);
+	reader.skip(1);
+
+	// skip to the line equal to the rank
+	boost::mpi::communicator world;
+	reader.skip(world.rank());
 
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
@@ -125,6 +129,13 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		}
 		// add the place to the vector.
 		places.push_back(place);
+
+		// skip to the next line to read
+		reader.skip(world.size() - 1);
+	}
+
+	for (int i = 0; i < 10; i++) {
+		std::cout << world.rank() << ": " <<  (*(places[i])) << std::endl;
 	}
 }
 

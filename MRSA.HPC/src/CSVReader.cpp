@@ -25,6 +25,14 @@ CSVReader::CSVReader(const CSVReader& reader) : fname(reader.fname), in(reader.f
 	if (!in.is_open()) throw invalid_argument("Error opening: " + fname);
 }
 
+void CSVReader::skip(int lines) {
+	int count = 0;
+	string str;
+	while (count < lines && getline(in, str)) {
+		++count;
+	}
+}
+
 bool CSVReader::next(vector<string>& vec) {
 	string line;
 	// read the line

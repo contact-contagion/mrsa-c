@@ -38,6 +38,11 @@ public:
 	 */
 	bool next(std::vector<std::string>& vec);
 
+	/**
+	 * Skips the specified number of lines in the file.
+	 */
+	void skip(int lines);
+
 	// assignment operator
 	CSVReader& operator=(const CSVReader& rhs);
 
