@@ -38,8 +38,7 @@ const std::string HOSPITAL_STAY_DURATION_SD = "hospital.stay.duration.sd";
 const std::string MIN_INFECT_PERIOD = "minimum.infection.period";
 const std::string SEEK_CARE_INFECT_PERIOD = "seek.care.infection.period";
 const std::string SELF_CARE_INFECT_PERIOD = "self.care.infection.period";
-const std::string SEEK_AND_DESTROY_AT = "seek.and.destroy.at";
-const std::string SEEK_AND_DESTROY_CURE_FRACTION = "seek.and.destroy.cure.fraction";
+const std::string SEEK_AND_DESTROY_ENABLED = "seek.and.destroy.enabled";
 
  const std::string A = "a";
  const std::string B = "b";
@@ -53,8 +52,11 @@ const std::string SEEK_AND_DESTROY_CURE_FRACTION = "seek.and.destroy.cure.fracti
 
 Parameters* Parameters::instance_ = 0;
 
-Parameters::Parameters(repast::Properties& props) : props_(props), seek_and_destroy_on(false) {
-
+Parameters::Parameters(repast::Properties& props) : props_(props),
+		seek_and_destroy_on(false) {
+	std::string sd_val = props.getProperty(SEEK_AND_DESTROY_ENABLED);
+	std::transform(sd_val.begin(), sd_val.end(), sd_val.begin(), ::tolower);
+	seek_and_destroy_on = sd_val == "true";
 }
 
 Parameters::~Parameters() {
@@ -96,7 +98,8 @@ void Parameters::putParameter(const std::string& key, bool value) {
 }
 
 bool Parameters::getBooleanParameter(const std::string& prop_name) const {
-	return getIntParameter(prop_name) != 0;
+	std::string val = getStringParameter(prop_name);
+	return val == "true" || val == "TRUE";
 }
 
 } /* namespace mrsa */

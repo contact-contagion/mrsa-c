@@ -36,8 +36,7 @@ extern const std::string HOSPITAL_STAY_DURATION_SD;
 extern const std::string MIN_INFECT_PERIOD;
 extern const std::string SEEK_CARE_INFECT_PERIOD;
 extern const std::string SELF_CARE_INFECT_PERIOD;
-extern const std::string SEEK_AND_DESTROY_AT;
-extern const std::string SEEK_AND_DESTROY_CURE_FRACTION;
+extern const std::string SEEK_AND_DESTROY_ENABLED;
 
 extern const std::string A;
 extern const std::string B;
@@ -105,16 +104,9 @@ public:
 	bool getBooleanParameter(const std::string& prop_name) const;
 
 	/**
-	 * Switches the seek and destroy flag to on.
-	 */
-	void activateSeekAndDestroy() {
-		seek_and_destroy_on = true;
-	}
-
-	/**
 	 * Gets whether or not the seek and destroy flag is on.
 	 */
-	bool seekAndDestroyActivated() const {
+	bool seekAndDestroyEnabled() const {
 		return seek_and_destroy_on;
 	}
 

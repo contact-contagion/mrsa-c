@@ -81,8 +81,9 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 		} else if (status == SEEK_CARE) {
 			DiseaseStatus disease_status = ta->runInfectedSeekCare();
 			person->updateStatus(disease_status);
-			if (disease_status == UNCOLONIZED)
+			if (disease_status == UNCOLONIZED && Parameters::instance()->seekAndDestroyEnabled()) {
 				person->initHouseholdTreatment();
+			}
 		}
 	}
 }

@@ -35,6 +35,10 @@ gamma = 0.5
 # probability of self-care infected to uncolonized, else colonized
 z = 0.5
 
+# whether or not seek and destroy for household members of 
+# infected persons is enabled
+seek.and.destroy.enabled = true
+
 # probabilty of a random stay in a hospital
 hospital.stay.probability = 0.01
 # mean of the normal distribution from which the length
