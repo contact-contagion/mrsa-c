@@ -47,7 +47,10 @@ public:
 	CSVReader& operator=(const CSVReader& rhs);
 
 private:
+	void findDelimeter();
+
 	std::string fname;
+	char delim;
 	std::ifstream in;
 };
 
