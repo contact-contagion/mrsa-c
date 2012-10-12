@@ -40,7 +40,6 @@ public:
 		vec.push_back(1);
 		obs = creator.createWorld<MyObserver, repast::relogo::Patch>(def, vec);
 		repast::Properties props;
-		props.putProperty(mrsa::SEEK_AND_DESTROY_CURE_FRACTION, 0);
 		try {
 			// this will throw an exception if we try to reinit
 			// so we can ignore that.

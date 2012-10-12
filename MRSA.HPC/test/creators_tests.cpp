@@ -25,7 +25,7 @@ BOOST_FIXTURE_TEST_SUITE(creator_tests, ObserverSetup);
 BOOST_AUTO_TEST_CASE(place_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", places);
+	creator.run("../test_data/places.csv", "../data/risk.csv", places);
 
 	BOOST_REQUIRE_EQUAL(places.size(), (size_t)13);
 
@@ -47,14 +47,14 @@ BOOST_AUTO_TEST_CASE(place_creator) {
 BOOST_AUTO_TEST_CASE(people_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", places);
+	creator.run("../test_data/places.csv", "../data/risk.csv", places);
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
 		Place* place = places[i];
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people1.csv", &placeMap, 7.0f, 1.0f);
+	PersonsCreator pCreator("../test_data/people1.csv", &placeMap, 7.0f);
 	obs->create<Person>(14, pCreator);
 
 	AgentSet<Person> persons;

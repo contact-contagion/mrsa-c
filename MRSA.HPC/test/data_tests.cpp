@@ -57,7 +57,7 @@ BOOST_AUTO_TEST_CASE(data_integrity) {
 
 		vector<Place*> places;
 		PlaceCreator placeCreator;
-		placeCreator.run(file_prefix + "places.csv", places);
+		placeCreator.run(file_prefix + "places.csv", "../data/risk.csv", places);
 
 		std::set<string> placeSet;
 		for (vector<Place*>::iterator iter = places.begin(); iter != places.end(); ++iter) {

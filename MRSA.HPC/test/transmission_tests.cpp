@@ -23,20 +23,27 @@ BOOST_FIXTURE_TEST_SUITE(transmission_test, ObserverSetup);
 
 BOOST_AUTO_TEST_CASE(uncolonized) {
 
-	TransmissionAlgorithm::initialize(0, 0, 0.0, 0, 0);
+	TAParameters params;
+	params.a = 0;
+	params.b = 0;
+	params.e = 0;
+
+	TransmissionAlgorithm::initialize(params);
 	// a is 0, so starting with UNCOLONIZED should always return UNCOLONIZED
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
 		BOOST_REQUIRE(ta->runUncolonized(0, 0, 0) == UNCOLONIZED);
 	}
 
-	TransmissionAlgorithm::initialize(1, 0, 0.0, 0, 0);
+	params.a = 1;
+	TransmissionAlgorithm::initialize(params);
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
 		BOOST_REQUIRE(ta->runUncolonized(1, 0, 1) == COLONIZED);
 	}
 
-	TransmissionAlgorithm::initialize(0.5, 0, 0.0, 0, 0);
+	params.a = 0.5;
+	TransmissionAlgorithm::initialize(params);
 	// a is .5 and risk is 2 so double a is one so always move to colonized.
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
@@ -47,44 +54,49 @@ BOOST_AUTO_TEST_CASE(uncolonized) {
 
 BOOST_AUTO_TEST_CASE(colonized) {
 
-	double b = 1;
-	TransmissionAlgorithm::initialize(0, b, 0.0, 0, 0);
+	TAParameters params;
+	params.a = 0;
+	params.b = 1;
+	params.e = 0;
+	TransmissionAlgorithm::initialize(params);
 	// b is one so should always move from colonized to infected
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runColonized() == INFECTED);
+		BOOST_REQUIRE(ta->runColonized(1) == INFECTED);
 	}
 
-	b = 0;
-	double e = 1;
-	TransmissionAlgorithm::initialize(0, b, 0.0, 0, e);
+	params.b = 0;
+	params.e = 1;
+	TransmissionAlgorithm::initialize(params);
 	// b is 0 and e is one so should always return to uncolonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runColonized() == UNCOLONIZED);
+		BOOST_REQUIRE(ta->runColonized(1) == UNCOLONIZED);
 	}
 }
 
-BOOST_AUTO_TEST_CASE(infected) {
 
-	double c = 0;
-	double d = 1;
-	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
-	// d is one so should always move from infected to uncolonized
-	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runInfected() == UNCOLONIZED);
-	}
+//BOOST_AUTO_TEST_CASE(infected) {
+//
+//	double c = 0;
+//	double d = 1;
+//	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
+//	// d is one so should always move from infected to uncolonized
+//	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
+//	for (int i = 0; i < 2000; ++i) {
+//		BOOST_REQUIRE(ta->runInfected() == UNCOLONIZED);
+//	}
+//
+//	c = 1;
+//	d = 0;
+//	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
+//	// c is 1 and d is 0 so should move to colonized
+//	ta = TransmissionAlgorithm::instance();
+//	for (int i = 0; i < 2000; ++i) {
+//		BOOST_REQUIRE(ta->runInfected() == COLONIZED);
+//	}
+//}
 
-	c = 1;
-	d = 0;
-	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
-	// c is 1 and d is 0 so should move to colonized
-	ta = TransmissionAlgorithm::instance();
-	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runInfected() == COLONIZED);
-	}
-}
 
 struct PlacePredicate {
 
@@ -105,14 +117,14 @@ void deletePlaces(std::vector<Place*>& places) {
 
 void createPersons(Observer* obs, AgentSet<Person>& persons, std::vector<Place*>& places, int count = 14) {
 	PlaceCreator creator;
-	creator.run("../test_data/places.csv", places);
+	creator.run("../test_data/places.csv", "../data/risk.csv", places);
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
 		Place* place = places[i];
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2, 1.0f);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
 	obs->create<Person>(count, pCreator);
 	obs->get(persons);
 }
@@ -134,12 +146,16 @@ BOOST_AUTO_TEST_CASE(workplace) {
 			p->updateStatus(INFECTED);
 			first = false;
 		}
-		place->addPerson(p);
+		place->addPerson(p, 0);
 	}
 
 	// a is 10 because the risk is .1f, so draw should be 1 and
 	// so 4 should be colonized.
-	TransmissionAlgorithm::initialize(10, 0, 0.0, 0, 0);
+	TAParameters params;
+	params.a = 10;
+	params.b = 0;
+	params.e = 0;
+	TransmissionAlgorithm::initialize(params);
 	place->runTransmission();
 
 	int colonized_count = 0;
@@ -170,16 +186,20 @@ BOOST_AUTO_TEST_CASE(school) {
 
 	(twelves[0])->updateStatus(INFECTED);
 	for (vector<Person*>::iterator iter = forties.begin(); iter != forties.end(); ++iter) {
-		place->addPerson(*iter);
+		place->addPerson(*iter, 0);
 	}
 
 	for (vector<Person*>::iterator iter = twelves.begin(); iter != twelves.end(); ++iter) {
-		place->addPerson(*iter);
+		place->addPerson(*iter, 0);
 	}
 
+	TAParameters params;
+	params.a = 1;
+	params.b = 0;
+	params.e = 0;
 	// a is 1, so draw should be 1 and so tweleves should be colonized
 	// others should be uncolonized
-	TransmissionAlgorithm::initialize(1, 0, 0.0, 0, 0);
+	TransmissionAlgorithm::initialize(params);
 	place->runTransmission();
 	BOOST_REQUIRE_EQUAL(twelves[1]->status(), COLONIZED);
 	BOOST_REQUIRE_EQUAL(twelves[2]->status(), COLONIZED);
@@ -199,12 +219,12 @@ BOOST_AUTO_TEST_CASE(school) {
 		} else {
 			(*iter)->updateStatus(UNCOLONIZED);
 		}
-		place->addPerson(*iter);
+		place->addPerson(*iter, 0);
 	}
 
 	for (vector<Person*>::iterator iter = twelves.begin(); iter != twelves.end(); ++iter) {
 		(*iter)->updateStatus(UNCOLONIZED);
-		place->addPerson(*iter);
+		place->addPerson(*iter, 0);
 	}
 
 	place->runTransmission();
@@ -238,34 +258,42 @@ BOOST_AUTO_TEST_CASE(household) {
 	mrsa::Parameters::initialize(props);
 
 	// household now has one uncolonized and one infected person.
-	hh->addPerson(p1);
-	hh->addPerson(p2);
+	hh->addPerson(p1, 0);
+	hh->addPerson(p2, 0);
 
+	TAParameters params;
+	params.a = 0;
+	params.b = 0;
+	params.e = 0;
 	// a is 0, so p1 should remain uncolonized.
-	TransmissionAlgorithm::initialize(0, 0, 0.0, 0, 0);
+	TransmissionAlgorithm::initialize(params);
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == UNCOLONIZED);
 
 	// a is 1, so p1 should be colonized
-	TransmissionAlgorithm::initialize(1, 0, 0.0, 0, 0);
+	params.a = 1;
+	TransmissionAlgorithm::initialize(params);
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == COLONIZED);
 
 	hh->reset();
 	p1->updateStatus(UNCOLONIZED);
 	p2->updateStatus(INFECTED);
-	hh->addPerson(p1);
-	hh->addPerson(p2);
+	hh->addPerson(p1, 0);
+	hh->addPerson(p2, 0);
+
+	params.a = 0.5;
 	// a is .5 but risk for household is 2 so should be
 	// colonized
-	TransmissionAlgorithm::initialize(0.5, 0, 0.0, 0, 0);
+	TransmissionAlgorithm::initialize(params);
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == COLONIZED);
 
-	double b = 1;
-	TransmissionAlgorithm::initialize(0, b, 0.0, 0, 0);
+	params.a = 0;
+	params.b = 1;
+	TransmissionAlgorithm::initialize(params);
 	hh->reset();
-	hh->addPerson(p1);
+	hh->addPerson(p1, 0);
 	hh->runTransmission();
 	BOOST_REQUIRE(p1->status() == INFECTED);
 
@@ -275,13 +303,13 @@ BOOST_AUTO_TEST_CASE(household) {
 	repast::RepastProcess::instance()->getScheduleRunner().scheduleStop(3);
 	repast::RepastProcess::instance()->getScheduleRunner().run();
 
-	double c = 0;
-	double d = 1;
-	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
-	hh->reset();
-	hh->addPerson(p1);
-	hh->runTransmission();
-	BOOST_REQUIRE(p1->status() == UNCOLONIZED);
+//	double c = 0;
+//	double d = 1;
+//	TransmissionAlgorithm::initialize(0, 0, c, d, 0);
+//	hh->reset();
+//	hh->addPerson(p1);
+//	hh->runTransmission();
+//	BOOST_REQUIRE(p1->status() == UNCOLONIZED);
 
 	deletePlaces(places);
 }
@@ -355,7 +383,6 @@ BOOST_AUTO_TEST_CASE(disease_update_test) {
 	p2->updateStatus(COLONIZED);
 
 	Person* p3 = persons[2];
-
 
 	// infected then drop to colonized
 	p3->updateStatus(INFECTED);
