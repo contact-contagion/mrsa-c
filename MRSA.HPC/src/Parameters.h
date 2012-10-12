@@ -47,6 +47,15 @@ extern const std::string GAMMA;
 extern const std::string Z;
 
 
+extern const std::string A;
+extern const std::string B;
+extern const std::string E;
+extern const std::string ALPHA;
+extern const std::string THETA;
+extern const std::string GAMMA;
+extern const std::string Z;
+
+
 /**
  * Parameters singleton that contains the model properties.
  *
