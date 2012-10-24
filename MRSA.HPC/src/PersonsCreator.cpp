@@ -11,11 +11,29 @@
 
 #include "PersonsCreator.h"
 #include "Constants.h"
+#include "NoStayManager.h"
+#include "HospitalStayManager.h"
 
 namespace mrsa {
 
 using namespace std;
 using namespace repast;
+using namespace boost;
+
+
+shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<IHospitalStayManager>& no_stay_manager) {
+	unsigned int y1_length = strToUInt(data[H_NIGHTS_1]);
+	unsigned int y2_length = strToUInt(data[H_NIGHTS_2]);
+	unsigned int y3_length = strToUInt(data[H_NIGHTS_3]);
+	unsigned int y4_length = strToUInt(data[H_NIGHTS_4]);
+	unsigned int y5_length = strToUInt(data[H_NIGHTS_5]);
+
+	if (y1_length == 0 && y2_length == 0 && y3_length == 0 && y4_length == 0 && y5_length == 0) {
+		return no_stay_manager;
+	} else {
+		return shared_ptr<IHospitalStayManager>(new HospitalStayManager(y1_length, y2_length, y3_length, y4_length, y5_length));
+	}
+}
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
@@ -66,12 +84,6 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	const string& hh_id = vec[HH_ID_IDX];
 	places.household = findPlace(hh_id);
 
-	/*
-	if (places.household == 0) {
-			std::cout << "0 hh id for " << vec[0] << std::endl;
-	}
-	*/
-
 	const string& school_id = vec[SCHOOL_ID_IDX];
 	places.school = findPlace(school_id);
 	const string& gq_id = vec[GQ_ID_IDX];
@@ -90,8 +102,9 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
+	shared_ptr<IHospitalStayManager> no_stay_manager(new NoStayManager());
 	// create the Person
-	return new Person(id, obs, vec, places, min_infection_duration_);
+	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), min_infection_duration_);
 }
 
 }
