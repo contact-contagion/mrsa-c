@@ -17,6 +17,15 @@
 
 namespace mrsa {
 
+struct Calendar {
+
+	int hour_of_day, day_of_week, day_of_year, year;
+
+	Calendar();
+	void increment();
+	bool isWeekDay();
+};
+
 /**
  * The Observer class for the MRSA model.
  */
@@ -61,6 +70,8 @@ private:
 	std::vector<Place*> places;
 	repast::relogo::AgentSet<Person>* people_;
 	std::string summary_output_file;
+	Calendar calendar;
+
 
 	/**
 	 * Load the activities and assign them to persons.

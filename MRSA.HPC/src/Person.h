@@ -9,12 +9,14 @@
 #define PERSON_H_
 
 #include <map>
+#include <boost/shared_ptr.hpp>
 
 #include "relogo/Turtle.h"
 
 #include "DiseaseStatusUpdater.h"
 #include "Places.h"
 #include "Activity.h"
+#include "HospitalStayManager.h"
 
 namespace mrsa {
 
@@ -34,6 +36,12 @@ const int HOSPITAL_ID_IDX = 12;
 const int OTHER_H_START_IDX = 13;
 const int OTHER_H_END_IDX = 16;
 
+const int H_NIGHTS_1 = 17;
+const int H_NIGHTS_2 = 18;
+const int H_NIGHTS_3 = 19;
+const int H_NIGHTS_4 = 20;
+const int H_NIGHTS_5 = 21;
+
 class Person: public repast::relogo::Turtle {
 
 	friend std::ostream& operator<<(std::ostream& os, const Person& id);
@@ -42,7 +50,7 @@ class Person: public repast::relogo::Turtle {
 public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-			Places places, float min_infection_duration);
+			Places places, boost::shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration);
 	virtual ~Person();
 
 	/**
@@ -134,7 +142,7 @@ public:
 	 * Performs the current activity for the specified time
 	 * and weekday / weekend.
 	 */
-	void performActivity(int time, bool isWeekday);
+	void performActivity(int time, int day_of_year, int year,  bool isWeekday);
 
 private:
 	typedef std::vector<Activity> ActivityList;
@@ -142,6 +150,7 @@ private:
 
 	std::string person_id;
 	Places places_;
+	boost::shared_ptr<IHospitalStayManager> hosp_manager_;
 	std::string tucaseid_weekday, tucaseid_weekend;
 	int relate, sex, age_;
 	ActivityList weekday_acts;
@@ -156,7 +165,7 @@ private:
 	void changePlace(Place* place, int activity_type);
 
 	// checks whether this person should go to the hospital
-	bool hospitalCheck(int time);
+	//bool hospitalCheck(int time);
 };
 
 std::ostream& operator<<(std::ostream& os, const Person& id);

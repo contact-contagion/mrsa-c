@@ -43,8 +43,32 @@ int line_count(const std::string& file) {
 	return numLines;
 }
 
+Calendar::Calendar() :
+		hour_of_day(0), day_of_week(0), day_of_year(1), year(1) {
+}
+
+void Calendar::increment() {
+	++hour_of_day;
+	if (hour_of_day > 23) {
+		hour_of_day = 0;
+		++day_of_week;
+		if (day_of_week > 6) {
+			day_of_week = 0;
+		}
+		++day_of_year;
+		if (day_of_year > 365) {
+			day_of_year = 1;
+			++year;
+		}
+	}
+}
+
+bool Calendar::isWeekDay() {
+	return !(day_of_week == 0 || day_of_week == 6);
+}
+
 MRSAObserver::MRSAObserver() :
-		personType(0), places(0), people_(0), summary_output_file() {
+personType(0), places(0), people_(0), summary_output_file(), calendar() {
 }
 
 MRSAObserver::~MRSAObserver() {
@@ -63,13 +87,9 @@ void MRSAObserver::go() {
 	// reset the hourly stats, as they are per tick.
 	Statistics* stats = Statistics::getInstance();
 	stats->resetHourlyStats();
-	// using the current tick determine the simulated hour and
-	// day and whether this is a weekday or weekend.
-	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
-	int time = tick % 24;
-	int day = (tick / 24) % 7;
-	bool is_weekday = (day == 0 || day == 6) ? false : true;
+	calendar.increment();
 
+	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
 	// print out time stamp each simulated month
 	// on process 0
 	if (RepastProcess::instance()->rank() == 0 && tick % 720 == 0) {
@@ -81,8 +101,8 @@ void MRSAObserver::go() {
 	// for each person,
 	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		Person* person = (*people_)[i];
-		// perform the activity for the specified time and day
-		person->performActivity(time, is_weekday);
+		// perform the activity for the specified time and day_of_week
+		person->performActivity(calendar.hour_of_day, calendar.day_of_year, calendar.year, calendar.isWeekDay());
 		// update the stats -- update the disease status counts
 		// with the status of the current person
 		stats->countPerson(person);
@@ -379,12 +399,15 @@ void MRSAObserver::setup(Properties& props) {
 	// create a random distribution used by Person-s to
 	// choose which "other household" to go to
 	_IntUniformGenerator gen(Random::instance()->engine(), boost::uniform_int<>(0, 3));
-	Random::instance()->putGenerator(OH_DIST, new DefaultNumberGenerator<_IntUniformGenerator>(gen));
+	Random::instance()->putGenerator(OH_DIST,
+			new DefaultNumberGenerator<_IntUniformGenerator>(gen));
 
-	double duration_mean = params->getDoubleParameter(HOSPITAL_STAY_DURATION_MEAN);
-	double duration_sd = params->getDoubleParameter(HOSPITAL_STAY_DURATION_SD);
-	_NormalGenerator ngen(Random::instance()->engine(), boost::normal_distribution<>(duration_mean, duration_sd));
-	Random::instance()->putGenerator(HOSPITAL_STAY_DURATION, new DefaultNumberGenerator<_NormalGenerator>(ngen));
+	//double duration_mean = params->getDoubleParameter(HOSPITAL_STAY_DURATION_MEAN);
+	//double duration_sd = params->getDoubleParameter(HOSPITAL_STAY_DURATION_SD);
+	//_NormalGenerator ngen(Random::instance()->engine(),
+	//		boost::normal_distribution<>(duration_mean, duration_sd));
+	//Random::instance()->putGenerator(HOSPITAL_STAY_DURATION,
+	//		new DefaultNumberGenerator<_NormalGenerator>(ngen));
 
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
@@ -430,7 +453,6 @@ void MRSAObserver::setup(Properties& props) {
 	// persons.
 	people_ = new AgentSet<Person>();
 	get(*people_);
-
 
 	Statistics* stats = Statistics::getInstance();
 	stats->setInitialCounts(*people_);

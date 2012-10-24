@@ -4,6 +4,7 @@ SOURCES = CSVReader.cpp \
           TransmissionAlgorithm.cpp \
           DiseaseStatusUpdater.cpp \
           Person.cpp \
+          HospitalStayManager.cpp \
           PersonsCreator.cpp \
           Place.cpp \
           SelectiveTransmissionPlace.cpp \

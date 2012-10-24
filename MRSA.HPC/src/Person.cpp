@@ -18,11 +18,12 @@ namespace mrsa {
 
 using namespace repast::relogo;
 using namespace repast;
+using namespace boost;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Places places, float min_infection_duration) :
-		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), tucaseid_weekday(
+		Places places, shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration) :
+		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(hosp_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
 				min_infection_duration), hospital_stay_start(0), hospital_stay_duration(0) {
@@ -52,6 +53,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 }
 
 Person::~Person() {
+
 }
 
 void Person::validate() {
@@ -94,40 +96,40 @@ bool Person::initializeActivities(map<string, vector<Activity> >& map) {
 	return true;
 }
 
-bool Person::hospitalCheck(int time) {
-	bool retVal = false;
-	if (hospital_stay_duration > 0.0f) {
-		if (RepastProcess::instance()->getScheduleRunner().currentTick() - hospital_stay_start
-				<= hospital_stay_duration) {
-			changePlace(places_.hospital, 0);
-			retVal = true;
-
-		} else {
-			hospital_stay_duration = 0;
-			hospital_stay_start = 0;
-		}
-	} else if (time == 0 && places_.hospital != 0) {
-		// not in hosptial, start of day, so do check
-		double val = Parameters::instance()->getDoubleParameter(HOSPITALIZED_PROBABILITY);
-		if (Random::instance()->nextDouble() <= val) {
-			hospital_stay_start = RepastProcess::instance()->getScheduleRunner().currentTick();
-			hospital_stay_duration = repast::Random::instance()->getGenerator(
-					HOSPITAL_STAY_DURATION)->next();
-			// stay 5 hours at the least
-			if (hospital_stay_duration <= 0) hospital_stay_duration = 5;
-			changePlace(places_.hospital, 0);
-			retVal = true;
-		}
-	}
-	return retVal;
-}
+//bool Person::hospitalCheck(int time) {
+//	bool retVal = false;
+//	if (hospital_stay_duration > 0.0f) {
+//		if (RepastProcess::instance()->getScheduleRunner().currentTick() - hospital_stay_start
+//				<= hospital_stay_duration) {
+//			changePlace(places_.hospital, 0);
+//			retVal = true;
+//
+//		} else {
+//			hospital_stay_duration = 0;
+//			hospital_stay_start = 0;
+//		}
+//	} else if (time == 0 && places_.hospital != 0) {
+//		// not in hosptial, start of day, so do check
+//		double val = Parameters::instance()->getDoubleParameter(HOSPITALIZED_PROBABILITY);
+//		if (Random::instance()->nextDouble() <= val) {
+//			hospital_stay_start = RepastProcess::instance()->getScheduleRunner().currentTick();
+//			hospital_stay_duration = repast::Random::instance()->getGenerator(
+//					HOSPITAL_STAY_DURATION)->next();
+//			// stay 5 hours at the least
+//			if (hospital_stay_duration <= 0) hospital_stay_duration = 5;
+//			changePlace(places_.hospital, 0);
+//			retVal = true;
+//		}
+//	}
+//	return retVal;
+//}
 
 // peform the activity for this time and day.
-void Person::performActivity(int time, bool isWeekday) {
-
-	// check if person has made a random hospital visit, overrides the
-	// scheduled activites
-	if (!hospitalCheck(time)) {
+void Person::performActivity(int time, int day_of_year, int year,  bool isWeekday) {
+	if (hosp_manager_->inHospital(year, day_of_year) && places_.hospital != 0) {
+		//std::cout << (*this) << ": going to hospital on " << day_of_year << ", " << year << endl;
+		changePlace(places_.hospital, 0);
+	} else {
 		// iterate through the activity list and find the activity
 		// whose time span contains the specified time.
 		const Activity* act(0);
