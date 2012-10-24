@@ -1,6 +1,7 @@
 random.seed = 1
 
-stop.at = 8760.5
+stop.at = 17520.5 
+#8760.5
 
 persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
 places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
@@ -38,15 +39,6 @@ z = 0.5
 # whether or not seek and destroy for household members of 
 # infected persons is enabled
 seek.and.destroy.enabled = true
-
-# probabilty of a random stay in a hospital
-hospital.stay.probability = 0.01
-# mean of the normal distribution from which the length
-# of a hospital stay is drawn IN HOURS. 
-hospital.stay.duration.mean = 72
-# standard deviation of the normal distribution from which the length
-# of a hospital stay is drawn IN HOURS. 
-hospital.stay.duration.sd = 24
 
 # world definition props
 min.x = 0
