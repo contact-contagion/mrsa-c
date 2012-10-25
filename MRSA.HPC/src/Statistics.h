@@ -106,7 +106,7 @@ public:
 	 * Calculate stats at the end of a year using the set of
 	 * persons.
 	 */
-	void yearEnded(repast::relogo::AgentSet<Person>& people);
+	void yearEnded(repast::relogo::AgentSet<Person>& people, int year, repast::Properties& props);
 
 	/**
 	 * Calculates the summary stats and writes them to the specified file.
@@ -114,7 +114,7 @@ public:
 	 * @param people an AgentSet of the persons to use to calculate the summary stats
 	 * @param file the path of the file to write to
 	 */
-	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file);
+	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file, repast::Properties& props);
 
 private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;

@@ -68,7 +68,7 @@ bool Calendar::isWeekDay() {
 }
 
 MRSAObserver::MRSAObserver() :
-personType(0), places(0), people_(0), summary_output_file(), calendar() {
+     yearCounter(0), personType(0), places(0), people_(0), summary_output_file(), calendar() {
 }
 
 MRSAObserver::~MRSAObserver() {
@@ -158,7 +158,9 @@ void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap
 
 	// create the places.
 	PlaceCreator placeCreator;
-	placeCreator.run(placesFile, riskFile, places);
+//	placeCreator.run(placesFile, riskFile, places);
+
+	placeCreator.run(placesFile, props, places);
 
 	// put the places in a map. Key is the place id
 	// so that the PersonsCreator can easily look up
@@ -172,10 +174,14 @@ void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap
 // Creates the Persons. The Persons are turtles and
 // so must be created by the Observer using a functor.
 void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMap) {
+  boost::mpi::communicator world;
+
 	const string personsFile = props.getProperty(PERSONS_FILE);
+
 	// count the lines in the file so we know how many
 	// persons to create: one per line.
 	int lines = line_count(personsFile);
+
 
 	if (lines == -1)
 		throw invalid_argument("Error opening: " + personsFile);
@@ -192,6 +198,7 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// get all the created Persons and validate them.
 	AgentSet<Person> people;
 	get(people);
+
 	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
 		Person* person = (*iter);
 		// check if a person was assigned any places, and if not
@@ -241,7 +248,8 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 }
 
 void MRSAObserver::calcYearlyStats() {
-	Statistics::getInstance()->yearEnded(*people_);
+  yearCounter++;
+	Statistics::getInstance()->yearEnded(*people_, yearCounter, *propsPtr);
 }
 
 void MRSAObserver::initializeYearlyDataCollection(const string& file) {
@@ -383,11 +391,12 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 }
 
 void MRSAObserver::atEnd() {
-	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file);
+	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file, *propsPtr);
 }
 
 // entry point for model setup.
 void MRSAObserver::setup(Properties& props) {
+  propsPtr = &props;
 	Parameters::initialize(props);
 	Parameters* params = Parameters::instance();
 
@@ -442,10 +451,23 @@ void MRSAObserver::setup(Properties& props) {
 	//people.ask(&Person::goToHome);
 
 	// initialize the hourly data collection
-	initializeHourlyDataCollection(params->getStringParameter(HOURLY_OUTPUT_FILE));
+	int runNumber = strToInt(props.getProperty("run.number"));
+
+//	initializeHourlyDataCollection(params->getStringParameter(HOURLY_OUTPUT_FILE));
+	std::stringstream hourlyDataFileName;
+	hourlyDataFileName << props.getProperty(HOURLY_OUTPUT_FILE) << "_" << runNumber << ".csv";
+	initializeHourlyDataCollection(hourlyDataFileName.str());
+
 	// initialize yearly data collection
-	initializeYearlyDataCollection(params->getStringParameter(YEARLY_OUTPUT_FILE));
-	summary_output_file = params->getStringParameter(SUMMARY_OUTPUT_FILE);
+//	initializeYearlyDataCollection(params->getStringParameter(YEARLY_OUTPUT_FILE));
+	std::stringstream yearlyDataFileName;
+	yearlyDataFileName << props.getProperty(YEARLY_OUTPUT_FILE) << "_" << runNumber << ".csv";
+	initializeYearlyDataCollection(yearlyDataFileName.str());
+
+//	summary_output_file = params->getStringParameter(SUMMARY_OUTPUT_FILE);
+	std::stringstream summaryOutputFileName;
+	summaryOutputFileName << props.getProperty(SUMMARY_OUTPUT_FILE) << "_" << runNumber << ".txt";
+  summary_output_file = summaryOutputFileName.str();
 
 	// get a permanent set of people so we don't have to retrieve
 	// them each iteration which will be slow. We do this here because

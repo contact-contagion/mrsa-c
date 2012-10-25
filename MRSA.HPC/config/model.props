@@ -3,14 +3,19 @@ random.seed = 1
 stop.at = 17520.5 
 #8760.5
 
-persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
-places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
-activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+#persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
+#places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
+#activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+
+persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
+places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
+activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
+
 risk.file = ../data/risk.csv 
 
-hourly.output.file = ./output/hourly_data.csv
-yearly.output.file = ./output/yearly_data.csv
-summary.output.file = ./output/summary_stats.txt
+hourly.output.file = ./output/hourly_data
+yearly.output.file = ./output/yearly_data
+summary.output.file = ./output/summary_stats
 
 initial.colonization.fraction = 0.03
 initial.infected.count = 34
@@ -50,5 +55,4 @@ grid.buffer = 0
 # these must multiply to total number of processes
 proc.per.x = 1
 proc.per.y = 1
-
 

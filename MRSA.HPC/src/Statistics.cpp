@@ -173,7 +173,7 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 	}
 }
 
-void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people) {
+void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year, repast::Properties& props) {
 	PersonStats p_stats = { };
 
 	// get yearly stats from each person.
@@ -183,31 +183,37 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people) {
 		p->status_.resetYearlyCounts();
 	}
 
+
+	// Add to properties file
+	std::stringstream ss1;
+	ss1 << "infections_year_" << year;
+	props.putProperty(ss1.str(), yearly_infected);
+
+	std::stringstream ss2;
+  ss2 << "colonizations_year_" << year;
+  props.putProperty(ss2.str(), yearly_colonized);
+
+
 	yearly_infection_duration = yearly_colonization_duration = 0;
 
-	// average infection duration over all persons
-	// = total duratio / number of times infected
+	// average infection duration over all persons = total duration / number of times infected
 	if (p_stats.infection_count != 0) {
-		yearly_infection_duration = p_stats.infection_duration / p_stats.infection_count;
-		yearly_seek_infection_duration = p_stats.seek_infection_duration
-				/ p_stats.seek_infection_count;
-		yearly_no_seek_infection_duration = p_stats.no_seek_infection_duration
-				/ p_stats.no_seek_infection_count;
+		yearly_infection_duration         = p_stats.infection_duration         / p_stats.infection_count;
+		yearly_seek_infection_duration    = p_stats.seek_infection_duration    / p_stats.seek_infection_count;
+		yearly_no_seek_infection_duration = p_stats.no_seek_infection_duration / p_stats.no_seek_infection_count;
 	}
-	// average colonization duration over all persons
-	// = total duration / number of time colonized
-	if (p_stats.colonized_count != 0)
-		yearly_colonization_duration = p_stats.colonization_duration / p_stats.colonized_count;
+
+	// average colonization duration over all persons = total duration / number of time colonized
+	if (p_stats.colonized_count != 0){
+		yearly_colonization_duration      = p_stats.colonization_duration      / p_stats.colonized_count;
+	}
 
 	// divide the sum of all the r0 averages by the number of persons that were
 	// infected / colonized (i.e. the number of people that contributed to that sum)
 	// to get the yearly r0s.
-	yearly_infected_r0 = p_stats.avg_infection_r0 / p_stats.infected_person_count;
+	yearly_infected_r0  = p_stats.avg_infection_r0    / p_stats.infected_person_count;
 	yearly_colonized_r0 = p_stats.avg_colonization_r0 / p_stats.colonized_person_count;
-	yearly_r0 = p_stats.avg_r0 / p_stats.i_or_c_count;
-
-	//std::cout << "yearly avg_infection: " << p_stats.avg_infection_r0 << ", yearly infected p count: " << p_stats.infected_person_count << std::endl;
-	//std::cout << "yearly infection_r0: " << yearly_infected_r0 << std::endl;
+	yearly_r0           = p_stats.avg_r0              / p_stats.i_or_c_count;
 
 	++averages.count;
 	averages.yearly_infected_r0 += yearly_infected_r0;
@@ -220,12 +226,11 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people) {
 	// get the total number of colonizations by summing the
 	// colonization at X place counts
 	double total = 0;
-	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
-			++iter) {
+	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end(); ++iter) {
 		total += iter->second;
 	}
 
-	// for each place in the colonizaiton_count_map, get the fraction of colonizations
+	// for each place in the colonization_count_map, get the fraction of colonizations
 	// that occured in that place
 	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
 			++iter) {
@@ -235,7 +240,7 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people) {
 }
 
 void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
-		const std::string& file) {
+		const std::string& file, repast::Properties& props) {
 	std::map<unsigned int, unsigned long> infection_hist;
 	std::map<unsigned int, unsigned long> colonized_hist;
 
@@ -266,22 +271,25 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 	out.open(findFreeFile(file).c_str());
 
 	// write the stats out to the file
-	out << "total infections: " << total_infected << std::endl << "total colonizations: "
-			<< total_colonized << std::endl << "total from infection: " << total_c_from_i
-			<< std::endl << "total from colonization: " << total_c_from_c << std::endl
-			<< "avg. seek care infection duration: "
-			<< averages.yearly_seek_infection_duration / averages.count << std::endl
-			<< "avg. no seek care infection duration: "
-			<< averages.yearly_no_seek_infection_duration / averages.count << std::endl
-			<< "avg. infection duration: " << averages.yearly_infection_duration / averages.count
-			<< std::endl
-
-			<< "avg. colonization duration: "
-			<< averages.yearly_colonization_duration / averages.count << std::endl
-
-			<< "avg. infected_r0: " << (averages.yearly_infected_r0 / averages.count) << std::endl
-			<< "avg. colonized_r0: " << (averages.yearly_colonized_r0 / averages.count) << std::endl
+	out << "total infections: "                      << total_infected                                              << std::endl
+	    << "total colonizations: "	                 << total_colonized                                             << std::endl
+	    << "total from infection: "                  << total_c_from_i                                              << std::endl
+	    << "total from colonization: "               << total_c_from_c                                              << std::endl
+			<< "avg. seek care infection duration: "     << averages.yearly_seek_infection_duration / averages.count    << std::endl
+			<< "avg. no seek care infection duration: "  << averages.yearly_no_seek_infection_duration / averages.count << std::endl
+			<< "avg. infection duration: "               << averages.yearly_infection_duration / averages.count    			<< std::endl
+			<< "avg. colonization duration: "       		 << averages.yearly_colonization_duration / averages.count      << std::endl
+			<< "avg. infected_r0: "                      << (averages.yearly_infected_r0 / averages.count)              << std::endl
+			<< "avg. colonized_r0: "                     << (averages.yearly_colonized_r0 / averages.count)             << std::endl
 			<< std::endl;
+
+	props.putProperty("total_infections", total_infected);
+	props.putProperty("colonizations", total_colonized);
+	props.putProperty("total_from_infection", total_c_from_i);
+	props.putProperty("total_from_colonization", total_c_from_c);
+	props.putProperty("avg_infected_r0", (averages.yearly_infected_r0 / averages.count));
+	props.putProperty("avg_colonized_r0", (averages.yearly_colonized_r0 / averages.count));
+
 
 	for (ConstHistIter iter = infection_hist.begin(); iter != infection_hist.end(); ++iter) {
 		out << "" << iter->second << " persons infected " << iter->first << " times" << std::endl;

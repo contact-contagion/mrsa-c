@@ -9,6 +9,8 @@
 #include <map>
 #include <iostream>
 
+#include <boost/algorithm/string.hpp>
+
 #include "repast_hpc/Utilities.h"
 
 #include "PlaceCreator.h"
@@ -47,46 +49,81 @@ void setRisk(Risk& risk, int act_type, float a, float b) {
 	}
 }
 
-void loadRisk(const string& risk_file, std::map<string, Risk>& map) {
-	CSVReader reader(risk_file);
-	vector<string> vec;
-	// skip the first header line.
-	reader.next(vec);
+//void loadRisk(const string& risk_file, std::map<string, Risk>& map) {
+//	CSVReader reader(risk_file);
+//	vector<string> vec;
+//	// skip the first header line.
+//	reader.next(vec);
+//
+//	// read each line and depending on the type, create that type of place.
+//	while (reader.next(vec)) {
+//		int act_type = repast::strToInt(vec[RISK_ACT_TYPE_IDX]);
+//		float par = (float) repast::strToDouble(vec[RISK_PAR_IDX]);
+//		float tip = (float) repast::strToDouble(vec[RISK_TIP_IDX]);
+//		float aip = (float) repast::strToDouble(vec[RISK_AIP_IDX]);
+//
+//		string type = vec[RISK_PLACE_TYPE_IDX];
+//		// lower case the type for easier, less error prone comparisons
+//		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+//		std::map<string, Risk>::iterator iter = map.find(type);
+//		if (iter == map.end()) {
+//			Risk risk;
+//			setRisk(risk, act_type, par * tip, aip);
+//			map.insert(std::make_pair(type, risk));
+//		} else {
+//			Risk& risk = iter->second;
+//			setRisk(risk, act_type, par * tip, aip);
+//		}
+//	}
+//
+//	/*
+//	for (std::map<string, Risk>::iterator iter = map.begin(); iter != map.end(); ++iter) {
+//		Risk& risk = iter->second;
+//		std::cout << iter->first << ": a0 = " << risk.a0_ << ", a1 = " << risk.a1_ << ", b0 = "
+//				<< risk.b0_  << ", b1= " << risk.b1_ << std::endl;
+//	}
+//	*/
+//}
 
-	// read each line and depending on the type, create that type of place.
-	while (reader.next(vec)) {
-		int act_type = repast::strToInt(vec[RISK_ACT_TYPE_IDX]);
-		float par = (float) repast::strToDouble(vec[RISK_PAR_IDX]);
-		float tip = (float) repast::strToDouble(vec[RISK_TIP_IDX]);
-		float aip = (float) repast::strToDouble(vec[RISK_AIP_IDX]);
+void loadRisk(Properties& props, std::map<string, Risk>& map) {
 
-		string type = vec[RISK_PLACE_TYPE_IDX];
-		// lower case the type for easier, less error prone comparisons
-		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
-		std::map<string, Risk>::iterator iter = map.find(type);
-		if (iter == map.end()) {
-			Risk risk;
-			setRisk(risk, act_type, par * tip, aip);
-			map.insert(std::make_pair(type, risk));
-		} else {
-			Risk& risk = iter->second;
-			setRisk(risk, act_type, par * tip, aip);
-		}
-	}
+  std::vector<std::string> placeTypes;
+  const std::string placeTypeList = props.getProperty("place.types");
+  boost::split(placeTypes, placeTypeList, boost::is_any_of(","));
 
-	/*
-	for (std::map<string, Risk>::iterator iter = map.begin(); iter != map.end(); ++iter) {
-		Risk& risk = iter->second;
-		std::cout << iter->first << ": a0 = " << risk.a0_ << ", a1 = " << risk.a1_ << ", b0 = "
-				<< risk.b0_  << ", b1= " << risk.b1_ << std::endl;
-	}
-	*/
+  for(size_t i = 0; i< placeTypes.size(); i++){
+    for(int j = 0; j < 2; j++){
+      std::string type = placeTypes[i];
+      std::string typeProp = type;
+      boost::replace_all(typeProp, " ", "_");
+
+      std::stringstream PARname; PARname << typeProp << "_" << j << "_PAR";
+      std::stringstream TIPname; TIPname << typeProp << "_" << j << "_TIP";
+      std::stringstream AIPname; AIPname << typeProp << "_" << j << "_AIP";
+
+      float par = (float) repast::strToDouble(props.getProperty(PARname.str()));
+      float tip = (float) repast::strToDouble(props.getProperty(TIPname.str()));
+      float aip = (float) repast::strToDouble(props.getProperty(AIPname.str()));
+
+      // lower case the type for easier, less error prone comparisons
+      std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+      std::map<string, Risk>::iterator iter = map.find(type);
+      if (iter == map.end()) {
+        Risk risk;
+        setRisk(risk, j, par * tip, aip);
+        map.insert(std::make_pair(type, risk));
+      } else {
+        Risk& risk = iter->second;
+        setRisk(risk, j, par * tip, aip);
+      }
+    }
+  }
 }
 
 // reads the file and fills the vector of places with the created places.
-void PlaceCreator::run(const string& places_file, const string& risk_file, vector<Place*>& places) {
+void PlaceCreator::run(const string& places_file, Properties& props, vector<Place*>& places) {
 	std::map<string, Risk> map;
-	loadRisk(risk_file, map);
+	loadRisk(props, map);
 
 	CSVReader reader(places_file);
 	vector<string> vec;
@@ -94,8 +131,8 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 	reader.skip(1);
 
 	// skip to the line equal to the rank
-	boost::mpi::communicator world;
-	reader.skip(world.rank());
+	boost::mpi::communicator* world = RepastProcess::instance()->getCommunicator();
+	reader.skip(world->rank());
 
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
@@ -131,7 +168,7 @@ void PlaceCreator::run(const string& places_file, const string& risk_file, vecto
 		places.push_back(place);
 
 		// skip to the next line to read
-		reader.skip(world.size() - 1);
+		reader.skip(world->size() - 1);
 	}
 }
 

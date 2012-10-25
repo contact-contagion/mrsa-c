@@ -13,6 +13,9 @@
 
 #include "CSVReader.h"
 #include "Place.h"
+#include "repast_hpc/Properties.h"
+
+using namespace repast;
 
 namespace mrsa {
 
@@ -35,7 +38,9 @@ public:
 	 * @param file the path to the places file
 	 * @param places the vector to put the created places in
 	 */
-	void run(const std::string& places_file, const std::string& risk_file, std::vector<Place*>& places);
+//	void run(const std::string& places_file, const std::string& risk_file, std::vector<Place*>& places);
+
+	void run(const std::string& places_file, Properties& props, std::vector<Place*>& places);
 };
 
 } /* namespace mrsa */

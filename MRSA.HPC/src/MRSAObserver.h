@@ -31,6 +31,9 @@ struct Calendar {
  */
 class MRSAObserver : public repast::relogo::Observer {
 
+  repast::Properties* propsPtr;
+  int yearCounter;
+
 public:
 	MRSAObserver();
 	virtual ~MRSAObserver();
