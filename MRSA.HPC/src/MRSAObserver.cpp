@@ -68,7 +68,7 @@ bool Calendar::isWeekDay() {
 }
 
 MRSAObserver::MRSAObserver() :
-     yearCounter(0), personType(0), places(0), people_(0), summary_output_file(), calendar() {
+		personType(0), places(0), people_(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(0){
 }
 
 MRSAObserver::~MRSAObserver() {
@@ -102,7 +102,8 @@ void MRSAObserver::go() {
 	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		Person* person = (*people_)[i];
 		// perform the activity for the specified time and day_of_week
-		person->performActivity(calendar.hour_of_day, calendar.day_of_year, calendar.year, calendar.isWeekDay());
+		person->performActivity(calendar.hour_of_day, calendar.day_of_year, calendar.year,
+				calendar.isWeekDay());
 		// update the stats -- update the disease status counts
 		// with the status of the current person
 		stats->countPerson(person);
@@ -174,14 +175,13 @@ void MRSAObserver::createPlaces(Properties& props, map<string, Place*>* placeMap
 // Creates the Persons. The Persons are turtles and
 // so must be created by the Observer using a functor.
 void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMap) {
-  boost::mpi::communicator world;
+	boost::mpi::communicator world;
 
 	const string personsFile = props.getProperty(PERSONS_FILE);
 
 	// count the lines in the file so we know how many
 	// persons to create: one per line.
 	int lines = line_count(personsFile);
-
 
 	if (lines == -1)
 		throw invalid_argument("Error opening: " + personsFile);
@@ -248,7 +248,7 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 }
 
 void MRSAObserver::calcYearlyStats() {
-  yearCounter++;
+	yearCounter++;
 	Statistics::getInstance()->yearEnded(*people_, yearCounter, *propsPtr);
 }
 
@@ -265,6 +265,13 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 	builder.addDataSource(
 			createSVDataSource("colonized_count", new LDataSourceAdapter(&stats->yearly_colonized),
 					std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("new_infection_count",
+					new LDataSourceAdapter(&stats->yearly_new_infected), std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("new_colonized_count",
+					new LDataSourceAdapter(&stats->yearly_new_colonized), std::plus<double>()));
 
 	builder.addDataSource(
 			createSVDataSource("colonizations_from_infection",
@@ -396,7 +403,7 @@ void MRSAObserver::atEnd() {
 
 // entry point for model setup.
 void MRSAObserver::setup(Properties& props) {
-  propsPtr = &props;
+	propsPtr = &props;
 	Parameters::initialize(props);
 	Parameters* params = Parameters::instance();
 
@@ -410,13 +417,6 @@ void MRSAObserver::setup(Properties& props) {
 	_IntUniformGenerator gen(Random::instance()->engine(), boost::uniform_int<>(0, 3));
 	Random::instance()->putGenerator(OH_DIST,
 			new DefaultNumberGenerator<_IntUniformGenerator>(gen));
-
-	//double duration_mean = params->getDoubleParameter(HOSPITAL_STAY_DURATION_MEAN);
-	//double duration_sd = params->getDoubleParameter(HOSPITAL_STAY_DURATION_SD);
-	//_NormalGenerator ngen(Random::instance()->engine(),
-	//		boost::normal_distribution<>(duration_mean, duration_sd));
-	//Random::instance()->putGenerator(HOSPITAL_STAY_DURATION,
-	//		new DefaultNumberGenerator<_NormalGenerator>(ngen));
 
 	// setup the transmission algorithm with the
 	// a, b, c etc. parameters.
@@ -467,7 +467,7 @@ void MRSAObserver::setup(Properties& props) {
 //	summary_output_file = params->getStringParameter(SUMMARY_OUTPUT_FILE);
 	std::stringstream summaryOutputFileName;
 	summaryOutputFileName << props.getProperty(SUMMARY_OUTPUT_FILE) << "_" << runNumber << ".txt";
-  summary_output_file = summaryOutputFileName.str();
+	summary_output_file = summaryOutputFileName.str();
 
 	// get a permanent set of people so we don't have to retrieve
 	// them each iteration which will be slow. We do this here because

@@ -31,9 +31,6 @@ struct Calendar {
  */
 class MRSAObserver : public repast::relogo::Observer {
 
-  repast::Properties* propsPtr;
-  int yearCounter;
-
 public:
 	MRSAObserver();
 	virtual ~MRSAObserver();
@@ -75,6 +72,8 @@ private:
 	std::string summary_output_file;
 	Calendar calendar;
 
+	repast::Properties* propsPtr;
+	int yearCounter;
 
 	/**
 	 * Load the activities and assign them to persons.

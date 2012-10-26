@@ -54,7 +54,8 @@ Statistics::Statistics() :
 
 		hourly_infected(0), hourly_colonized(0), hourly_uncolonized(0), newly_infected(0), newly_colonized(
 				0), yearly_infected_r0(0), yearly_colonized_r0(0), yearly_r0(0), yearly_infected(0), yearly_colonized(
-				0), yearly_no_seek_infection_duration(0), yearly_seek_infection_duration(0), yearly_infection_duration(
+				0), yearly_new_infected(0), yearly_new_colonized(0), yearly_no_seek_infection_duration(0),
+				yearly_seek_infection_duration(0), yearly_infection_duration(
 				0), yearly_colonization_duration(0), yearly_c_from_i(0), yearly_c_from_c(0), total_c_from_i(
 				0), total_c_from_c(0), total_infected(0), total_colonized(0), colonization_count_map(), averages() {
 }
@@ -110,6 +111,9 @@ void Statistics::hourEnded() {
 
 	yearly_colonized += newly_colonized;
 	yearly_infected += newly_infected;
+
+	yearly_new_infected += newly_infected;
+	yearly_new_colonized += newly_colonized;
 
 	total_infected += newly_infected;
 	total_colonized += newly_colonized;

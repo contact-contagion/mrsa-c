@@ -72,6 +72,7 @@ public:
 	 */
 	void resetYearlyStats() {
 		yearly_infected = yearly_colonized = 0;
+		yearly_new_infected = yearly_new_colonized = 0;
 		yearly_c_from_c = yearly_c_from_i = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
 		colonization_count_map.clear();
@@ -139,6 +140,7 @@ private:
 	// in order to log them using RepastHPC data collection.
 	double yearly_infected_r0, yearly_colonized_r0, yearly_r0;
 	long yearly_infected, yearly_colonized;
+	long yearly_new_infected, yearly_new_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
 	long yearly_c_from_i, yearly_c_from_c;
