@@ -31,7 +31,7 @@ const int RISK_AIP_IDX = 3;
 
 
 static const int countOfInputRecordValues  = 30;
-static const int countOfRecordValues       = 39;
+static const int countOfRecordValues       = 46;
 
 static const char * const recordValues[] = {
     // Input
