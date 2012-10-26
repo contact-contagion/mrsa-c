@@ -1,6 +1,7 @@
 #include <boost/mpi.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/algorithm/string.hpp>
+#include <boost/assign/std/vector.hpp>
 
 
 #include <iostream>
@@ -33,59 +34,7 @@ const int RISK_AIP_IDX = 3;
 static const int countOfInputRecordValues  = 30;
 static const int countOfRecordValues       = 46;
 
-static const char * const recordValues[] = {
-    // Input
-    "run.number",
-    "date_time.run",
-    "run.time",
-    "random.seed",
-    "stop.at",
-    "seek.and.destroy.at",
-    "seek.and.destroy.cure.fraction",
-    "persons.file",
-    "places.file",
-    "activities.file",
-    "hourly.output.file",
-    "yearly.output.file",
-    "summary.output.file",
-    "seek.care.fraction",
-    "initial.colonization.fraction",
-    "initial.infected.count",
-    "minimum.infection.period",
-    "a",
-    "b",
-    "c",
-    "d",
-    "e",
-    "min.x",
-    "min.y",
-    "max.x",
-    "max.y",
-    "grid.buffer",
-    "proc.per.x",
-    "proc.per.y",
-    "process.count",
-    // Output
-    "run.time",
-    "total_infections",
-    "colonizations",
-    "total_from_infection",
-    "total_from_colonization",
-    "avg_infected_r0",
-    "avg_colonized_r0",
-    "infections_year_1",
-    "infections_year_2",
-    "infections_year_3",
-    "infections_year_4",
-    "infections_year_5"
-    "colonizations_year_1",
-    "colonizations_year_2",
-    "colonizations_year_3",
-    "colonizations_year_4",
-    "colonizations_year_5"
-}
-;
-
+using namespace boost::assign;
 
 void usage() {
 	std::cerr << "usage: X  string string" << std::endl;
@@ -112,7 +61,7 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
         props.putProperty("b", bVals[j]);
         props.putProperty("e", eVals[k]);
 
-        props.putProperty("stop.at", 8760.5);
+        props.putProperty("stop.at", 10.5);
 
         std::stringstream ss;
         ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
@@ -121,6 +70,126 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
       }
       c++;
     }
+  }
+}
+
+void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
+  if(!output){
+    keylist +=
+        // Basic Info:
+        "run.number", "date_time.run", "run.time", "random.seed", "stop.at",
+
+        // Obsolete?
+        "seek.and.destroy.at", "seek.and.destroy.cure.fraction",
+
+        // Input files:
+        "persons.file", "places.file", "activities.file",
+
+        // Output files:
+        "hourly.output.file", "yearly.output.file", "summary.output.file",
+
+        // Parameters:
+        "seek.care.fraction",
+        "initial.colonization.fraction",
+        "initial.infected.count",
+        "minimum.infection.period",
+        "a", "b", "e",
+
+        // Risks:
+        "Hospital_0_PAR",     "Hospital_0_TIP",     "Hospital_0_AIP",
+        "Hospital_1_PAR",     "Hospital_1_TIP",     "Hospital_1_AIP",
+
+        "Workplace_0_PAR",    "Workplace_0_TIP",    "Workplace_0_AIP",
+        "Workplace_1_PAR",    "Workplace_1_TIP",    "Workplace_1_AIP",
+
+        "Household_0_PAR",    "Household_0_TIP",    "Household_0_AIP",
+        "Household_1_PAR",    "Household_1_TIP",    "Household_1_AIP",
+
+        "School_0_PAR",       "School_0_TIP",       "School_0_AIP",
+        "School_1_PAR",       "School_1_TIP",       "School_1_AIP",
+
+        "Gym_0_PAR",          "Gym_0_TIP",          "Gym_0_AIP",
+        "Gym_1_PAR",          "Gym_1_TIP",          "Gym_1_AIP",
+
+        "Nursing_Home_0_PAR", "Nursing_Home_0_TIP", "Nursing_Home_0_AIP",
+        "Nursing_Home_1_PAR", "Nursing_Home_1_TIP", "Nursing_Home_1_AIP",
+
+        "Prison_0_PAR",       "Prison_0_TIP",       "Prison_0_AIP",
+        "Prison_1_PAR",       "Prison_1_TIP",       "Prison_1_AIP",
+
+        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP"
+        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP"
+
+
+        // Spatial for ReLogo
+        "min.x", "min.y", "max.x", "max.y",
+        "grid.buffer", "proc.per.x", "proc.per.y";
+  }
+  else{
+    keylist +=
+        // Basic Info:
+        "run.number", "date_time.run", "run.time", "random.seed", "stop.at",
+
+        // Obsolete?
+        "seek.and.destroy.at", "seek.and.destroy.cure.fraction",
+
+        // Input files:
+        "persons.file", "places.file", "activities.file",
+
+        // Output files:
+        "hourly.output.file", "yearly.output.file", "summary.output.file",
+
+        // Parameters:
+        "seek.care.fraction",
+        "initial.colonization.fraction",
+        "initial.infected.count",
+        "minimum.infection.period",
+        "a", "b", "e",
+
+        // Risks:
+        "Hospital_0_PAR",     "Hospital_0_TIP",     "Hospital_0_AIP",
+        "Hospital_1_PAR",     "Hospital_1_TIP",     "Hospital_1_AIP",
+
+        "Workplace_0_PAR",    "Workplace_0_TIP",    "Workplace_0_AIP",
+        "Workplace_1_PAR",    "Workplace_1_TIP",    "Workplace_1_AIP",
+
+        "Household_0_PAR",    "Household_0_TIP",    "Household_0_AIP",
+        "Household_1_PAR",    "Household_1_TIP",    "Household_1_AIP",
+
+        "School_0_PAR",       "School_0_TIP",       "School_0_AIP",
+        "School_1_PAR",       "School_1_TIP",       "School_1_AIP",
+
+        "Gym_0_PAR",          "Gym_0_TIP",          "Gym_0_AIP",
+        "Gym_1_PAR",          "Gym_1_TIP",          "Gym_1_AIP",
+
+        "Nursing_Home_0_PAR", "Nursing_Home_0_TIP", "Nursing_Home_0_AIP",
+        "Nursing_Home_1_PAR", "Nursing_Home_1_TIP", "Nursing_Home_1_AIP",
+
+        "Prison_0_PAR",       "Prison_0_TIP",       "Prison_0_AIP",
+        "Prison_1_PAR",       "Prison_1_TIP",       "Prison_1_AIP",
+
+        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP"
+        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP"
+
+        // Spatial for ReLogo
+        "min.x", "min.y", "max.x", "max.y",
+        "grid.buffer", "proc.per.x", "proc.per.y",
+
+        // Output
+        "process.count",
+        "run.time",
+
+        // Summary Statistics
+        "total_infections",
+        "colonizations",
+        "total_from_infection",
+        "total_from_colonization",
+        "avg_infected_r0",
+        "avg_colonized_r0",
+
+        // By Year Stats
+        "infections_year_1", "infections_year_2", "infections_year_3", "infections_year_4", "infections_year_5",
+        "colonizations_year_1", "colonizations_year_2", "colonizations_year_3", "colonizations_year_4", "colonizations_year_5";
   }
 }
 
@@ -137,8 +206,7 @@ void writePropertiesFromAllProcesses(Properties& props, std::string fileName, bo
   boost::mpi::gather(world, map, rec, 0);
 
   std::vector<std::string> keysToWrite;
-  int limit = (includeOutput ? countOfRecordValues : countOfInputRecordValues);
-  for(int i = 0; i < limit; i++) keysToWrite.push_back(recordValues[i]);
+  getKeysToWrite(keysToWrite, includeOutput);
 
   for(size_t i = 0; i < rec.size(); i++){
     Properties outProps;
@@ -220,7 +288,9 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 	// add process count property
 	props.putProperty("process.count", world.size());
 
-  int sweepIndex = strToInt(props.getProperty("BaseSweepNumber")) + world.rank();
+	int sweepIndex = 0;
+	if(props.contains("BaseSweepNumber")) sweepIndex = strToInt(props.getProperty("BaseSweepNumber")) + world.rank();
+
   props.putProperty("run.number", sweepIndex);
   setPropertiesForSweep(props, sweepIndex);
 
