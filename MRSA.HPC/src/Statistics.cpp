@@ -197,6 +197,15 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year, r
   ss2 << "colonizations_year_" << year;
   props.putProperty(ss2.str(), yearly_colonized);
 
+  std::stringstream ss3;
+  ss3 << "new_infections_year_" << year;
+  props.putProperty(ss3.str(), yearly_new_infected);
+
+  std::stringstream ss4;
+  ss4 << "new_colonizations_year_" << year;
+  props.putProperty(ss4.str(), yearly_new_colonized);
+
+
 
 	yearly_infection_duration = yearly_colonization_duration = 0;
 

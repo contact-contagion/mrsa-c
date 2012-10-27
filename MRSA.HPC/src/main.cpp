@@ -53,22 +53,21 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
 
   int c = 0;
   for(int i = 0; i < 3; i++){
-    for(int j = 0; j < 3; i++){
-      for(int k = 0; k < 3; k++)
-      if(c == sweepIndex){
-        // Set Properties here
-        props.putProperty("a", aVals[i]);
-        props.putProperty("b", bVals[j]);
-        props.putProperty("e", eVals[k]);
+    for(int j = 0; j < 3; j++){
+      for(int k = 0; k < 3; k++){
+        if(c == sweepIndex){
+          // Set Properties here
+          props.putProperty("a", aVals[i]);
+          props.putProperty("b", bVals[j]);
+          props.putProperty("e", eVals[k]);
 
-        props.putProperty("stop.at", 10.5);
-
-        std::stringstream ss;
-        ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
-        props.putProperty("random.seed", ss.str());
-        return;
+          std::stringstream ss;
+          ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
+          props.putProperty("random.seed", ss.str());
+          return;
+        }
+        c++;
       }
-      c++;
     }
   }
 }
@@ -189,7 +188,9 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
 
         // By Year Stats
         "infections_year_1", "infections_year_2", "infections_year_3", "infections_year_4", "infections_year_5",
-        "colonizations_year_1", "colonizations_year_2", "colonizations_year_3", "colonizations_year_4", "colonizations_year_5";
+        "colonizations_year_1", "colonizations_year_2", "colonizations_year_3", "colonizations_year_4", "colonizations_year_5",
+        "new_infections_year_1", "new_infections_year_2", "new_infections_year_3", "new_infections_year_4", "new_infections_year_5",
+        "new_colonizations_year_1", "new_colonizations_year_2", "new_colonizations_year_3", "new_colonizations_year_4", "new_colonizations_year_5";
   }
 }
 
@@ -299,7 +300,7 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
   RepastProcess::init(config, &sub);
 
   // Write INPUT parameters (in case of crash)
-  writePropertiesFromAllProcesses(props, "mrsa_model_INPUT.csv");
+  writePropertiesFromAllProcesses(props, "output/mrsa_model_INPUT.csv");
 
 	try {
 		// create a simulation runner to run the MRSA model.
@@ -318,7 +319,7 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 		props.putProperty("run.time", timer.stop());
 
 		// Write out properties and output
-	  writePropertiesFromAllProcesses(props, "mrsa_model_OUTPUT.csv", true);
+	  writePropertiesFromAllProcesses(props, "output/mrsa_model_OUTPUT.csv", true);
 	}
 	catch (std::exception& exp) {
 		// catch any exception (e.g. if data files couldn't be opened) and
