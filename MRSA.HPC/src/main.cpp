@@ -47,6 +47,11 @@ void usage() {
 void setPropertiesForSweep(Properties& props, int sweepIndex){
   boost::mpi::communicator world;
 
+  std::stringstream ss;
+  ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
+  props.putProperty("random.seed", ss.str());
+
+
   float aVals[3] = { 1.92e-05f, 2.59e-05f, 3.25e-05f};
   float bVals[3] = { 2.31e-05f, 2.58e-05f, 2.85e-04f};
   float eVals[3] = { 1.53e-05f, 2.40e-05f, 6.69e-05f};
@@ -61,9 +66,6 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
           props.putProperty("b", bVals[j]);
           props.putProperty("e", eVals[k]);
 
-          std::stringstream ss;
-          ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
-          props.putProperty("random.seed", ss.str());
           return;
         }
         c++;
