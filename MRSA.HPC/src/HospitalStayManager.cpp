@@ -5,6 +5,7 @@
  *      Author: nick
  */
 
+#include <utility>
 #include <repast_hpc/Random.h>
 
 #include "HospitalStayManager.h"
@@ -13,7 +14,7 @@ namespace mrsa {
 
 HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2_length,
 		unsigned int y3_length, unsigned int y4_length, unsigned int y5_length) : IHospitalStayManager(),
-				stays(), duration(0), start_day(0) {
+				stays(10, std::make_pair(0u, 0u)), duration(0), start_day(0) {
 
 	stays.push_back(std::pair<unsigned int, unsigned int>
 			((unsigned int)repast::Random::instance()->createUniIntGenerator(1, 365 - y1_length).next(), y1_length));
@@ -25,8 +26,6 @@ HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2
 				((unsigned int)repast::Random::instance()->createUniIntGenerator(1, 365 - y4_length).next(), y4_length));
 	stays.push_back(std::pair<unsigned int, unsigned int>
 				((unsigned int)repast::Random::instance()->createUniIntGenerator(1, 365 - y5_length).next(), y5_length));
-
-
 }
 
 HospitalStayManager::~HospitalStayManager() {
