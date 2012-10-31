@@ -52,23 +52,27 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
   props.putProperty("random.seed", ss.str());
 
 
-  float aVals[3] = { 1.92e-05f, 2.59e-05f, 3.25e-05f};
-  float bVals[3] = { 2.31e-05f, 2.58e-05f, 2.85e-04f};
-  float eVals[3] = { 1.53e-05f, 2.40e-05f, 6.69e-05f};
+  int   iicVals[3] = { 49, 123, 500 };
+  float aVals[3]   = { 1.92e-05f, 2.59e-05f, 3.25e-05f};
+  float bVals[3]   = { 2.31e-05f, 2.58e-05f, 2.85e-04f};
+  float eVals[3]   = { 1.53e-05f, 2.40e-05f, 6.69e-05f};
 
   int c = 0;
-  for(int i = 0; i < 3; i++){
-    for(int j = 0; j < 3; j++){
-      for(int k = 0; k < 3; k++){
-        if(c == sweepIndex){
-          // Set Properties here
-          props.putProperty("a", aVals[i]);
-          props.putProperty("b", bVals[j]);
-          props.putProperty("e", eVals[k]);
+  for(int ii = 0; ii < 3; ii++){
+    for(int i = 0; i < 3; i++){
+      for(int j = 0; j < 3; j++){
+        for(int k = 0; k < 3; k++){
+          if(c == sweepIndex){
+            // Set Properties here
+            props.putProperty("initial.infected.count", iicVals[ii]);
+            props.putProperty("a", aVals[i]);
+            props.putProperty("b", bVals[j]);
+            props.putProperty("e", eVals[k]);
 
-          return;
+            return;
+          }
+          c++;
         }
-        c++;
       }
     }
   }
@@ -84,7 +88,7 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "seek.and.destroy.at", "seek.and.destroy.cure.fraction",
 
         // Input files:
-        "persons.file", "places.file", "activities.file",
+        "persons.file", "places.file", "activities.file", "risk.file",
 
         // Output files:
         "hourly.output.file", "yearly.output.file", "summary.output.file",
@@ -118,8 +122,8 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "Prison_0_PAR",       "Prison_0_TIP",       "Prison_0_AIP",
         "Prison_1_PAR",       "Prison_1_TIP",       "Prison_1_AIP",
 
-        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP"
-        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP"
+        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP",
+        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP",
 
 
         // Spatial for ReLogo
@@ -135,7 +139,7 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "seek.and.destroy.at", "seek.and.destroy.cure.fraction",
 
         // Input files:
-        "persons.file", "places.file", "activities.file",
+        "persons.file", "places.file", "activities.file", "risk.file",
 
         // Output files:
         "hourly.output.file", "yearly.output.file", "summary.output.file",
@@ -169,8 +173,8 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "Prison_0_PAR",       "Prison_0_TIP",       "Prison_0_AIP",
         "Prison_1_PAR",       "Prison_1_TIP",       "Prison_1_AIP",
 
-        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP"
-        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP"
+        "College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP",
+        "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP",
 
         // Spatial for ReLogo
         "min.x", "min.y", "max.x", "max.y",
@@ -204,23 +208,26 @@ void writePropertiesFromAllProcesses(Properties& props, std::string fileName, bo
     keyIter++;
   }
 
-  std::vector<std::map<std::string, std::string> > rec;
   boost::mpi::communicator world;
-  boost::mpi::gather(world, map, rec, 0);
-
-  std::vector<std::string> keysToWrite;
-  getKeysToWrite(keysToWrite, includeOutput);
-
-  for(size_t i = 0; i < rec.size(); i++){
-    Properties outProps;
-    std::map<std::string, std::string> recdMap = rec[i];
-    for(std::map<std::string, std::string>::iterator iter = recdMap.begin(); iter != recdMap.end(); iter++){
-      outProps.putProperty(iter->first, iter->second);
-    }
-    outProps.log("root");
-    outProps.writeToSVFile(fileName, keysToWrite);
+  if(world.rank() != 0){
+    boost::mpi::gather(world, map, 0);
   }
+  else{
+    std::vector<std::map<std::string, std::string> > rec;
+    boost::mpi::gather(world, map, rec, 0);
 
+    std::vector<std::string> keysToWrite;
+    getKeysToWrite(keysToWrite, includeOutput);
+    for(size_t i = 0; i < rec.size(); i++){
+      Properties outProps;
+      std::map<std::string, std::string> recdMap = rec[i];
+      for(std::map<std::string, std::string>::iterator iter = recdMap.begin(); iter != recdMap.end(); iter++){
+        outProps.putProperty(iter->first, iter->second);
+      }
+      outProps.log("root");
+      outProps.writeToSVFile(fileName, keysToWrite);
+    }
+  }
 }
 
 
@@ -290,16 +297,21 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 
 	// add process count property
 	props.putProperty("process.count", world.size());
+	if(!props.contains("run.number")) props.putProperty("run.number", -1);
 
-	int sweepIndex = 0;
-	if(props.contains("BaseSweepNumber")) sweepIndex = strToInt(props.getProperty("BaseSweepNumber")) + world.rank();
+	boost::mpi::communicator sub;
+	if(props.contains("DoParameterSweeps")){
+    int sweepIndex = 0;
+    if(props.contains("BaseSweepNumber")) sweepIndex = strToInt(props.getProperty("BaseSweepNumber")) + world.rank();
 
-  props.putProperty("run.number", sweepIndex);
-  setPropertiesForSweep(props, sweepIndex);
+    props.putProperty("run.number", sweepIndex);
+    setPropertiesForSweep(props, sweepIndex);
 
-  // Create SUBCOMMUNICATORS for all ranks
-  boost::mpi::communicator sub = world.split(world.rank());
-  RepastProcess::init(config, &sub);
+    // Create SUBCOMMUNICATORS for all ranks
+    sub = world.split(world.rank());
+	}
+
+	RepastProcess::init(config, &sub);
 
   // Write INPUT parameters (in case of crash)
   writePropertiesFromAllProcesses(props, "output/mrsa_model_INPUT.csv");
