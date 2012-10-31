@@ -31,7 +31,7 @@ const int RISK_PLACE_TYPE_IDX = 0;
 const int RISK_ACT_TYPE_IDX = 1;
 const int RISK_PAR_IDX = 2;
 const int RISK_TIP_IDX = 3;
-const int RISK_AIP_IDX = 3;
+const int RISK_AIP_IDX = 4;
 
 PlaceCreator::PlaceCreator() {
 }
