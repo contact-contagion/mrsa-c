@@ -53,27 +53,23 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
   ss << std::fixed << ((world.rank()+ 1) * (rand() % 3727));
   props.putProperty("random.seed", ss.str());
 
-  int   iicVals[3] = { 49, 123, 500 };
-  float aVals[3]   = { 1.92e-05f, 2.59e-05f, 3.25e-05f};
-  float bVals[3]   = { 2.31e-05f, 2.58e-05f, 2.85e-04f};
-  float eVals[3]   = { 1.53e-05f, 2.40e-05f, 6.69e-05f};
+  std::vector<float> aVals, bVals, eVals;
+  aVals += 2.05e-05f, 2.18e-05f, 2.31e-05f, 2.44e-05f;
+  bVals += 2.38e-05f, 2.45e-05f, 2.52e-05f, 2.65e-05f, 2.72e-05f, 2.79e-05f, 3.40e-05f, 4.00e-05f;
+  eVals += 3.26e-05f, 4.12e-05f, 4.98e-05f, 5.84e-05;
 
   int c = 0;
-  for(int ii = 0; ii < 3; ii++){
-    for(int i = 0; i < 3; i++){
-      for(int j = 0; j < 3; j++){
-        for(int k = 0; k < 3; k++){
-          if(c == sweepIndex){
-            // Set Properties here
-            props.putProperty("initial.infected.count", iicVals[ii]);
-            props.putProperty("a", aVals[i]);
-            props.putProperty("b", bVals[j]);
-            props.putProperty("e", eVals[k]);
-
-            return;
-          }
-          c++;
+  for(size_t i = 0; i < aVals.size(); i++){
+    for(size_t j = 0; j < bVals.size(); j++){
+      for(size_t k = 0; k < eVals.size(); k++){
+        if(c == sweepIndex){
+          // Set Properties here
+          props.putProperty("a", aVals[i]);
+          props.putProperty("b", bVals[j]);
+          props.putProperty("e", eVals[k]);
+          return;
         }
+        c++;
       }
     }
   }
