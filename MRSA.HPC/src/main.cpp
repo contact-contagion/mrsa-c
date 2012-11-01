@@ -28,7 +28,7 @@ const int RISK_PLACE_TYPE_IDX = 0;
 const int RISK_ACT_TYPE_IDX = 1;
 const int RISK_PAR_IDX = 2;
 const int RISK_TIP_IDX = 3;
-const int RISK_AIP_IDX = 3;
+const int RISK_AIP_IDX = 4;
 
 
 static const int countOfInputRecordValues  = 30;
@@ -47,10 +47,11 @@ void usage() {
 void setPropertiesForSweep(Properties& props, int sweepIndex){
   boost::mpi::communicator world;
 
+  srand((int)(time(NULL) * world.rank()));
+  for(int i = 0; i < world.rank(); i++) rand();
   std::stringstream ss;
-  ss << std::fixed << (time(NULL) + (world.rank() + 5) * 7327);
+  ss << std::fixed << ((world.rank()+ 1) * (rand() % 3727));
   props.putProperty("random.seed", ss.str());
-
 
   int   iicVals[3] = { 49, 123, 500 };
   float aVals[3]   = { 1.92e-05f, 2.59e-05f, 3.25e-05f};
@@ -297,24 +298,36 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 
 	// add process count property
 	props.putProperty("process.count", world.size());
-	if(!props.contains("run.number")) props.putProperty("run.number", -1);
 
 	boost::mpi::communicator sub;
-	if(props.contains("DoParameterSweeps")){
-    int sweepIndex = 0;
-    if(props.contains("BaseSweepNumber")) sweepIndex = strToInt(props.getProperty("BaseSweepNumber")) + world.rank();
+	if(props.contains("do.parameter.sweeps")){
+    int sweepIndex = world.rank();
+    if(props.contains("base.sweep.number")) sweepIndex += strToInt(props.getProperty("base.sweep.number"));
 
-    props.putProperty("run.number", sweepIndex);
+    // If a 'run.number' is provided, use it.
+    if(!props.contains("run.number")){
+      // If not, calculate from sweep index
+      // If a 'base.run.number' is provided, start from there, otherwise start from 0
+      int baseRunNumber = 0;
+      if(props.contains("base.run.number")) baseRunNumber = strToInt(props.getProperty("base.run.number"));
+      props.putProperty("run.number", baseRunNumber + sweepIndex);
+    }
+
+    // Set properties specific to this run
     setPropertiesForSweep(props, sweepIndex);
-
     // Create SUBCOMMUNICATORS for all ranks
     sub = world.split(world.rank());
 	}
 
+	if(!props.contains("run.number")) props.putProperty("run.number", -1);
 	RepastProcess::init(config, &sub);
 
   // Write INPUT parameters (in case of crash)
-  writePropertiesFromAllProcesses(props, "output/mrsa_model_INPUT.csv");
+	std::string inputRecordLocation =
+	    (props.contains("input.record.location") ? props.getProperty("input.record.location") : "output/mrsa_model_INPUT.csv");
+  writePropertiesFromAllProcesses(props, inputRecordLocation);
+
+
 
 	try {
 		// create a simulation runner to run the MRSA model.
@@ -333,7 +346,11 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 		props.putProperty("run.time", timer.stop());
 
 		// Write out properties and output
-	  writePropertiesFromAllProcesses(props, "output/mrsa_model_OUTPUT.csv", true);
+		std::string outputRecordLocation =
+		      (props.contains("output.record.location") ? props.getProperty("output.record.location") : "output/mrsa_model_OUTPUT.csv");
+		  writePropertiesFromAllProcesses(props, inputRecordLocation);
+
+	  writePropertiesFromAllProcesses(props, outputRecordLocation, true);
 	}
 	catch (std::exception& exp) {
 		// catch any exception (e.g. if data files couldn't be opened) and
