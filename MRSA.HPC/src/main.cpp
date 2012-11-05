@@ -53,26 +53,72 @@ void setPropertiesForSweep(Properties& props, int sweepIndex){
   ss << std::fixed << ((world.rank()+ 1) * (rand() % 3727));
   props.putProperty("random.seed", ss.str());
 
-  std::vector<float> aVals, bVals, eVals;
-  aVals += 2.05e-05f, 2.18e-05f, 2.31e-05f, 2.44e-05f;
-  bVals += 2.38e-05f, 2.45e-05f, 2.52e-05f, 2.65e-05f, 2.72e-05f, 2.79e-05f, 3.40e-05f, 4.00e-05f;
-  eVals += 3.26e-05f, 4.12e-05f, 4.98e-05f, 5.84e-05;
+//  std::vector<float> aVals, bVals, eVals;
+//  aVals += 2.05e-05f, 2.18e-05f, 2.31e-05f, 2.44e-05f;
+//  bVals += 2.38e-05f, 2.45e-05f, 2.52e-05f, 2.65e-05f, 2.72e-05f, 2.79e-05f, 3.40e-05f, 4.00e-05f;
+//  eVals += 3.26e-05f, 4.12e-05f, 4.98e-05f, 5.84e-05;
+//
+//  int c = 0;
+//  for(size_t i = 0; i < aVals.size(); i++){
+//    for(size_t j = 0; j < bVals.size(); j++){
+//      for(size_t k = 0; k < eVals.size(); k++){
+//        if(c == sweepIndex){
+//          // Set Properties here
+//          props.putProperty("a", aVals[i]);
+//          props.putProperty("b", bVals[j]);
+//          props.putProperty("e", eVals[k]);
+//          return;
+//        }
+//        c++;
+//      }
+//    }
+//  }
 
-  int c = 0;
-  for(size_t i = 0; i < aVals.size(); i++){
-    for(size_t j = 0; j < bVals.size(); j++){
-      for(size_t k = 0; k < eVals.size(); k++){
-        if(c == sweepIndex){
-          // Set Properties here
-          props.putProperty("a", aVals[i]);
-          props.putProperty("b", bVals[j]);
-          props.putProperty("e", eVals[k]);
-          return;
-        }
-        c++;
+  if(props.contains("SWEEP")){
+    std::string sweepList = props.getProperty("SWEEP");
+    std::vector<std::string> list;
+    boost::split(list, sweepList, boost::is_any_of(","));
+    int* sizes = new int[list.size()];
+    int* index = new int[list.size()];
+    std::vector<std::vector<std::string> > valArray;
+    for(int i = 0; i < list.size(); i++){
+      sizes[i] = 1;
+      index[i] = 0;
+      if(props.contains(list[i])){
+        std::string valList = props.getProperty(list[i]);
+        std::vector<std::string> vals;
+        boost::split(vals, valList, boost::is_any_of(","));
+        valArray.push_back(vals);
       }
     }
+    for(int i = list.size() - 2; i >=0; i--) sizes[i] = valArray[i + 1].size() * sizes[i+1];
+
+    if(sweepIndex < sizes[0] * valArray[0].size()){ // If sweepIndex is beyond sweeps, ignore
+      for(int i = 0; i < list.size(); i++){
+        index[i] = sweepIndex/sizes[i];
+        sweepIndex -= (index[i] * sizes[i]);
+      }
+
+      for(int i = 0; i < list.size(); i++){
+        std::cout << "rank: " << world.rank() << " i " << i << " sizes[i] " << sizes[i] << " value: " << valArray[i][index[i]] << std::endl;
+        props.putProperty(list[i], valArray[i][index[i]]);
+      }
+    }
+    delete sizes;
+    delete index;
   }
+
+
+  // Get the property. If it begins with 'SWEEP'
+  // Split the property
+  // Create a new vector
+  // Add all elements in split to vector (Except first)
+  // Add to map with property name, vector
+
+  // Create two arrays
+  //
+
+
 }
 
 void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
@@ -311,6 +357,7 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 
     // Set properties specific to this run
     setPropertiesForSweep(props, sweepIndex);
+
     // Create SUBCOMMUNICATORS for all ranks
     sub = world.split(world.rank());
 	}
