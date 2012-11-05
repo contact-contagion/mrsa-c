@@ -344,8 +344,6 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 		// Write out properties and output
 		std::string outputRecordLocation =
 		      (props.contains("output.record.location") ? props.getProperty("output.record.location") : "output/mrsa_model_OUTPUT.csv");
-		  writePropertiesFromAllProcesses(props, inputRecordLocation);
-
 	  writePropertiesFromAllProcesses(props, outputRecordLocation, true);
 	}
 	catch (std::exception& exp) {
