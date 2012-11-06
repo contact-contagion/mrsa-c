@@ -301,6 +301,7 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 					new DDataSourceAdapter(&stats->yearly_colonization_duration),
 					std::plus<double>()));
 
+	/*
 	builder.addDataSource(
 			repast::createSVDataSource("infected_r0",
 					new DDataSourceAdapter(&stats->yearly_infected_r0), std::plus<double>()));
@@ -308,6 +309,7 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 	builder.addDataSource(
 			repast::createSVDataSource("colonized_r0",
 					new DDataSourceAdapter(&stats->yearly_colonized_r0), std::plus<double>()));
+	*/
 
 	builder.addDataSource(
 			repast::createSVDataSource("hospital_colonization_incidence",

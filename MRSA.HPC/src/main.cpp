@@ -232,8 +232,10 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "colonizations",
         "total_from_infection",
         "total_from_colonization",
+        /*
         "avg_infected_r0",
         "avg_colonized_r0",
+        */
 
         // By Year Stats
         "infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4", "infections_incidence_year_5",

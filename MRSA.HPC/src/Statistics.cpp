@@ -337,16 +337,20 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 			<< "avg. infection duration: " << averages.yearly_infection_duration / averages.count
 			<< std::endl << "avg. colonization duration: "
 			<< averages.yearly_colonization_duration / averages.count << std::endl
+			/*
 			<< "avg. infected_r0: " << (averages.yearly_infected_r0 / averages.count) << std::endl
 			<< "avg. colonized_r0: " << (averages.yearly_colonized_r0 / averages.count) << std::endl
+			*/
 			<< std::endl;
 
 	props.putProperty("total_infections", total_infected);
 	props.putProperty("colonizations", total_colonized);
 	props.putProperty("total_from_infection", total_c_from_i);
 	props.putProperty("total_from_colonization", total_c_from_c);
+	/*
 	props.putProperty("avg_infected_r0", (averages.yearly_infected_r0 / averages.count));
 	props.putProperty("avg_colonized_r0", (averages.yearly_colonized_r0 / averages.count));
+	*/
 
 	for (ConstHistIter iter = infection_hist.begin(); iter != infection_hist.end(); ++iter) {
 		out << "" << iter->second << " persons infected " << iter->first << " times" << std::endl;
