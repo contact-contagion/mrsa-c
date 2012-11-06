@@ -93,7 +93,7 @@ public:
 
 
 private:
-	float min_infection_duration_, default_infection_duration_;
+	float min_infection_duration_; // default_infection_duration_;
 	// records the time at which a status change occured, the
 	// total time spent infected, and the total time spent colonized.
 	unsigned int timestamp;
