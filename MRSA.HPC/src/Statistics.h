@@ -81,7 +81,15 @@ public:
 		hospital_stays = 0;
 		hospital_stay_duration = 0;
 		hospital_infections = hospital_colonizations = 0;
+		colonization_from_infection_override = 0;
 	}
+
+	/**
+	 * Manually increment colonization from infection. This should
+	 * only be called when there isn't an actualy person to
+	 * tag as the cause of the infection.
+	 */
+	void incrementColonizationFromInfection();
 
 	/**
 	 * Set the initial counts using the specified AgentSet of persons.
@@ -175,6 +183,7 @@ private:
 	long hospital_stays;
 	double hospital_stay_duration;
 	double hospital_colonizations, hospital_infections;
+	long colonization_from_infection_override;
 
 	std::map<std::string, double> colonization_count_map;
 	std::map<std::string, double> infection_count_map;

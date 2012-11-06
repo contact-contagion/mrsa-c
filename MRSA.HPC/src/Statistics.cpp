@@ -75,7 +75,7 @@ Statistics::Statistics() :
 				0), yearly_seek_infection_duration(0), yearly_infection_duration(0), yearly_colonization_duration(
 				0), yearly_c_from_i(0), yearly_c_from_c(0), total_c_from_i(0), total_c_from_c(0), total_infected(
 				0), total_colonized(0), hospital_stays(0), hospital_stay_duration(0), hospital_colonizations(
-				0), hospital_infections(0), colonization_count_map(), infection_count_map(), averages() {
+				0), hospital_infections(0), colonization_from_infection_override(0), colonization_count_map(), infection_count_map(), averages() {
 }
 
 Statistics::~Statistics() {
@@ -83,6 +83,10 @@ Statistics::~Statistics() {
 
 void Statistics::incrementColonizationCount(const std::string& type) {
 	increment_map_count(colonization_count_map, type);
+}
+
+void Statistics::incrementColonizationFromInfection() {
+	++colonization_from_infection_override;
 }
 
 void Statistics::incrementInfectionCount(const std::string& type) {

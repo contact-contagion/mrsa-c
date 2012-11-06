@@ -47,14 +47,7 @@ void Hospital::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
 		Statistics::getInstance()->incrementColonizationCount(type_);
-		if (infected.size() > 0) {
-			// increment the pro-rated number of people colonized by the infectious
-			// persons in this place.
-			float colonizations_caused = 1.0f / infected.size();
-			for (PersonIter iter = infected.begin(); iter != infected.end(); ++iter) {
-				(*iter)->incrementColonizationsCaused(colonizations_caused);
-			}
-		}
+		//Statistics::getInstance()->incrementColonizationFromInfection();
 	}
 }
 
