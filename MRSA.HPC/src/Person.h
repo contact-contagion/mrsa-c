@@ -157,7 +157,7 @@ private:
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
-	float hospital_stay_start, hospital_stay_duration;
+	double entered_hospital_time;
 
 	/**
 	 * Changes this Person's place to the specified place.

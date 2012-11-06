@@ -2,7 +2,8 @@ random.seed = 1
 
 BaseSweepNumber = 0
 
-stop.at = 17520.5 
+stop.at = 17520.5
+#17520.5 
 #8760.5
 
 #persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 

@@ -11,7 +11,6 @@
 
 #include "PersonsCreator.h"
 #include "Constants.h"
-#include "NoStayManager.h"
 #include "HospitalStayManager.h"
 
 namespace mrsa {
@@ -38,7 +37,8 @@ shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 		float min_infection_duration) :
-		reader(file), places(map), min_infection_duration_(min_infection_duration) {
+		reader(file), places(map), min_infection_duration_(min_infection_duration),
+		no_stay_manager(new NoStayManager()){
 
 	init();
 }
@@ -46,7 +46,7 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_) {
+				creator.min_infection_duration_), no_stay_manager(new NoStayManager()) {
 	init();
 }
 
@@ -102,7 +102,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
-	shared_ptr<IHospitalStayManager> no_stay_manager(new NoStayManager());
+
 	// create the Person
 	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), min_infection_duration_);
 }

@@ -13,6 +13,7 @@
 #include "Household.h"
 #include "Parameters.h"
 #include "Constants.h"
+#include "Statistics.h"
 
 namespace mrsa {
 
@@ -23,10 +24,10 @@ using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
 		Places places, shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration) :
-		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(hosp_manager), tucaseid_weekday(
-				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
-				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), hospital_stay_start(0), hospital_stay_duration(0) {
+		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(
+				hosp_manager), tucaseid_weekday(vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(
+				vec[TUCASE_ID_WEEKEND_IDX]), relate(0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
+				min_infection_duration), entered_hospital_time(0) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -96,38 +97,12 @@ bool Person::initializeActivities(map<string, vector<Activity> >& map) {
 	return true;
 }
 
-//bool Person::hospitalCheck(int time) {
-//	bool retVal = false;
-//	if (hospital_stay_duration > 0.0f) {
-//		if (RepastProcess::instance()->getScheduleRunner().currentTick() - hospital_stay_start
-//				<= hospital_stay_duration) {
-//			changePlace(places_.hospital, 0);
-//			retVal = true;
-//
-//		} else {
-//			hospital_stay_duration = 0;
-//			hospital_stay_start = 0;
-//		}
-//	} else if (time == 0 && places_.hospital != 0) {
-//		// not in hosptial, start of day, so do check
-//		double val = Parameters::instance()->getDoubleParameter(HOSPITALIZED_PROBABILITY);
-//		if (Random::instance()->nextDouble() <= val) {
-//			hospital_stay_start = RepastProcess::instance()->getScheduleRunner().currentTick();
-//			hospital_stay_duration = repast::Random::instance()->getGenerator(
-//					HOSPITAL_STAY_DURATION)->next();
-//			// stay 5 hours at the least
-//			if (hospital_stay_duration <= 0) hospital_stay_duration = 5;
-//			changePlace(places_.hospital, 0);
-//			retVal = true;
-//		}
-//	}
-//	return retVal;
-//}
-
 // peform the activity for this time and day.
-void Person::performActivity(int time, int day_of_year, int year,  bool isWeekday) {
+void Person::performActivity(int time, int day_of_year, int year, bool isWeekday) {
 	if (hosp_manager_->inHospital(year, day_of_year) && places_.hospital != 0) {
-		//std::cout << (*this) << ": going to hospital on " << day_of_year << ", " << year << endl;
+		if (entered_hospital_time == 0) {
+			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
+		}
 		changePlace(places_.hospital, 0);
 	} else {
 		// iterate through the activity list and find the activity
@@ -155,7 +130,6 @@ void Person::performActivity(int time, int day_of_year, int year,  bool isWeekda
 			changePlace(act->selectPlace(places_), act->activityType());
 		}
 	}
-
 }
 
 void Person::incrementColonizationsCaused(float colonization_caused) {
@@ -186,6 +160,15 @@ void Person::changePlace(Place* place, int activity_type) {
 	if (place != 0) {
 		places_.current = place;
 	}
+
+	if (entered_hospital_time != 0 && (place == 0 || place->placeType() != HOSPITAL_TYPE)) {
+		Statistics::getInstance()->incrementHospitalStayCount();
+		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
+				- entered_hospital_time;
+		Statistics::getInstance()->incrementHospitalDurationCount(duration);
+		entered_hospital_time = 0;
+	}
+
 	// regardless of whether this Person has changed its
 	// current place, this method should only be called once
 	// per tick. Consequently, the current should have had its

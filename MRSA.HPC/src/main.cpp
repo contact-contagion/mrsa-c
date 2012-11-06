@@ -236,10 +236,16 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false){
         "avg_colonized_r0",
 
         // By Year Stats
-        "infections_year_1", "infections_year_2", "infections_year_3", "infections_year_4", "infections_year_5",
-        "colonizations_year_1", "colonizations_year_2", "colonizations_year_3", "colonizations_year_4", "colonizations_year_5",
-        "new_infections_year_1", "new_infections_year_2", "new_infections_year_3", "new_infections_year_4", "new_infections_year_5",
-        "new_colonizations_year_1", "new_colonizations_year_2", "new_colonizations_year_3", "new_colonizations_year_4", "new_colonizations_year_5";
+        "infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4", "infections_incidence_year_5",
+        "colonizations_incidence_year_1", "colonizations_incidence_year_2", "colonizations_incidence_year_3", "colonizations_incidence_year_4", "colonizations_incidence_year_5",
+        "infections_prevalence_year_1", "infections_prevalence_year_2", "infections_prevalence_year_3", "infections_prevalence_year_4", "infections_prevalence_year_5",
+        "colonizations_prevalence_year_1", "colonizations_prevalence_year_2", "colonizations_prevalence_year_3", "colonizations_prevalence_year_4", "colonizations_incidence_year_5",
+
+       "hospital_colonizations_year_1", "hospital_colonizations_year_2", "hospital_colonizations_year_3", "hospital_colonizations_year_4",
+       "hospital_colonizations_year_5",
+       "hospital_infections_year_1", "hospital_infections_year_2", "hospital_infections_year_3", "hospital_infections_year_4", "hospital_infections_year_5",
+       "hospital_stays_year_1", "hospital_stays_year_2", "hospital_stays_year_3", "hospital_stays_year_4", "hospital_stays_year_5",
+       "hospital_days_year_1", "hospital_days_year_2", "hospital_days_year_3", "hospital_days_year_4", "hospital_days_year_5";
   }
 }
 

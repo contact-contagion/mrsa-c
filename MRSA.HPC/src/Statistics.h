@@ -72,11 +72,15 @@ public:
 	 */
 	void resetYearlyStats() {
 		yearly_infected = yearly_colonized = 0;
-		yearly_new_infected = yearly_new_colonized = 0;
+		eoy_prevalence_infected = eoy_prevalence_colonized = 0;
 		yearly_c_from_c = yearly_c_from_i = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
 		colonization_count_map.clear();
+		infection_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
+		hospital_stays = 0;
+		hospital_stay_duration = 0;
+		hospital_infections = hospital_colonizations = 0;
 	}
 
 	/**
@@ -90,6 +94,25 @@ public:
 	 * Increments the colonization count for the specified place type.
 	 */
 	void incrementColonizationCount(const std::string& type);
+
+	/**
+	 * Increments the infection count for the specified place type.
+	 */
+	void incrementInfectionCount(const std::string& type);
+
+	/**
+	 * Increments the hospital stay count.
+	 */
+	void incrementHospitalStayCount() {
+		++hospital_stays;
+	}
+
+	/**
+	 * Increments the hospital stay duration count by the specified amount.
+	 */
+	void incrementHospitalDurationCount(double hours) {
+		hospital_stay_duration += hours;
+	}
 
 	/**
 	 * Counts the specified Person, incrementing
@@ -115,7 +138,8 @@ public:
 	 * @param people an AgentSet of the persons to use to calculate the summary stats
 	 * @param file the path of the file to write to
 	 */
-	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file, repast::Properties& props);
+	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file,
+			repast::Properties& props);
 
 private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;
@@ -140,7 +164,7 @@ private:
 	// in order to log them using RepastHPC data collection.
 	double yearly_infected_r0, yearly_colonized_r0, yearly_r0;
 	long yearly_infected, yearly_colonized;
-	long yearly_new_infected, yearly_new_colonized;
+	long eoy_prevalence_infected, eoy_prevalence_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
 	long yearly_c_from_i, yearly_c_from_c;
@@ -148,7 +172,12 @@ private:
 	long total_c_from_i, total_c_from_c;
 	double total_infected, total_colonized;
 
+	long hospital_stays;
+	double hospital_stay_duration;
+	double hospital_colonizations, hospital_infections;
+
 	std::map<std::string, double> colonization_count_map;
+	std::map<std::string, double> infection_count_map;
 	YearlyAvg averages;
 };
 
