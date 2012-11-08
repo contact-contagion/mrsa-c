@@ -14,7 +14,7 @@ persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv
 places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
 activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
 
-risk.file = ../data/risk.csv 
+risk.file = ../data/new_risk_file_102612.csv 
 
 hourly.output.file = ./output/hourly_data
 yearly.output.file = ./output/yearly_data
