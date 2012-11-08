@@ -83,15 +83,14 @@ DiseaseStatus TransmissionAlgorithm::runUncolonized(float risk_multiplier, unsig
 }
 
 // the algorithm for colonized persons.
-DiseaseStatus TransmissionAlgorithm::runColonized(float risk_multiplier) {
+DiseaseStatus TransmissionAlgorithm::runColonized(float b_risk_multiplier, float e_risk_multiplier) {
 	DiseaseStatus ret(COLONIZED);
-	//++attempts;
 	double draw = repast::Random::instance()->nextDouble();
-	if (draw <= (b_ * risk_multiplier)) {
+	if (draw <= (b_ * b_risk_multiplier)) {
 		// move from colonized to infected with a probability of b_
 		ret = INFECTED;
 		++newly_infected;
-	} else if (draw <= e_ + (b_ * risk_multiplier))
+	} else if (draw <= (e_ * e_risk_multiplier) + (b_ * b_risk_multiplier))
 		// move from colonized to infected with a probability of e_
 		// we already tested for <= b_ so only get here if > b_ but
 		// <= e_.

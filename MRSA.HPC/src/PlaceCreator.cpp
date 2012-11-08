@@ -32,6 +32,7 @@ const int RISK_ACT_TYPE_IDX = 1;
 const int RISK_PAR_IDX = 2;
 const int RISK_TIP_IDX = 3;
 const int RISK_AIP_IDX = 4;
+const int RISK_X_IDX = 5;
 
 PlaceCreator::PlaceCreator() {
 }
@@ -39,13 +40,15 @@ PlaceCreator::PlaceCreator() {
 PlaceCreator::~PlaceCreator() {
 }
 
-void setRisk(Risk& risk, int act_type, float a, float b) {
+void setRisk(Risk& risk, int act_type, float a, float b, float x) {
 	if (act_type == 0) {
 		risk.a0_ = a;
 		risk.b0_ = b;
+		risk.x0_ = x;
 	} else {
 		risk.a1_ = a;
 		risk.b1_ = b;
+		risk.x1_ = x;
 	}
 }
 
@@ -100,21 +103,25 @@ void loadRisk(Properties& props, std::map<string, Risk>& map) {
       std::stringstream PARname; PARname << typeProp << "_" << j << "_PAR";
       std::stringstream TIPname; TIPname << typeProp << "_" << j << "_TIP";
       std::stringstream AIPname; AIPname << typeProp << "_" << j << "_AIP";
+      std::stringstream Xname; Xname << typeProp << "_" << j << "_X";
 
       float par = (float) repast::strToDouble(props.getProperty(PARname.str()));
       float tip = (float) repast::strToDouble(props.getProperty(TIPname.str()));
       float aip = (float) repast::strToDouble(props.getProperty(AIPname.str()));
+      float x = (float) repast::strToDouble(props.getProperty(Xname.str()));
 
       // lower case the type for easier, less error prone comparisons
       std::transform(type.begin(), type.end(), type.begin(), ::tolower);
       std::map<string, Risk>::iterator iter = map.find(type);
       if (iter == map.end()) {
         Risk risk;
-        setRisk(risk, j, par * tip, aip);
+        setRisk(risk, j, par * tip, aip, x);
         map.insert(std::make_pair(type, risk));
+        //std::cout << type << " " << j <<  ": par = " << par << ", tip = " << tip << ", aip = " << aip << ", x = " << x << std::endl;
       } else {
         Risk& risk = iter->second;
-        setRisk(risk, j, par * tip, aip);
+        setRisk(risk, j, par * tip, aip, x);
+        //std::cout << type << j << ": par = " << par << ", tip = " << tip << ", aip = " << aip << ", x = " << x << std::endl;
       }
     }
   }

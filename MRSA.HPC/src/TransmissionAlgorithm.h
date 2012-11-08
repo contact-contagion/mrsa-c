@@ -73,7 +73,7 @@ public:
 	 * Run the transmission algorithm for a colonized person, returning the result as a
 	 * DiseaseStatus.
 	 */
-	DiseaseStatus runColonized(float risk_multiplier);
+	DiseaseStatus runColonized(float b_risk_multiplier, float e_risk_multiplier);
 
 	/**
 	 * Run the transmission algorithm for an initially infected person.

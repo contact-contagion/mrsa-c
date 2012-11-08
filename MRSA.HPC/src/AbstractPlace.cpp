@@ -89,12 +89,18 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 }
 
 void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) {
-	float risk_multiplier = 1;
-	if (activity_type_ == 0) risk_multiplier = risk_.b0_;
-	else risk_multiplier = risk_.b1_;
+	float b_risk_multiplier = 1, e_risk_multiplier = 1;
+	if (activity_type_ == 0) {
+		b_risk_multiplier = risk_.b0_;
+		e_risk_multiplier = risk_.x0_;
+	}
+	else {
+		b_risk_multiplier = risk_.b1_;
+		e_risk_multiplier = risk_.x1_;
+	}
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
-	person->updateStatus(ta->runColonized(risk_multiplier));
+	person->updateStatus(ta->runColonized(b_risk_multiplier, e_risk_multiplier));
 }
 
 } /* namespace mrsa */

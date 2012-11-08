@@ -19,16 +19,17 @@ struct Risk {
 	// a risk multiplier for activity type 0 and activity type 1
 	float a0_, a1_;
 	float b0_, b1_;
+	float x0_, x1_;
 
 	Risk() : a0_(1), a1_(1),
-			b0_(1), b1_(1) {}
+			b0_(1), b1_(1), x0_(1), x1_(1) {}
 
 
-	Risk(float a0, float a1, float b0, float b1) : a0_(a0), a1_(a1),
-			b0_(b0), b1_(b1) {}
+	Risk(float a0, float a1, float b0, float b1, float x0, float x1) : a0_(a0), a1_(a1),
+			b0_(b0), b1_(b1), x0_(x0), x1_(x1) {}
 
 	Risk(const Risk& r) : a0_(r.a0_), a1_(r.a1_),
-			b0_(r.b0_), b1_(r.b1_) {}
+			b0_(r.b0_), b1_(r.b1_), x0_(r.x0_), x1_(r.x1_) {}
 
 };
 
