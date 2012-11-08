@@ -307,15 +307,18 @@ void loadRisks(Properties& props) {
 
     std::stringstream PAR;
     PAR << type << "_" << act_type << "_PAR";
-    props.putProperty(PAR.str(), (float) repast::strToDouble(vec[RISK_PAR_IDX]));
+    if(!props.contains(PAR.str()))
+        props.putProperty(PAR.str(), (float) repast::strToDouble(vec[RISK_PAR_IDX]));
 
     std::stringstream TIP;
     TIP << type << "_" << act_type << "_TIP";
-    props.putProperty(TIP.str(), (float) repast::strToDouble(vec[RISK_TIP_IDX]));
+    if(!props.contains(TIP.str()))
+        props.putProperty(TIP.str(), (float) repast::strToDouble(vec[RISK_TIP_IDX]));
 
     std::stringstream AIP;
     AIP << type << "_" << act_type << "_AIP";
-    props.putProperty(AIP.str(), (float) repast::strToDouble(vec[RISK_AIP_IDX]));
+    if(!props.contains(AIP.str()))
+        props.putProperty(AIP.str(), (float) repast::strToDouble(vec[RISK_AIP_IDX]));
 
     props.putProperty("place.types", placeNames.str());
 
