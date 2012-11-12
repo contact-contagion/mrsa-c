@@ -43,9 +43,14 @@ HospitalStayManager::~HospitalStayManager() {
 
 bool HospitalStayManager::inHospital(int year, int day) {
 	bool ret_val = false;
+
+//	if (debug) {
+//		std::cout << "year: " << year << ", day: " << day;
+//		std::cout << ", start_day " << start_day << ", duration: " << duration;
+//	}
 	if (duration > 0) {
 		// currently in hospital. check if should leave.
-		bool ret_val = day - start_day < duration;
+		ret_val = (day - start_day) < duration;
 		if (!ret_val) {
 			duration = 0;
 			start_day = 0;
@@ -60,8 +65,8 @@ bool HospitalStayManager::inHospital(int year, int day) {
 		}
 	}
 
+//	if (debug) std::cout << ", ret val: " << ret_val << std::endl;
 	return ret_val;
-
 }
 
 } /* namespace mrsa */

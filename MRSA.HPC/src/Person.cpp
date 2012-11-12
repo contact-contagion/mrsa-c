@@ -99,6 +99,9 @@ bool Person::initializeActivities(map<string, vector<Activity> >& map) {
 
 // peform the activity for this time and day.
 void Person::performActivity(int time, int day_of_year, int year, bool isWeekday) {
+//	if (personId() == "5511519") {
+//		has 7 days in hospital so good for testing hosp code.
+//	}
 	if (hosp_manager_->inHospital(year, day_of_year) && places_.hospital != 0) {
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
