@@ -3,7 +3,7 @@
 
 #include <map>
 
-#include "relogo/AgentSet.h"=
+#include "relogo/AgentSet.h"
 #include "repast_hpc/TDataSource.h"
 
 #include "Person.h"

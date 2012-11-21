@@ -11,8 +11,8 @@
 #include "relogo/Observer.h"
 #include "repast_hpc/Properties.h"
 
-#include "Place.h";
-#include "Person.h";
+#include "Place.h"
+#include "Person.h"
 #include "Statistics.h"
 
 namespace mrsa {
