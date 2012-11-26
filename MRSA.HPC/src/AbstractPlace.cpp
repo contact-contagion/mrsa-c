@@ -100,7 +100,10 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	}
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
-	person->updateStatus(ta->runColonized(b_risk_multiplier, e_risk_multiplier));
+	DiseaseStatus status = ta->runColonized(b_risk_multiplier, e_risk_multiplier);
+	person->updateStatus(status);
+	if (status == INFECTED)
+		Statistics::getInstance()->incrementInfectionCount(type_);
 }
 
 } /* namespace mrsa */
