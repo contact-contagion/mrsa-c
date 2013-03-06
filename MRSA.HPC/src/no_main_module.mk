@@ -1,5 +1,6 @@
 SOURCES = CSVReader.cpp \
 		  Parameters.cpp \
+		  Calendar.cpp \
           Activity.cpp \
           TransmissionAlgorithm.cpp \
           DiseaseStatusUpdater.cpp \

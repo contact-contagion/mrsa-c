@@ -13,6 +13,7 @@
 #include "repast_hpc/io.h"
 
 #include "MRSAObserver.h"
+#include "Calendar.h"
 #include "PersonsCreator.h"
 #include "PlaceCreator.h"
 #include "ActivityCreator.h"
@@ -43,29 +44,7 @@ int line_count(const std::string& file) {
 	return numLines;
 }
 
-Calendar::Calendar() :
-		hour_of_day(0), day_of_week(0), day_of_year(1), year(1) {
-}
 
-void Calendar::increment() {
-	++hour_of_day;
-	if (hour_of_day > 23) {
-		hour_of_day = 0;
-		++day_of_week;
-		if (day_of_week > 6) {
-			day_of_week = 0;
-		}
-		++day_of_year;
-		if (day_of_year > 365) {
-			day_of_year = 1;
-			++year;
-		}
-	}
-}
-
-bool Calendar::isWeekDay() {
-	return !(day_of_week == 0 || day_of_week == 6);
-}
 
 MRSAObserver::MRSAObserver() :
 		personType(0), places(0), people_(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(
@@ -103,8 +82,7 @@ void MRSAObserver::go() {
 	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		Person* person = (*people_)[i];
 		// perform the activity for the specified time and day_of_week
-		person->performActivity(calendar.hour_of_day, calendar.day_of_year, calendar.year,
-				calendar.isWeekDay());
+		person->performActivity(calendar);
 		// update the stats -- update the disease status counts
 		// with the status of the current person
 		stats->countPerson(person);
