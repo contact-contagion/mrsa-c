@@ -50,14 +50,14 @@ TransmissionEventRecorder::TransmissionEventRecorder(const std::string& filename
 		filepath = newName;
 	}
 	out.open(filepath.string().c_str());
-	out << "tick,person_id,place_id,place_type,event_type" << std::endl;
+	out << "tick,person_id,place_id,place_type,zip_code,event_type" << std::endl;
 	out.flush();
 }
 
 void TransmissionEventRecorder::recordEvent(double tick, Person* person, Place* place,
 		const std::string& event) {
 	out << tick << "," << person->personId() << "," << place->placeId() << "," << place->placeType()
-			<< "," << event << std::endl;
+			<< "," << person->zipCode() << "," << event << std::endl;
 }
 
 void TransmissionEventRecorder::close() {
