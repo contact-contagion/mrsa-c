@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 	// b is one so should always move from colonized to infected
 	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runColonized(1) == INFECTED);
+		BOOST_REQUIRE(ta->runColonized(1, 1) == INFECTED);
 	}
 
 	params.b = 0;
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(colonized) {
 	// b is 0 and e is one so should always return to uncolonized
 	ta = TransmissionAlgorithm::instance();
 	for (int i = 0; i < 2000; ++i) {
-		BOOST_REQUIRE(ta->runColonized(1) == UNCOLONIZED);
+		BOOST_REQUIRE(ta->runColonized(1, 1) == UNCOLONIZED);
 	}
 }
 
@@ -117,7 +117,8 @@ void deletePlaces(std::vector<Place*>& places) {
 
 void createPersons(Observer* obs, AgentSet<Person>& persons, std::vector<Place*>& places, int count = 14) {
 	PlaceCreator creator;
-	creator.run("../test_data/places.csv", "../data/risk.csv", places);
+	Properties props("../config/model.props");
+	creator.run("../test_data/places.csv", props, places);
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
 		Place* place = places[i];
@@ -320,13 +321,17 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 	std::vector<Place*> places;
 	createPersons(obs, persons, places);
 
+	Calendar cal;
+
+
 	// no matter the time or the day, should be at home as
 	// no activities.
 	for (ASIter iter = persons.begin(); iter != persons.end(); ++iter) {
 		Person* p = (*iter);
 		p->goToHome();
 		for (int i = 0; i <= 24; ++i) {
-			p->performActivity(i, true);
+			cal.hour_of_day = i;
+			p->performActivity(cal);
 			BOOST_REQUIRE_EQUAL(p->currentPlace()->placeType(), "household");
 		}
 	}
@@ -349,22 +354,32 @@ BOOST_AUTO_TEST_CASE(activity_test) {
 	BOOST_REQUIRE(p1 != 0);
 	BOOST_REQUIRE(p2 != 0);
 
-	p1->performActivity(14, true);
+	cal.hour_of_day = 14;
+	p1->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "school");
+
 	// gone back home
-	p1->performActivity(17, true);
+	cal.hour_of_day = 17;
+	p1->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "household");
+
 	// go to work
-	p1->performActivity(19, true);
+	cal.hour_of_day = 19;
+	p1->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p1->currentPlace()->placeType(), "workplace");
 
-	p2->performActivity(14, false);
+	cal.hour_of_day = 14;
+	p2->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "school");
+
 	// gone back home
-	p2->performActivity(17, false);
+	cal.hour_of_day = 17;
+	p2->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "household");
+
 	// go to work
-	p2->performActivity(19, false);
+	cal.hour_of_day = 19;
+	p2->performActivity(cal);
 	BOOST_REQUIRE_EQUAL(p2->currentPlace()->placeType(), "workplace");
 
 	deletePlaces(places);

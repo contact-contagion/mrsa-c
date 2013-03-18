@@ -7,6 +7,7 @@
 #include "../src/PersonsCreator.h"
 #include "../src/ActivityCreator.h"
 #include "../src/Person.h"
+#include "../src/utility.h"
 
 #include "ObserverSetup.h"
 
@@ -25,7 +26,8 @@ BOOST_FIXTURE_TEST_SUITE(creator_tests, ObserverSetup);
 BOOST_AUTO_TEST_CASE(place_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", "../data/risk.csv", places);
+	Properties props("../config/model.props");
+	creator.run("../test_data/places.csv", props, places);
 
 	BOOST_REQUIRE_EQUAL(places.size(), (size_t)13);
 
@@ -47,7 +49,8 @@ BOOST_AUTO_TEST_CASE(place_creator) {
 BOOST_AUTO_TEST_CASE(people_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", "../data/risk.csv", places);
+	Properties props("../config/model.props");
+	creator.run("../test_data/places.csv", props, places);
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
 		Place* place = places[i];
