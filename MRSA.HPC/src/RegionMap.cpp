@@ -37,7 +37,7 @@ RegionMap::RegionMap() :
 	}
 
 	for (int i = 0; i < 13; ++i) {
-		region_map.insert(std::pair<unsigned int, char>(E_ZIPS[i], 'E'));
+		region_map.insert(std::pair<unsigned int, char>(E_ZIPS[i], 'C'));
 	}
 
 	for (int i = 0; i < 19; ++i) {
@@ -56,6 +56,19 @@ const char RegionMap::region(const unsigned int zip_code) {
 		throw std::invalid_argument(ss.str());
 	}
 	return iter->second;
+}
+
+void RegionMap::regions(std::vector<char>& out) {
+	out.push_back('N');
+	out.push_back('S');
+	out.push_back('W');
+	out.push_back('C');
+}
+
+void RegionMap::zipCodes(std::vector<unsigned int>& out) {
+	for (std::map<unsigned int, char>::const_iterator iter = region_map.begin(); iter != region_map.end(); ++iter) {
+		out.push_back(iter->first);
+	}
 }
 
 RegionMap* RegionMap::instance() {

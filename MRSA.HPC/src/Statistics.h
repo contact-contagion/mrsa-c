@@ -11,6 +11,24 @@
 
 namespace mrsa {
 
+struct RegionStat {
+
+	char region;
+	long infection_incidence, colonization_incidence;
+	long infection_prevalence, colonization_prevalence;
+	long c_from_i, c_from_c;
+
+	//RegionStat(const char& r) : region(r), infection_incidence(0), colonization_incidence(0),
+	//		infection_prevalence(0), colonization_prevalence(0), c_from_i(0), c_from_c(0) {
+
+	//}
+
+	void reset() {
+		infection_incidence = colonization_incidence = infection_prevalence =
+				colonization_prevalence = c_from_i = c_from_c = 0;
+	}
+};
+
 // captures yearly averages, used
 // to compute the total averages.
 struct YearlyAvg {
@@ -82,6 +100,10 @@ public:
 		colonization_from_infection_override = 0;
 		hospital_stats.reset();
 		jail_stats.reset();
+
+		for (std::map<char, RegionStat>::iterator iter = region_stats.begin(); iter != region_stats.end(); ++iter) {
+			iter->second.reset();
+		}
 	}
 
 	/**
@@ -210,6 +232,7 @@ private:
 
 	std::map<std::string, double> colonization_count_map;
 	std::map<std::string, double> infection_count_map;
+	std::map<char, RegionStat> region_stats;
 	YearlyAvg averages;
 };
 

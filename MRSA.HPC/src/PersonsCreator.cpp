@@ -121,7 +121,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
-	// TODO remove when zip code info is Persons file
+	// TODO remove when zip code info is in Persons file
 	if (flip) {
 		vec[ZIP_CODE_IDX] = "60615";
 		flip = false;

@@ -3,6 +3,7 @@ random.seed = 1
 BaseSweepNumber = 0
 
 stop.at = 17520.5
+#stop.at = 8760.5
 #17520.5 
 #8760.5
 
@@ -17,14 +18,16 @@ activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv
 
 
 risk.file = ../data/new_risk_file_102612.csv 
+init.c_and_i.file = ../data/colonization_infection_init.csv
 
 hourly.output.file = ./output/hourly_data
 yearly.output.file = ./output/yearly_data
 summary.output.file = ./output/summary_stats
 event.output.file = ./output/transmission_events.csv
 
-initial.colonization.fraction = 0.03
-initial.infected.count = 34
+#initial.colonization.fraction = 0.03
+#initial.infected.count = 34
+
 
 # 7 days (24 x 7)
 minimum.infection.period = 168

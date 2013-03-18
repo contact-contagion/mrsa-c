@@ -9,6 +9,7 @@
 #define REGIONMAP_H_
 
 #include <map>
+#include <vector>
 
 namespace mrsa {
 
@@ -27,6 +28,16 @@ public:
 	 * @return  the region for the specified zip code.
 	 */
 	const char region(const unsigned int zip_code);
+
+	/**
+	 * Gets all the regions in the map and puts them in out.
+	 */
+	void regions(std::vector<char>& out);
+
+	/**
+	 * Gets all the zip codes in the map and puts them in out.
+	 */
+	void zipCodes(std::vector<unsigned int>& out);
 
 
 private:

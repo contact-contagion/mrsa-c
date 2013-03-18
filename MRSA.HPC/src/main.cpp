@@ -240,6 +240,7 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 	Properties props(propsFile, argc, argv, &world);
 
 	mrsa::load_risks(props);
+	mrsa::load_init_col_inf_fractions(props);
 
 	// add a starting time property
 	std::string time;
