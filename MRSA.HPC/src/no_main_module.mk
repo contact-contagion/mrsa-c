@@ -24,6 +24,8 @@ SOURCES = CSVReader.cpp \
           Prison.cpp \
           PlaceCreator.cpp \
           ActivityCreator.cpp \
+          PlaceStats.cpp \
+          DataSourceAdapters.cpp \
           Statistics.cpp \
           MRSAObserver.cpp 
           

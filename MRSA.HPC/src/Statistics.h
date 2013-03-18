@@ -7,6 +7,7 @@
 #include "repast_hpc/TDataSource.h"
 
 #include "Person.h"
+#include "PlaceStats.h"
 
 namespace mrsa {
 
@@ -78,10 +79,9 @@ public:
 		colonization_count_map.clear();
 		infection_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
-		hospital_stays = 0;
-		hospital_stay_duration = 0;
-		hospital_infections = hospital_colonizations = 0;
 		colonization_from_infection_override = 0;
+		hospital_stats.reset();
+		jail_stats.reset();
 	}
 
 	/**
@@ -112,14 +112,28 @@ public:
 	 * Increments the hospital stay count.
 	 */
 	void incrementHospitalStayCount() {
-		++hospital_stays;
+		hospital_stats.incrementStayCount();
 	}
 
 	/**
 	 * Increments the hospital stay duration count by the specified amount.
 	 */
 	void incrementHospitalDurationCount(double hours) {
-		hospital_stay_duration += hours;
+		hospital_stats.incrementDuration(hours);
+	}
+
+	/**
+	 * Increments the prison stay count.
+	 */
+	void incrementPrisonStayCount() {
+		jail_stats.incrementStayCount();
+	}
+
+	/**
+	 * Increments the prison stay duration count by the specified amount.
+	 */
+	void incrementPrisonDurationCount(double hours) {
+		jail_stats.incrementDuration(hours);
 	}
 
 	/**
@@ -148,6 +162,17 @@ public:
 	 */
 	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file,
 			repast::Properties& props);
+
+	/**
+	 * Creates data sources that produce yearly data and adds them to the specified builder
+	 */
+	void createYearlyDataSources(repast::SVDataSetBuilder& builder);
+
+	/**
+	 * Creates the data sources that produce hourly data and adds them to the
+	 * specified builder.
+	 */
+	void createHourlyDataSources(repast::SVDataSetBuilder& builder);
 
 private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;
@@ -180,44 +205,12 @@ private:
 	long total_c_from_i, total_c_from_c;
 	double total_infected, total_colonized;
 
-	long hospital_stays;
-	double hospital_stay_duration;
-	double hospital_colonizations, hospital_infections;
 	long colonization_from_infection_override;
+	PlaceStats hospital_stats, jail_stats;
 
 	std::map<std::string, double> colonization_count_map;
 	std::map<std::string, double> infection_count_map;
 	YearlyAvg averages;
-};
-
-/**
- * Adapts long stat vars to the TDataSource interface.
- */
-class LDataSourceAdapter: public repast::TDataSource<double> {
-
-public:
-	LDataSourceAdapter(long* stat);
-	virtual ~LDataSourceAdapter();
-
-	double getData();
-
-private:
-	long* stat_;
-};
-
-/**
- * Adapts double stat vars to the TDataSource interface.
- */
-class DDataSourceAdapter: public repast::TDataSource<double> {
-
-public:
-	DDataSourceAdapter(double* stat);
-	virtual ~DDataSourceAdapter();
-
-	double getData();
-
-private:
-	double* stat_;
 };
 
 /**
@@ -236,25 +229,6 @@ public:
 
 private:
 	Statistics* stats_;
-};
-
-/**
- * Adapts map double values to the TDataSource API. The constructor
- * takes a map key and a map. getData returns the current value
- * for that key.
- */
-class PlaceCount: public repast::TDataSource<double> {
-
-public:
-	PlaceCount(std::map<std::string, double>* place_map, const std::string& place_name);
-	virtual ~PlaceCount();
-
-	double getData();
-
-private:
-
-	std::map<std::string, double>* place_map_;
-	std::string place_name_;
 };
 
 } /* namespace mrsa */

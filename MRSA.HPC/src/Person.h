@@ -132,6 +132,13 @@ public:
 	}
 
 	/**
+	 * Gets this Person's household.
+	 */
+	const Place* household() const {
+		return places_.household;
+	}
+
+	/**
 	 * Initializes treatment within this Person's household.
 	 */
 	void initHouseholdTreatment();

@@ -240,84 +240,7 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 	// Create a DataSet that will output data to yearly_data.csv
 	SVDataSetBuilder builder(file, ",",
 			repast::RepastProcess::instance()->getScheduleRunner().schedule());
-
-	builder.addDataSource(
-			createSVDataSource("infection_incidence_count",
-					new LDataSourceAdapter(&stats->yearly_infected), std::plus<double>()));
-	builder.addDataSource(
-			createSVDataSource("colonized_incidence_count",
-					new LDataSourceAdapter(&stats->yearly_colonized), std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("infection_prevalence_count",
-					new LDataSourceAdapter(&stats->eoy_prevalence_infected), std::plus<double>()));
-	builder.addDataSource(
-			createSVDataSource("colonized_prevalence_count",
-					new LDataSourceAdapter(&stats->eoy_prevalence_colonized), std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("colonizations_from_infection",
-					new LDataSourceAdapter(&stats->yearly_c_from_i), std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("colonizations_from_colonization",
-					new LDataSourceAdapter(&stats->yearly_c_from_c), std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("avg_seek_care_infection_duration",
-					new DDataSourceAdapter(&stats->yearly_seek_infection_duration),
-					std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("avg_no_seek_care_infection_duration",
-					new DDataSourceAdapter(&stats->yearly_no_seek_infection_duration),
-					std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("avg_infection_duration",
-					new DDataSourceAdapter(&stats->yearly_infection_duration),
-					std::plus<double>()));
-	builder.addDataSource(
-			createSVDataSource("avg_colonization_duration",
-					new DDataSourceAdapter(&stats->yearly_colonization_duration),
-					std::plus<double>()));
-
-	/*
-	builder.addDataSource(
-			repast::createSVDataSource("infected_r0",
-					new DDataSourceAdapter(&stats->yearly_infected_r0), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("colonized_r0",
-					new DDataSourceAdapter(&stats->yearly_colonized_r0), std::plus<double>()));
-	*/
-
-	builder.addDataSource(
-			repast::createSVDataSource("hospital_colonization_incidence",
-					new DDataSourceAdapter(&stats->hospital_colonizations), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("hospital_infection_incidence",
-					new DDataSourceAdapter(&stats->hospital_infections), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("hospital_stays",
-					new LDataSourceAdapter(&stats->hospital_stays), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("hospital_days",
-					new DDataSourceAdapter(&stats->hospital_stay_duration), std::plus<double>()));
-
-	string place_names[] = { "household", "hospital", "school", "workplace", "gym", "nursing home",
-			"college dorm", "prison" };
-	for (int i = 0; i < 8; i++) {
-		std::string prefix = place_names[i] == "gym" ? "sports_facilities" : place_names[i];
-		std::string header = prefix + "_colonization_fraction";
-		builder.addDataSource(
-				createSVDataSource(header,
-						new PlaceCount(&stats->colonization_count_map, place_names[i]),
-						std::plus<double>()));
-	}
+	stats->createYearlyDataSources(builder);
 
 	repast::DataSet* ds = builder.createDataSet();
 	// add it to the inherit dataSets vector.
@@ -352,41 +275,7 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 	// Create a DataSet that will output data to hourly_data.csv
 	SVDataSetBuilder builder(file, ",",
 			repast::RepastProcess::instance()->getScheduleRunner().schedule());
-
-	// data source for counting the number of uncolonized persons
-	builder.addDataSource(
-			repast::createSVDataSource("uncolonized_count",
-					new LDataSourceAdapter(&stats->hourly_uncolonized), std::plus<double>()));
-
-	// data source for counting the number of colonized persons
-	builder.addDataSource(
-			repast::createSVDataSource("colonized_count",
-					new LDataSourceAdapter(&stats->hourly_colonized), std::plus<double>()));
-
-	// data source for counting the number of infected persons
-	builder.addDataSource(
-			repast::createSVDataSource("infection_count",
-					new LDataSourceAdapter(&stats->hourly_infected), std::plus<double>()));
-
-	// data source for the total number of persons
-	TotalSum* tSum = new TotalSum(stats);
-	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("newly_infected",
-					new LDataSourceAdapter(&stats->newly_infected), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("newly_colonized",
-					new LDataSourceAdapter(&stats->newly_colonized), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("running_total_infected",
-					new DDataSourceAdapter(&stats->total_infected), std::plus<double>()));
-
-	builder.addDataSource(
-			repast::createSVDataSource("running_total_colonized",
-					new DDataSourceAdapter(&stats->total_colonized), std::plus<double>()));
+	stats->createHourlyDataSources(builder);
 
 	// add the data set to this Observer, which automatically
 	// schedules the data collection, data writing etc.

@@ -17,6 +17,7 @@
 #include "MRSAObserver.h"
 #include "CSVReader.h"
 #include "../src/utility.h"
+#include "Constants.h"
 
 using namespace repast;
 using namespace relogo;
@@ -26,6 +27,8 @@ static const int countOfInputRecordValues = 30;
 static const int countOfRecordValues = 46;
 
 const int TYPE_IDX = 1;
+const int YEARLY_DATA_LENGTH = 19;
+const int MAX_YEAR = 5;
 
 using namespace boost::assign;
 
@@ -116,7 +119,7 @@ void setPropertiesForSweep(Properties& props, int sweepIndex) {
 }
 
 void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
-	if (!output) {
+
 		keylist +=
 		// Basic Info:
 				"run.number", "date_time.run", "run.time", "random.seed", "stop.at",
@@ -154,60 +157,45 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 
 		// Spatial for ReLogo
 		"min.x", "min.y", "max.x", "max.y", "grid.buffer", "proc.per.x", "proc.per.y";
-	} else {
+	if (output) {
 		keylist +=
-		// Basic Info:
-				"run.number", "date_time.run", "run.time", "random.seed", "stop.at",
-
-		// Obsolete?
-		"seek.and.destroy.at", "seek.and.destroy.cure.fraction",
-
-		// Input files:
-		"persons.file", "places.file", "activities.file", "risk.file",
-
-		// Output files:
-		"hourly.output.file", "yearly.output.file", "summary.output.file",
-
-		// Parameters:
-		"seek.care.fraction", "initial.colonization.fraction", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
-
-		// Risks:
-		"Hospital_0_PAR", "Hospital_0_TIP", "Hospital_0_AIP", "Hospital_0_X", "Hospital_1_PAR", "Hospital_1_TIP", "Hospital_1_AIP", "Hospital_1_X",
-
-		"Workplace_0_PAR", "Workplace_0_TIP", "Workplace_0_AIP", "Workplace_0_X", "Workplace_1_PAR", "Workplace_1_TIP", "Workplace_1_AIP", "Workplace_1_X",
-
-		"Household_0_PAR", "Household_0_TIP", "Household_0_AIP", "Household_0_X", "Household_1_PAR", "Household_1_TIP", "Household_1_AIP", "Household_1_X",
-
-		"School_0_PAR", "School_0_TIP", "School_0_AIP", "School_0_X", "School_1_PAR", "School_1_TIP", "School_1_AIP", "School_1_X",
-
-		"Gym_0_PAR", "Gym_0_TIP", "Gym_0_AIP", "Gym_0_X","Gym_1_PAR", "Gym_1_TIP", "Gym_1_AIP", "Gym_1_X",
-
-		"Nursing_Home_0_PAR", "Nursing_Home_0_TIP", "Nursing_Home_0_AIP", "Nursing_Home_0_X","Nursing_Home_1_PAR", "Nursing_Home_1_TIP", "Nursing_Home_1_AIP",
-		"Nursing_Home_1_X",
-
-		"Prison_0_PAR", "Prison_0_TIP", "Prison_0_AIP", "Prison_0_X", "Prison_1_PAR", "Prison_1_TIP", "Prison_1_AIP", "Prison_1_X",
-
-		"College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP", "College_Dorm_0_X", "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP",
-		"College_Dorm_1_X",
-
-
-		// Spatial for ReLogo
-		"min.x", "min.y", "max.x", "max.y", "grid.buffer", "proc.per.x", "proc.per.y",
 
 		// Output
 		"process.count", "run.time",
 
 		// Summary Statistics
-		"total_infections", "colonizations", "total_from_infection", "total_from_colonization",
-		/*
-		 "avg_infected_r0",
-		 "avg_colonized_r0",
-		 */
+		"total_infections", "colonizations", "total_from_infection", "total_from_colonization";
+
+
+
+		std::string yearly_data[YEARLY_DATA_LENGTH] = {"infections_incidence", "colonizations_incidence", "infections_prevalence",
+				"colonizations_prevalence", "hospital_colonizations", "hospital_infections", "hospital_stays",
+				"hospital_days", "jail_colonizations", "jail_infections", "jail_stays",
+				"jail_days", HOUSEHOLD_COL_COUNT, OTHER_H_COL_COUNT, WORKPLACE_COL_COUNT,
+				SCHOOL_COL_COUNT, GYM_COL_COUNT, DORM_COL_COUNT, NURSING_HOME_COL_COUNT
+		};
+
+		for (int i = 0; i < YEARLY_DATA_LENGTH; ++i) {
+			for (int j = 1; j <= MAX_YEAR; ++j) {
+				std::stringstream ss;
+				ss << yearly_data[i] << "_year_" << j;
+				keylist.push_back(ss.str());
+			}
+		}
+
 
 		// By Year Stats
-		"infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4", "infections_incidence_year_5", "colonizations_incidence_year_1", "colonizations_incidence_year_2", "colonizations_incidence_year_3", "colonizations_incidence_year_4", "colonizations_incidence_year_5", "infections_prevalence_year_1", "infections_prevalence_year_2", "infections_prevalence_year_3", "infections_prevalence_year_4", "infections_prevalence_year_5", "colonizations_prevalence_year_1", "colonizations_prevalence_year_2", "colonizations_prevalence_year_3", "colonizations_prevalence_year_4", "colonizations_prevalence_year_5",
-
-		"hospital_colonizations_year_1", "hospital_colonizations_year_2", "hospital_colonizations_year_3", "hospital_colonizations_year_4", "hospital_colonizations_year_5", "hospital_infections_year_1", "hospital_infections_year_2", "hospital_infections_year_3", "hospital_infections_year_4", "hospital_infections_year_5", "hospital_stays_year_1", "hospital_stays_year_2", "hospital_stays_year_3", "hospital_stays_year_4", "hospital_stays_year_5", "hospital_days_year_1", "hospital_days_year_2", "hospital_days_year_3", "hospital_days_year_4", "hospital_days_year_5";
+//		"infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4",
+//		"infections_incidence_year_5", "colonizations_incidence_year_1", "colonizations_incidence_year_2", "colonizations_incidence_year_3",
+//		"colonizations_incidence_year_4", "colonizations_incidence_year_5", "infections_prevalence_year_1", "infections_prevalence_year_2",
+//		"infections_prevalence_year_3", "infections_prevalence_year_4", "infections_prevalence_year_5", "colonizations_prevalence_year_1",
+//		"colonizations_prevalence_year_2", "colonizations_prevalence_year_3", "colonizations_prevalence_year_4", "colonizations_prevalence_year_5",
+//
+//		"hospital_colonizations_year_1", "hospital_colonizations_year_2", "hospital_colonizations_year_3", "hospital_colonizations_year_4",
+//		"hospital_colonizations_year_5", "hospital_infections_year_1", "hospital_infections_year_2", "hospital_infections_year_3",
+//		"hospital_infections_year_4", "hospital_infections_year_5", "hospital_stays_year_1", "hospital_stays_year_2", "hospital_stays_year_3",
+//		"hospital_stays_year_4", "hospital_stays_year_5", "hospital_days_year_1", "hospital_days_year_2", "hospital_days_year_3", "hospital_days_year_4",
+//		"hospital_days_year_5";
 	}
 }
 

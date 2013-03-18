@@ -10,6 +10,7 @@
 #include "Person.h"
 #include "Statistics.h"
 #include "Parameters.h"
+#include "Constants.h"
 
 namespace mrsa {
 
@@ -53,7 +54,11 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 	if (person->status() == COLONIZED) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
-		Statistics::getInstance()->incrementColonizationCount(type_);
+		std::string place_type = type_;
+		if (type_ == HOUSEHOLD_TYPE && (person->household() != this)) {
+			place_type = OTHER_HOUSEHOLD_TYPE;
+		}
+		Statistics::getInstance()->incrementColonizationCount(place_type);
 		if (infected.size() > 0) {
 			// increment the pro-rated number of people colonized by the infectious
 			// persons in this place.

@@ -188,6 +188,14 @@ void Person::changePlace(Place* place, int activity_type) {
 		entered_hospital_time = 0;
 	}
 
+	if (entered_prison_time != 0 && (place == 0 || place->placeType() != PRISON_TYPE)) {
+			Statistics::getInstance()->incrementPrisonStayCount();
+			double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
+					- entered_prison_time;
+			Statistics::getInstance()->incrementPrisonDurationCount(duration);
+			entered_prison_time = 0;
+		}
+
 	// regardless of whether this Person has changed its
 	// current place, this method should only be called once
 	// per tick. Consequently, the current should have had its
