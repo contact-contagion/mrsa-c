@@ -6,13 +6,14 @@ stop.at = 17520.5
 #17520.5 
 #8760.5
 
-#persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
-#places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
-#activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
 
-persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
-places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
-activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
+#persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
+#places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
+#activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
+
 
 
 risk.file = ../data/new_risk_file_102612.csv 
