@@ -118,7 +118,7 @@ BOOST_AUTO_TEST_CASE(event_recorder) {
 	std::vector<string> data;
 	reader.next(data);
 	BOOST_REQUIRE_EQUAL(data.size(), 6);
-	//tick, person_id, place_id, place_type, event_type
+	//tick, person_id, place_id, place_type, zip_code, event_type
 	BOOST_REQUIRE_EQUAL(data[0], "tick");
 	BOOST_REQUIRE_EQUAL(data[1], "person_id");
 	BOOST_REQUIRE_EQUAL(data[2], "place_id");
@@ -128,7 +128,7 @@ BOOST_AUTO_TEST_CASE(event_recorder) {
 
 	reader.next(data);
 	BOOST_REQUIRE_EQUAL(data.size(), 6);
-	//tick, person_id, place_id, place_type, event_type
+	//tick, person_id, place_id, place_type, zip_code, event_type
 	BOOST_REQUIRE_EQUAL(data[0], "1");
 	BOOST_REQUIRE_EQUAL(data[1], persons[0]->personId());
 	BOOST_REQUIRE_EQUAL(data[2], places[0]->placeId());
@@ -138,7 +138,7 @@ BOOST_AUTO_TEST_CASE(event_recorder) {
 
 	reader.next(data);
 	BOOST_REQUIRE_EQUAL(data.size(), 6);
-	//tick, person_id, place_id, place_type, event_type
+	//tick, person_id, place_id, place_type, zip_code, event_type
 	BOOST_REQUIRE_EQUAL(data[0], "1");
 	BOOST_REQUIRE_EQUAL(data[1], persons[1]->personId());
 	BOOST_REQUIRE_EQUAL(data[2], places[1]->placeId());
