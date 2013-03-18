@@ -18,6 +18,8 @@
 #include "Household.h"
 #include "School.h"
 #include "Hospital.h"
+#include "Prison.h"
+#include "GeneralQuarters.h"
 #include "Workplace.h"
 #include "DefaultPlace.h"
 #include "Constants.h"
@@ -165,6 +167,12 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		} else if (type == HOSPITAL_TYPE) {
 			place = new Hospital(vec, risk);
 			//std::cout << "making a hospital" << std::endl;
+		} else if (type == DORM_TYPE || type == NURSING_HOME_TYPE) {
+			place = new GeneralQuarters(vec, risk);
+			//std::cout << "making a " << type << std::endl;
+		} else if (type == PRISON_TYPE) {
+			place = new Prison(vec, risk);
+			//std::cout << "making a " << type << std::endl;
 		} else {
 			// if the type is not one we have a specific place for
 			// yet, then create a DefaultPlace.

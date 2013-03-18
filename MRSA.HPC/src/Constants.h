@@ -20,6 +20,9 @@ const std::string WORKPLACE_TYPE = "workplace";
 const std::string HOUSEHOLD_TYPE = "household";
 const std::string GYM_TYPE = "gym";
 const std::string HOSPITAL_TYPE = "hospital";
+const std::string DORM_TYPE = "college dorm";
+const std::string NURSING_HOME_TYPE = "nursing home";
+const std::string PRISON_TYPE = "prison";
 
 // name of the random dist used to draw other households.
 const std::string OH_DIST = "other.household.random.dist";

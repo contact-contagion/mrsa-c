@@ -8,18 +8,18 @@
 #ifndef NOSTAYMANAGER_H_
 #define NOSTAYMANAGER_H_
 
-#include "IHospitalStayManager.h"
+#include "StayManager.h"
 
 namespace mrsa {
 
-class NoStayManager : public IHospitalStayManager {
+class NoStayManager : public PlaceStayManager {
 
 public:
 
-	NoStayManager() : IHospitalStayManager() {}
+	NoStayManager() : PlaceStayManager() {}
 	virtual ~NoStayManager() {}
 
-	bool inHospital(int year, int day) {
+	bool inPlace(int year, int day) {
 		return false;
 	}
 };

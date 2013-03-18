@@ -55,7 +55,7 @@ class Person: public repast::relogo::Turtle {
 public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-			Places places, boost::shared_ptr<IHospitalStayManager> hosp_manager,
+			Places places, boost::shared_ptr<PlaceStayManager> hosp_manager, boost::shared_ptr<PlaceStayManager> prison_manager,
 			float min_infection_duration);
 	virtual ~Person();
 
@@ -166,14 +166,15 @@ private:
 
 	std::string person_id;
 	Places places_;
-	boost::shared_ptr<IHospitalStayManager> hosp_manager_;
+	boost::shared_ptr<PlaceStayManager> hosp_manager_;
+	boost::shared_ptr<PlaceStayManager> prison_manager_;
 	std::string tucaseid_weekday, tucaseid_weekend;
 	int relate, sex, age_;
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
-	double entered_hospital_time;
+	double entered_hospital_time, entered_prison_time;
 	int prison_index, gq_index;
 
 	/**

@@ -14,25 +14,25 @@ namespace mrsa {
 
 HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2_length,
 		unsigned int y3_length, unsigned int y4_length, unsigned int y5_length) :
-		IHospitalStayManager(), stays(10, std::make_pair(0u, 0u)), duration(0), start_day(0) {
+		AbstractStayManager(10) {
 
-	stays[0] =
+	stay_data[0] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 							365 - y1_length).next(), y1_length));
-	stays[1] =
+	stay_data[1] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 							365 - y2_length).next(), y2_length));
-	stays[2] =
+	stay_data[2] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 							365 - y3_length).next(), y3_length));
-	stays[3] =
+	stay_data[3] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 							365 - y4_length).next(), y4_length));
-	stays[4] =
+	stay_data[4] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 							365 - y5_length).next(), y5_length));
@@ -41,32 +41,5 @@ HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2
 HospitalStayManager::~HospitalStayManager() {
 }
 
-bool HospitalStayManager::inHospital(int year, int day) {
-	bool ret_val = false;
-
-//	if (debug) {
-//		std::cout << "year: " << year << ", day: " << day;
-//		std::cout << ", start_day " << start_day << ", duration: " << duration;
-//	}
-	if (duration > 0) {
-		// currently in hospital. check if should leave.
-		ret_val = (day - start_day) < duration;
-		if (!ret_val) {
-			duration = 0;
-			start_day = 0;
-		}
-	} else {
-		// year starts with 1
-		StayData& data = stays.at(year - 1);
-		ret_val = data.second > 0 && data.first == (unsigned int) day;
-		if (ret_val) {
-			start_day = day;
-			duration = data.second;
-		}
-	}
-
-//	if (debug) std::cout << ", ret val: " << ret_val << std::endl;
-	return ret_val;
-}
 
 } /* namespace mrsa */

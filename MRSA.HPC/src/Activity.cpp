@@ -47,7 +47,10 @@ Activity::Activity(const Activity& act) :
 }
 
 Place* Activity::selectPlace(Places& places) const {
-	if (place_type == "Household") return places.household;
+	if (place_type == "Household") {
+		if (places.household != 0) return places.household;
+		return places.group_quarters;
+	}
 	else if (place_type == "Workplace") return places.work;
 
 	else if (place_type == "Other Household") {

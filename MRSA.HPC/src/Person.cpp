@@ -25,11 +25,14 @@ using namespace boost;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Places places, shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration) :
+		Places places, shared_ptr<PlaceStayManager> hosp_manager,
+		shared_ptr<PlaceStayManager> prison_manager, float min_infection_duration) :
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(
-				hosp_manager), tucaseid_weekday(vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(
-				vec[TUCASE_ID_WEEKEND_IDX]), relate(0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0), prison_index(-1), gq_index(-1) {
+				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
+				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), prison_index(
+				-1), gq_index(-1) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -112,11 +115,17 @@ void Person::performActivity(Calendar& calendar) {
 //	if (personId() == "5511519") {
 //		has 7 days in hospital so good for testing hosp code.
 //	}
-	if (hosp_manager_->inHospital(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
+	if (hosp_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
 		changePlace(places_.hospital, 0);
+
+	} else if (prison_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.prison != 0) {
+		if (entered_prison_time == 0) {
+			entered_prison_time = RepastProcess::instance()->getScheduleRunner().currentTick();
+		}
+		changePlace(places_.prison, 0);
 	} else {
 		// iterate through the activity list and find the activity
 		// whose time span contains the specified time.
@@ -173,6 +182,7 @@ void Person::changePlace(Place* place, int activity_type) {
 	if (place != 0) {
 		places_.current = place;
 	}
+
 
 	if (entered_hospital_time != 0 && (place == 0 || place->placeType() != HOSPITAL_TYPE)) {
 		Statistics::getInstance()->incrementHospitalStayCount();

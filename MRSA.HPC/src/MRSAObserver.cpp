@@ -184,6 +184,9 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 		// then remove the person with die().
 		person->validate();
 	}
+
+	people.clear();
+	get(people);
 }
 
 // initialize the disease state of all the persons in the model

@@ -75,7 +75,7 @@ void setPropertiesForSweep(Properties& props, int sweepIndex) {
 		int* sizes = new int[list.size()];
 		int* index = new int[list.size()];
 		std::vector<std::vector<std::string> > valArray;
-		for (int i = 0; i < list.size(); i++) {
+		for (size_t i = 0; i < list.size(); i++) {
 			sizes[i] = 1;
 			index[i] = 0;
 			if (props.contains(list[i])) {

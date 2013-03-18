@@ -11,25 +11,17 @@
 #include <utility>
 #include <vector>
 
-#include "IHospitalStayManager.h"
+#include "AbstractStayManager.h"
 
 namespace mrsa {
 
-class HospitalStayManager : public IHospitalStayManager {
-
-	typedef std::pair<unsigned int, unsigned int> StayData;
-
-private:
-	std::vector<StayData> stays;
-	unsigned int duration, start_day;
+class HospitalStayManager : public AbstractStayManager {
 
 public:
 	HospitalStayManager(unsigned int y1_length, unsigned int y2_length, unsigned int y3_length, unsigned int y4_length,
 			unsigned int y5_length);
 
 	virtual ~HospitalStayManager();
-
-	bool inHospital(int year, int day);
 };
 
 } /* namespace mrsa */

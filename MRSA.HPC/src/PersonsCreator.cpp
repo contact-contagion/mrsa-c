@@ -11,7 +11,8 @@
 
 #include "PersonsCreator.h"
 #include "Constants.h"
-#include "HospitalStayManager.h"
+#include "StayManager.h"
+#include "PrisonStayManager.h"
 
 namespace mrsa {
 
@@ -19,8 +20,7 @@ using namespace std;
 using namespace repast;
 using namespace boost;
 
-
-shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<IHospitalStayManager>& no_stay_manager) {
+shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<PlaceStayManager>& no_stay_manager) {
 	unsigned int y1_length = strToUInt(data[H_NIGHTS_1]);
 	unsigned int y2_length = strToUInt(data[H_NIGHTS_2]);
 	unsigned int y3_length = strToUInt(data[H_NIGHTS_3]);
@@ -30,8 +30,25 @@ shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data
 	if (y1_length == 0 && y2_length == 0 && y3_length == 0 && y4_length == 0 && y5_length == 0) {
 		return no_stay_manager;
 	} else {
-		return shared_ptr<IHospitalStayManager>(new HospitalStayManager(y1_length, y2_length, y3_length, y4_length, y5_length));
+		return shared_ptr<PlaceStayManager>(new HospitalStayManager(y1_length, y2_length, y3_length, y4_length, y5_length));
 	}
+}
+
+shared_ptr<PlaceStayManager> create_prison_stay(shared_ptr<PlaceStayManager>& no_stay_manager, float prison_prob, int duration) {
+	Random* random = Random::instance();
+	PrisonStayManager* manager(0);
+	// one try per year
+	for (int i = 0; i < 10; ++i) {
+		if(random->nextDouble() <= prison_prob) {
+			if (manager == 0) {
+				manager = new PrisonStayManager();
+			}
+			manager->createStayFor(i, duration);
+		}
+	}
+
+	if (manager != 0) return shared_ptr<PlaceStayManager>(manager);
+	else return no_stay_manager;
 }
 
 
@@ -102,9 +119,14 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
+	// TODO replace with real values when available
+	//places.prison = findPlace("G170312716001P1");
+	float prison_prob = 0f;
+	int prison_duration = 30;
 
 	// create the Person
-	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), min_infection_duration_);
+	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), create_prison_stay(no_stay_manager,
+			prison_prob, prison_duration), min_infection_duration_);
 }
 
 }
