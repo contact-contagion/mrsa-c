@@ -209,6 +209,8 @@ void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& 
 		}
 	}
 
+	std::cout << "init colonized: " << colonized << std::endl;
+
 	// shuffle the list of people and set the first
 	// N to infected, assuming he / she is not colonized.
 	people.shuffle();

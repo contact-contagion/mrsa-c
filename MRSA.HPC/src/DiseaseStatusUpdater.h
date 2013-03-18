@@ -25,6 +25,8 @@ struct StatusStats {
 	float colonized_persons;
 	// the duration of the infection / colonization
 	float duration;
+
+	ColonizationCause col_cause;
 };
 
 /**
@@ -43,7 +45,7 @@ public:
 	/**
 	 * Update the disease status to new status.
 	 */
-	void updateStatus(DiseaseStatus status);
+	void updateStatus(DiseaseStatus status, ColonizationCause cause);
 
 	/**
 	 * Updates the infection status.

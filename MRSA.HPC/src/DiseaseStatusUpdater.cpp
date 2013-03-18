@@ -29,14 +29,15 @@ void DiseaseStatusUpdater::updateInfectionStatus(InfectionStatus status) {
 	infection_status_ = status;
 }
 
-void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
+void DiseaseStatusUpdater::updateStatus(DiseaseStatus status, ColonizationCause cause) {
 	// these cover all the transitions except for INFECTED to INFECTED on
 	// which we dont' do anything.
 	if (status_ == UNCOLONIZED && (status == COLONIZED || status == INFECTED)) {
 		// set timestamp
 		timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
-		StatusStats stats = { status, NONE, 0.0f, 0.0f };
+		StatusStats stats = { status, NONE, 0.0f, 0.0f, cause};
+
 		yearly_status_stats.push_back(stats);
 		infection_status_ = NONE;
 
@@ -58,7 +59,7 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
 			// set time stamp.
 			timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
-			StatusStats stats = { status, NONE, 0.0f, 0.0f };
+			StatusStats stats = { status, NONE, 0.0f, 0.0f, NA};
 			yearly_status_stats.push_back(stats);
 		}
 
@@ -82,7 +83,7 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status) {
 			// set timestamp
 			timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
-			StatusStats stats = { status, NONE, 0.0f, 0.0f };
+			StatusStats stats = { status, NONE, 0.0f, 0.0f, NA};
 			yearly_status_stats.push_back(stats);
 		}
 		infection_status_ = NONE;

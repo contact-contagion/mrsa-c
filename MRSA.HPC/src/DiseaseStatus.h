@@ -21,6 +21,10 @@ enum InfectionStatus {
 	NONE, SELF_CARE, SEEK_CARE
 };
 
+enum ColonizationCause {
+	NA, C_FROM_C, C_FROM_I
+};
+
 }
 
 #endif /* DISEASESTATUS_H_ */

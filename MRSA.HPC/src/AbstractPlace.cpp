@@ -19,8 +19,9 @@ AbstractPlace::AbstractPlace(std::vector<std::string>& vec, Risk risk) :
 		Place(vec, risk), activity_type_(0), infected(), colonized(), uncolonized() {
 }
 
-AbstractPlace::AbstractPlace(std::string id, std::string type, Risk risk) : Place(id, type, risk),
-		 activity_type_(0), infected(), colonized(), uncolonized() {}
+AbstractPlace::AbstractPlace(std::string id, std::string type, Risk risk) :
+		Place(id, type, risk), activity_type_(0), infected(), colonized(), uncolonized() {
+}
 
 AbstractPlace::~AbstractPlace() {
 }
@@ -36,7 +37,8 @@ void AbstractPlace::addPerson(Person* person, int activity_type) {
 	} else {
 		infected.push_back(person);
 	}
-	if (activity_type > activity_type_) activity_type_ = activity_type;
+	if (activity_type > activity_type_)
+		activity_type_ = activity_type;
 }
 
 // sets the status counts to 0
@@ -49,20 +51,15 @@ void AbstractPlace::reset() {
 
 void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
 	float risk_multiplier = 1;
-	if (activity_type_ == 0) risk_multiplier = risk_.a0_;
-	else risk_multiplier = risk_.a1_;
-	person->updateStatus(ta->runUncolonized(risk_multiplier, infected.size(), colonized.size()));
-	if (person->status() == COLONIZED) {
-		// person has become colonized, so increment the
-		// colonization count for places of this type
-		std::string place_type = type_;
-		if (type_ == HOUSEHOLD_TYPE && (person->household() != this)) {
-			place_type = OTHER_HOUSEHOLD_TYPE;
-		}
-		Statistics::getInstance()->incrementColonizationCount(place_type);
-		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
-				this, U_TO_C);
+	if (activity_type_ == 0)
+		risk_multiplier = risk_.a0_;
+	else
+		risk_multiplier = risk_.a1_;
+	DiseaseStatus status = ta->runUncolonized(risk_multiplier, infected.size(), colonized.size());
+	if (status == COLONIZED) {
+
 		if (infected.size() > 0) {
+			person->updateStatus(status, C_FROM_I);
 			// increment the pro-rated number of people colonized by the infectious
 			// persons in this place.
 			float colonizations_caused = 1.0f / infected.size();
@@ -70,11 +67,23 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 				(*iter)->incrementColonizationsCaused(colonizations_caused);
 			}
 		} else if (colonized.size() > 0) {
+			person->updateStatus(status, C_FROM_C);
 			float colonizations_caused = 1.0f / colonized.size();
 			for (PersonIter iter = colonized.begin(); iter != colonized.end(); ++iter) {
 				(*iter)->incrementColonizationsCaused(colonizations_caused);
 			}
 		}
+
+		// person has become colonized, so increment the
+		// colonization count for places of this type
+		std::string place_type = type_;
+		if (type_ == HOUSEHOLD_TYPE && (person->household() != this)) {
+			place_type = OTHER_HOUSEHOLD_TYPE;
+		}
+		Statistics::getInstance()->incrementColonizationCount(place_type);
+		TransmissionEventRecorder::instance()->recordEvent(
+				repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person, this,
+				U_TO_C);
 	}
 }
 
@@ -85,21 +94,23 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 			person->updateInfectionStatus(ta->runInfected());
 
 		else if (status == SELF_CARE) {
-			person->updateStatus(ta->runInfectedSelfCare());
+			person->updateStatus(ta->runInfectedSelfCare(), NA);
 		} else if (status == SEEK_CARE) {
 			DiseaseStatus disease_status = ta->runInfectedSeekCare();
-			person->updateStatus(disease_status);
+			person->updateStatus(disease_status, NA);
 			if (disease_status == UNCOLONIZED && Parameters::instance()->seekAndDestroyEnabled()) {
 				person->initHouseholdTreatment();
 			}
 		}
 
 		if (person->status() == UNCOLONIZED) {
-			TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
-							this, I_TO_U);
-		} else if (person->status() == COLONIZED){
-			TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
-							this, I_TO_C);
+			TransmissionEventRecorder::instance()->recordEvent(
+					repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+					this, I_TO_U);
+		} else if (person->status() == COLONIZED) {
+			TransmissionEventRecorder::instance()->recordEvent(
+					repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+					this, I_TO_C);
 		}
 
 	}
@@ -110,23 +121,24 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	if (activity_type_ == 0) {
 		b_risk_multiplier = risk_.b0_;
 		e_risk_multiplier = risk_.x0_;
-	}
-	else {
+	} else {
 		b_risk_multiplier = risk_.b1_;
 		e_risk_multiplier = risk_.x1_;
 	}
 	// updates the status of the specified person given the current
 	// disease status counts in this place.
 	DiseaseStatus status = ta->runColonized(b_risk_multiplier, e_risk_multiplier);
-	person->updateStatus(status);
+	person->updateStatus(status, NA);
 
 	if (status == INFECTED) {
 		Statistics::getInstance()->incrementInfectionCount(type_);
-		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
-						this, C_TO_I);
+		TransmissionEventRecorder::instance()->recordEvent(
+				repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person, this,
+				C_TO_I);
 	} else if (status == UNCOLONIZED) {
-		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
-						this, C_TO_U);
+		TransmissionEventRecorder::instance()->recordEvent(
+				repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person, this,
+				C_TO_U);
 	}
 }
 

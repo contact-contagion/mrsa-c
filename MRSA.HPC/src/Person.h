@@ -43,6 +43,8 @@ const int H_NIGHTS_3 = 19;
 const int H_NIGHTS_4 = 20;
 const int H_NIGHTS_5 = 21;
 
+const int ZIP_CODE_IDX = 22;
+
 // forward declaration
 class CompositePlace;
 
@@ -80,7 +82,7 @@ public:
 	/**
 	 * Update this Person's disease status to the specified status.
 	 */
-	void updateStatus(DiseaseStatus status);
+	void updateStatus(DiseaseStatus status, ColonizationCause cause = NA);
 
 	/**
 	 * Gets whether or not this Person's disease status can change. For example,
@@ -166,6 +168,8 @@ private:
 	typedef std::vector<Activity>::const_iterator ActivityIter;
 
 	std::string person_id;
+	unsigned int zip_code;
+
 	Places places_;
 	boost::shared_ptr<PlaceStayManager> hosp_manager_;
 	boost::shared_ptr<PlaceStayManager> prison_manager_;

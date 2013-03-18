@@ -27,7 +27,7 @@ using namespace std;
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
 		Places places, shared_ptr<PlaceStayManager> hosp_manager,
 		shared_ptr<PlaceStayManager> prison_manager, float min_infection_duration) :
-		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(
+		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), zip_code(0), places_(places), hosp_manager_(
 				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
@@ -49,6 +49,9 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	val = trim(val);
 	if (val.length() > 0)
 		age_ = strToInt(val);
+
+	if (vec.size() >= 23)
+		zip_code = strToUInt(vec[ZIP_CODE_IDX]);
 
 	if (places.household != 0) {
 		((Household*) places.household)->addMember(this);
@@ -155,8 +158,8 @@ void Person::incrementColonizationsCaused(float colonization_caused) {
 }
 
 // sets the new disease status for this person.
-void Person::updateStatus(DiseaseStatus status) {
-	status_.updateStatus(status);
+void Person::updateStatus(DiseaseStatus status, ColonizationCause cause) {
+	status_.updateStatus(status, cause);
 }
 
 // makes the person to go "home" where home

@@ -134,18 +134,8 @@ void Statistics::countPerson(Person* person) {
 }
 
 void Statistics::hourEnded() {
-	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-	yearly_c_from_i += ta->colonizedFromInfectionCount();
-	yearly_c_from_c += ta->colonizedFromColonizationCount();
-
-	total_c_from_i += ta->colonizedFromInfectionCount();
-	total_c_from_c += ta->colonizedFromColonizationCount();
-
 	newly_infected = TransmissionAlgorithm::instance()->newlyInfectedCount();
 	newly_colonized = TransmissionAlgorithm::instance()->newlyColonizedCount();
-
-	yearly_colonized += newly_colonized;
-	yearly_infected += newly_infected;
 
 	total_infected += newly_infected;
 	total_colonized += newly_colonized;
@@ -161,6 +151,7 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 	double p_from_infection = 0, p_from_colonization = 0;
 	for (std::list<StatusStats>::iterator iter = vec.begin(); iter != vec.end(); ++iter) {
 		StatusStats& stats = *iter;
+
 		if (stats.duration != 0) {
 			if (stats.status == INFECTED) {
 				++i_count;
@@ -179,6 +170,10 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 			} else if (stats.status == COLONIZED) {
 				++c_count;
 				++(p_stats.colonized_count);
+
+				if (stats.col_cause == C_FROM_C) ++yearly_c_from_c;
+				else if (stats.col_cause == C_FROM_I) ++yearly_c_from_i;
+
 				p_stats.colonization_duration += stats.duration;
 				p_stats.from_colonization += stats.colonized_persons;
 				p_from_colonization += stats.colonized_persons;
@@ -223,6 +218,12 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 		else if (p->status() == COLONIZED)
 			++eoy_prevalence_colonized;
 	}
+
+	yearly_infected = p_stats.infection_count;
+	yearly_colonized = p_stats.colonized_count;
+
+	total_c_from_i += yearly_c_from_i;
+	total_c_from_c += yearly_c_from_c;
 
 	// Add to properties file
 	addValToProps("infections_incidence", year, props, yearly_infected);
