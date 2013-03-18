@@ -2,6 +2,7 @@
 
 #include <sstream>
 #include <boost/test/unit_test.hpp>
+#include <cstdio>
 
 #include "../src/PlaceCreator.h"
 #include "../src/PersonsCreator.h"
@@ -9,6 +10,7 @@
 #include "../src/Person.h"
 #include "../src/utility.h"
 #include "../src/Prison.h"
+#include "../src/TransmissionEventRecorder.h"
 
 #include "ObserverSetup.h"
 
@@ -70,5 +72,61 @@ BOOST_AUTO_TEST_CASE(comp_places) {
 	delete prison;
 }
 
+BOOST_AUTO_TEST_CASE(event_recorder) {
+	PlaceCreator creator;
+	vector<Place*> places;
+	Properties props("../config/model.props");
+	load_risks(props);
+	creator.run(props.getProperty("places.file"), props, places);
+	std::map<std::string, Place*> placeMap;
+	for (int i = 0, n = places.size(); i < n; i++) {
+		Place* place = places[i];
+		placeMap.insert(pair<string, Place*>(place->placeId(), place));
+	}
+
+	PersonsCreator pCreator(props.getProperty("persons.file"), &placeMap, 7.0f);
+	obs->create<Person>(2, pCreator);
+
+	AgentSet<Person> persons;
+	obs->get(persons);
+
+	remove("events.csv");
+	TransmissionEventRecorder::initialize("events.csv");
+	TransmissionEventRecorder* recorder = TransmissionEventRecorder::instance();
+	recorder->recordEvent(1, persons[0], places[0], U_TO_C);
+	recorder->recordEvent(1, persons[1], places[1], I_TO_C);
+	delete recorder;
+
+	CSVReader reader("events.csv");
+	std::vector<string> data;
+	reader.next(data);
+	BOOST_REQUIRE_EQUAL(data.size(), 5);
+	//tick, person_id, place_id, place_type, event_type
+	BOOST_REQUIRE_EQUAL(data[0], "tick");
+	BOOST_REQUIRE_EQUAL(data[1], "person_id");
+	BOOST_REQUIRE_EQUAL(data[2], "place_id");
+	BOOST_REQUIRE_EQUAL(data[3], "place_type");
+	BOOST_REQUIRE_EQUAL(data[4], "event_type");
+
+	reader.next(data);
+	BOOST_REQUIRE_EQUAL(data.size(), 5);
+	//tick, person_id, place_id, place_type, event_type
+	BOOST_REQUIRE_EQUAL(data[0], "1");
+	BOOST_REQUIRE_EQUAL(data[1], persons[0]->personId());
+	BOOST_REQUIRE_EQUAL(data[2], places[0]->placeId());
+	BOOST_REQUIRE_EQUAL(data[3], places[0]->placeType());
+	BOOST_REQUIRE_EQUAL(data[4], U_TO_C);
+
+	reader.next(data);
+	BOOST_REQUIRE_EQUAL(data.size(), 5);
+	//tick, person_id, place_id, place_type, event_type
+	BOOST_REQUIRE_EQUAL(data[0], "1");
+	BOOST_REQUIRE_EQUAL(data[1], persons[1]->personId());
+	BOOST_REQUIRE_EQUAL(data[2], places[1]->placeId());
+	BOOST_REQUIRE_EQUAL(data[3], places[1]->placeType());
+	BOOST_REQUIRE_EQUAL(data[4], I_TO_C);
+
+	BOOST_REQUIRE_EQUAL(reader.next(data), false);
+}
 BOOST_AUTO_TEST_SUITE_END()
 
