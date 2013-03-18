@@ -75,6 +75,7 @@ Place* Activity::selectPlace(Places& places) const {
 
 	else if (place_type == "Gym") return places.gym;
 	else if (place_type == "Hospital") return places.hospital;
+	else if (place_type == "Prison") return places.prison;
 	else {
 		// unknown place type so go to household if it exists or if not
 		// go to group quarters.
