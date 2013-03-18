@@ -31,11 +31,12 @@ include src/no_main_module.mk
 
 ifeq "$(MAKECMDGOALS)" "unit_tests"
  include test/module.mk
-	
+ -include $(dependencies)
 endif
 
 ifeq "$(MAKECMDGOALS)" "mrsa"
  include src/module.mk
+ -include $(dependencies)
 endif
 
 
@@ -63,7 +64,7 @@ endif
 
 
 %.d: %.cpp
-	$(CXX) $(CPPFLAGS) -M $< | \
+	@$(CXX) $(CPPFLAGS) -M $< | \
 	$(SED) 's,\($(notdir $*)\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
 	$(MV) $@.tmp $@
 	
