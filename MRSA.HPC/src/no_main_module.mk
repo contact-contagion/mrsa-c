@@ -1,5 +1,6 @@
 SOURCES = CSVReader.cpp \
 		  Parameters.cpp \
+		  RegionMap.cpp \
 		  utility.cpp \
 		  Calendar.cpp \
           Activity.cpp \
