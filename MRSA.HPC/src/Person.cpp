@@ -31,8 +31,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), prison_index(
-				-1), gq_index(-1) {
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(3, -1) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -61,12 +60,9 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 Person::~Person() {
 }
 
-void Person::goToPrison(Prison* prison, int activity_type) {
-	prison_index = prison->addPersonToComponent(this, activity_type, prison_index);
-}
-
-void Person::goToGQ(GeneralQuarters* gq, int activity_type) {
-	gq_index = gq->addPersonToComponent(this, activity_type, gq_index);
+void Person::goToCompositePlace(CompositePlace* place, int activity_type) {
+	const CompPlaceType& type = place->compPlaceType();
+	comp_indices[type] = place->addPersonToComponent(this, activity_type, comp_indices[type]);
 }
 
 void Person::validate() {

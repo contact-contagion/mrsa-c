@@ -42,8 +42,8 @@ size_t ComponentPlace::size() {
 }
 
 CompositePlace::CompositePlace(std::vector<std::string>& vec, Risk risk,
-		unsigned int component_max_size) :
-		Place(vec, risk), components(), component_max_size_(component_max_size) {
+		unsigned int component_max_size, CompPlaceType pType) :
+		Place(vec, risk), components(), component_max_size_(component_max_size), placeType_(pType) {
 
 	// add an initial component.
 	components.push_back(new ComponentPlace(id_, type_, risk_));

@@ -19,6 +19,7 @@
 #include "School.h"
 #include "Hospital.h"
 #include "Prison.h"
+#include "Gym.h"
 #include "GeneralQuarters.h"
 #include "Workplace.h"
 #include "DefaultPlace.h"
@@ -155,7 +156,7 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		Risk& risk = iter->second;
 
 		Place* place = 0;
-		if (type == SCHOOL_TYPE || type == GYM_TYPE) {
+		if (type == SCHOOL_TYPE) {
 			place = new School(vec, risk);
 			///std::cout << "making a school" << std::endl;
 		} else if (type == HOUSEHOLD_TYPE) {
@@ -173,6 +174,8 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		} else if (type == PRISON_TYPE) {
 			place = new Prison(vec, risk);
 			//std::cout << "making a " << type << std::endl;
+		} else if (type == GYM_TYPE) {
+			place = new Gym(vec, risk);
 		} else {
 			// if the type is not one we have a specific place for
 			// yet, then create a DefaultPlace.

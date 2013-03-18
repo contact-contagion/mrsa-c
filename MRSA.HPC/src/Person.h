@@ -43,9 +43,8 @@ const int H_NIGHTS_3 = 19;
 const int H_NIGHTS_4 = 20;
 const int H_NIGHTS_5 = 21;
 
-// forward declarations
-class Prison;
-class GeneralQuarters;
+// forward declaration
+class CompositePlace;
 
 class Person: public repast::relogo::Turtle {
 
@@ -145,14 +144,9 @@ public:
 	void goToHome();
 
 	/**
-	 * Makes this person go to the specified Prison.
+	 * Makes this Person go to the specified compoment place.
 	 */
-	void goToPrison(Prison* prison, int activity_type);
-
-	/**
-	 * Makes this person go to the specified GeneralQuarters.
-	 */
-	void goToGQ(GeneralQuarters* gq, int activity_type);
+	void goToCompositePlace(CompositePlace* place, int activity_type);
 
 	/**
 	 * Performs the current activity for the specified time
@@ -175,7 +169,7 @@ private:
 
 	DiseaseStatusUpdater status_;
 	double entered_hospital_time, entered_prison_time;
-	int prison_index, gq_index;
+	std::vector<int> comp_indices;
 
 	/**
 	 * Changes this Person's place to the specified place.

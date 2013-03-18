@@ -19,6 +19,7 @@ SOURCES = CSVReader.cpp \
           Workplace.cpp \
           Hospital.cpp \
           DefaultPlace.cpp \
+          Gym.cpp \
           GeneralQuarters.cpp \
           Prison.cpp \
           PlaceCreator.cpp \

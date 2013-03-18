@@ -120,8 +120,8 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	}
 
 	// TODO replace with real values when available
-	//places.prison = findPlace("G170312716001P1");
-	float prison_prob = 0f;
+	places.prison = findPlace("G170312716001P1");
+	float prison_prob = 1;
 	int prison_duration = 30;
 
 	// create the Person

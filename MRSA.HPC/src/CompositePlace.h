@@ -13,11 +13,15 @@
 
 namespace mrsa {
 
+enum CompPlaceType {
+	PRISON = 0, GQ, GYM
+};
+
 /**
  * A group of persons of the same age in a school. Transmission
  * occurs between members of an AgeGroup.
  */
-class ComponentPlace : public AbstractPlace {
+class ComponentPlace: public AbstractPlace {
 
 public:
 	ComponentPlace(std::string id, std::string type, Risk risk);
@@ -37,8 +41,6 @@ private:
 	ComponentPlace(const ComponentPlace& other);
 };
 
-
-
 /**
  * A CompositePlace contains sub component places in which
  * the transmission actually occurs.
@@ -46,7 +48,8 @@ private:
 class CompositePlace: public Place {
 
 public:
-	CompositePlace(std::vector<std::string>& vec, Risk risk, unsigned int component_max_size);
+	CompositePlace(std::vector<std::string>& vec, Risk risk, unsigned int component_max_size,
+			CompPlaceType pType);
 	virtual ~CompositePlace();
 
 	/**
@@ -78,12 +81,14 @@ public:
 	 */
 	size_t componentSize(size_t index);
 
-
-
+	const CompPlaceType compPlaceType() const {
+		return placeType_;
+	}
 
 private:
 	std::vector<ComponentPlace*> components;
 	unsigned int component_max_size_;
+	CompPlaceType placeType_;
 };
 
 } /* namespace mrsa */
