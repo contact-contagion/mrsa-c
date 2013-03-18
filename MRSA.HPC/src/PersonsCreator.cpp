@@ -88,6 +88,8 @@ Place* PersonsCreator::findPlace(const string id) {
 	return 0;
 }
 
+bool flip = true;
+
 // creates a Person from a line in the persons data file
 Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer* obs) {
 
@@ -117,6 +119,15 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	for (int i = OTHER_H_START_IDX; i <= OTHER_H_END_IDX; ++i) {
 		const string& other_hh_id = vec[i];
 		places.other_households.push_back(findPlace(other_hh_id));
+	}
+
+	// TODO remove when zip code info is Persons file
+	if (flip) {
+		vec[ZIP_CODE_IDX] = "60615";
+		flip = false;
+	} else {
+		vec[ZIP_CODE_IDX] = "60625";
+		flip = true;
 	}
 
 	// TODO replace with real values when available

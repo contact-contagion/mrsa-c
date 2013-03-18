@@ -115,6 +115,13 @@ public:
 	}
 
 	/**
+	 * Gets the zip code of this person.
+	 */
+	unsigned int zipCode() const {
+		return zip_code;
+	}
+
+	/**
 	 * Gets the current infection status.
 	 */
 	InfectionStatus infectionStatus() const {
