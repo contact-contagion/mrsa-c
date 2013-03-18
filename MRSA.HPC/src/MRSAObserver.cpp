@@ -20,6 +20,7 @@
 #include "TransmissionAlgorithm.h"
 #include "Parameters.h"
 #include "Constants.h"
+#include "TransmissionEventRecorder.h"
 
 namespace mrsa {
 
@@ -284,6 +285,7 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 
 void MRSAObserver::atEnd() {
 	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file, *propsPtr);
+	TransmissionEventRecorder::instance()->close();
 }
 
 // entry point for model setup.
@@ -296,6 +298,8 @@ void MRSAObserver::setup(Properties& props) {
 	std::string time;
 	repast::timestamp(time);
 	std::cout << "Setup Started at " << time << std::endl;
+
+	TransmissionEventRecorder::initialize(props.getProperty(EVENT_OUTPUT_FILE));
 
 	// create a random distribution used by Person-s to
 	// choose which "other household" to go to

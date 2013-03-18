@@ -23,6 +23,7 @@ SOURCES = CSVReader.cpp \
           GeneralQuarters.cpp \
           Prison.cpp \
           PlaceCreator.cpp \
+          TransmissionEventRecorder.cpp \
           ActivityCreator.cpp \
           PlaceStats.cpp \
           DataSourceAdapters.cpp \

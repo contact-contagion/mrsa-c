@@ -22,6 +22,7 @@ extern const std::string RISK_FILE;
 extern const std::string HOURLY_OUTPUT_FILE;
 extern const std::string YEARLY_OUTPUT_FILE;
 extern const std::string SUMMARY_OUTPUT_FILE;
+extern const std::string EVENT_OUTPUT_FILE;
 
 extern const std::string COLONIZATION_FRAC;
 extern const std::string INITIAL_INFECTION_COUNT;

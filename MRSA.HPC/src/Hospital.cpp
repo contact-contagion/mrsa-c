@@ -8,6 +8,7 @@
 #include "Hospital.h"
 #include "TransmissionAlgorithm.h"
 #include "Statistics.h"
+#include "TransmissionEventRecorder.h"
 
 namespace mrsa {
 
@@ -47,6 +48,8 @@ void Hospital::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
 		Statistics::getInstance()->incrementColonizationCount(type_);
+		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+								this, U_TO_C);
 		//Statistics::getInstance()->incrementColonizationFromInfection();
 	}
 }

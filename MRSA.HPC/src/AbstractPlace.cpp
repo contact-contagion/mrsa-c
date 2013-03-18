@@ -11,6 +11,7 @@
 #include "Statistics.h"
 #include "Parameters.h"
 #include "Constants.h"
+#include "TransmissionEventRecorder.h"
 
 namespace mrsa {
 
@@ -59,6 +60,8 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 			place_type = OTHER_HOUSEHOLD_TYPE;
 		}
 		Statistics::getInstance()->incrementColonizationCount(place_type);
+		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+				this, U_TO_C);
 		if (infected.size() > 0) {
 			// increment the pro-rated number of people colonized by the infectious
 			// persons in this place.
@@ -90,6 +93,15 @@ void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 				person->initHouseholdTreatment();
 			}
 		}
+
+		if (person->status() == UNCOLONIZED) {
+			TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+							this, I_TO_U);
+		} else if (person->status() == COLONIZED){
+			TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+							this, I_TO_C);
+		}
+
 	}
 }
 
@@ -107,8 +119,15 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	// disease status counts in this place.
 	DiseaseStatus status = ta->runColonized(b_risk_multiplier, e_risk_multiplier);
 	person->updateStatus(status);
-	if (status == INFECTED)
+
+	if (status == INFECTED) {
 		Statistics::getInstance()->incrementInfectionCount(type_);
+		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+						this, C_TO_I);
+	} else if (status == UNCOLONIZED) {
+		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
+						this, C_TO_U);
+	}
 }
 
 } /* namespace mrsa */

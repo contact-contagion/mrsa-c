@@ -1,4 +1,3 @@
-
 /*
  * Household.cpp
  *
@@ -9,6 +8,7 @@
 
 #include "Household.h"
 #include "TransmissionAlgorithm.h"
+#include "TransmissionEventRecorder.h"
 #include "Parameters.h"
 
 namespace mrsa {
@@ -48,7 +48,8 @@ void Household::runTransmission() {
 	}
 
 	if (source_infectee != 0
-			&& repast::RepastProcess::instance()->getScheduleRunner().currentTick() - sd_timestamp >= FOURTEEN_DAYS) {
+			&& repast::RepastProcess::instance()->getScheduleRunner().currentTick() - sd_timestamp
+					>= FOURTEEN_DAYS) {
 		treatHousehold();
 	}
 }
@@ -59,8 +60,18 @@ void Household::treatHousehold() {
 	for (PersonIter iter = members.begin(); iter != members.end(); ++iter) {
 		Person* p = *iter;
 		// if draw fails then status remains as it was
-		if (p->status() != UNCOLONIZED && p != source_infectee && repast::Random::instance()->nextDouble() <= cure_probability) {
+		if (p->status() != UNCOLONIZED && p != source_infectee
+				&& repast::Random::instance()->nextDouble() <= cure_probability) {
 			p->updateStatus(UNCOLONIZED);
+			if (p->status() == INFECTED) {
+				TransmissionEventRecorder::instance()->recordEvent(
+						repast::RepastProcess::instance()->getScheduleRunner().currentTick(), p,
+						this, I_TO_U);
+			} else {
+				TransmissionEventRecorder::instance()->recordEvent(
+						repast::RepastProcess::instance()->getScheduleRunner().currentTick(), p,
+						this, C_TO_U);
+			}
 		}
 	}
 	sd_timestamp = 0;

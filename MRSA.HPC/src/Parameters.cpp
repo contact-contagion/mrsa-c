@@ -24,6 +24,7 @@ const std::string RISK_FILE = "risk.file";
 const std::string HOURLY_OUTPUT_FILE = "hourly.output.file";
 const std::string YEARLY_OUTPUT_FILE = "yearly.output.file";
 const std::string SUMMARY_OUTPUT_FILE = "summary.output.file";
+const std::string EVENT_OUTPUT_FILE = "event.output.file";
 
 const std::string COLONIZATION_FRAC = "initial.colonization.fraction";
 const std::string INITIAL_INFECTION_COUNT = "initial.infected.count";
