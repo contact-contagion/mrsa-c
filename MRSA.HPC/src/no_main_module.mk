@@ -1,5 +1,6 @@
 SOURCES = CSVReader.cpp \
 		  Parameters.cpp \
+		  utility.cpp \
 		  Calendar.cpp \
           Activity.cpp \
           TransmissionAlgorithm.cpp \
@@ -9,12 +10,15 @@ SOURCES = CSVReader.cpp \
           PersonsCreator.cpp \
           Place.cpp \
           SelectiveTransmissionPlace.cpp \
+          CompositePlace.cpp \
           AbstractPlace.cpp \
           School.cpp \
           Household.cpp \
           Workplace.cpp \
           Hospital.cpp \
           DefaultPlace.cpp \
+          GeneralQuarters.cpp \
+          Prison.cpp \
           PlaceCreator.cpp \
           ActivityCreator.cpp \
           Statistics.cpp \

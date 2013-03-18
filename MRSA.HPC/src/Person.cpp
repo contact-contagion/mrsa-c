@@ -11,6 +11,8 @@
 
 #include "Person.h"
 #include "Household.h"
+#include "Prison.h"
+#include "GeneralQuarters.h"
 #include "Parameters.h"
 #include "Constants.h"
 #include "Statistics.h"
@@ -27,7 +29,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(
 				hosp_manager), tucaseid_weekday(vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(
 				vec[TUCASE_ID_WEEKEND_IDX]), relate(0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0) {
+				min_infection_duration), entered_hospital_time(0), prison_index(-1), gq_index(-1) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -54,7 +56,14 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 }
 
 Person::~Person() {
+}
 
+void Person::goToPrison(Prison* prison, int activity_type) {
+	prison_index = prison->addPersonToComponent(this, activity_type, prison_index);
+}
+
+void Person::goToGQ(GeneralQuarters* gq, int activity_type) {
+	gq_index = gq->addPersonToComponent(this, activity_type, gq_index);
 }
 
 void Person::validate() {

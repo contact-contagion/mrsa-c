@@ -43,6 +43,10 @@ const int H_NIGHTS_3 = 19;
 const int H_NIGHTS_4 = 20;
 const int H_NIGHTS_5 = 21;
 
+// forward declarations
+class Prison;
+class GeneralQuarters;
+
 class Person: public repast::relogo::Turtle {
 
 	friend std::ostream& operator<<(std::ostream& os, const Person& id);
@@ -51,7 +55,8 @@ class Person: public repast::relogo::Turtle {
 public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-			Places places, boost::shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration);
+			Places places, boost::shared_ptr<IHospitalStayManager> hosp_manager,
+			float min_infection_duration);
 	virtual ~Person();
 
 	/**
@@ -140,6 +145,16 @@ public:
 	void goToHome();
 
 	/**
+	 * Makes this person go to the specified Prison.
+	 */
+	void goToPrison(Prison* prison, int activity_type);
+
+	/**
+	 * Makes this person go to the specified GeneralQuarters.
+	 */
+	void goToGQ(GeneralQuarters* gq, int activity_type);
+
+	/**
 	 * Performs the current activity for the specified time
 	 * and weekday / weekend.
 	 */
@@ -159,6 +174,7 @@ private:
 
 	DiseaseStatusUpdater status_;
 	double entered_hospital_time;
+	int prison_index, gq_index;
 
 	/**
 	 * Changes this Person's place to the specified place.
