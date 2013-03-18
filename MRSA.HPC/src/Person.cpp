@@ -98,11 +98,12 @@ bool Person::initializeActivities(map<string, vector<Activity> >& map) {
 }
 
 // peform the activity for this time and day.
-void Person::performActivity(int time, int day_of_year, int year, bool isWeekday) {
+//void Person::performActivity(int time, int day_of_year, int year, bool isWeekday) {
+void Person::performActivity(Calendar& calendar) {
 //	if (personId() == "5511519") {
 //		has 7 days in hospital so good for testing hosp code.
 //	}
-	if (hosp_manager_->inHospital(year, day_of_year) && places_.hospital != 0) {
+	if (hosp_manager_->inHospital(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
@@ -113,9 +114,9 @@ void Person::performActivity(int time, int day_of_year, int year, bool isWeekday
 		const Activity* act(0);
 		// use the weekday or weekend list depending.
 		// Using a reference here speeds up the model by a lot.
-		const ActivityList& list = isWeekday ? weekday_acts : weekend_acts;
+		const ActivityList& list = calendar.isWeekDay() ? weekday_acts : weekend_acts;
 		for (ActivityIter iter = list.begin(); iter != list.end(); ++iter) {
-			if (iter->contains(time)) {
+			if (iter->contains(calendar.hour_of_day)) {
 				act = &(*iter);
 				break;
 			}

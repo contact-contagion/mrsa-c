@@ -17,15 +17,6 @@
 
 namespace mrsa {
 
-struct Calendar {
-
-	int hour_of_day, day_of_week, day_of_year, year;
-
-	Calendar();
-	void increment();
-	bool isWeekDay();
-};
-
 /**
  * The Observer class for the MRSA model.
  */

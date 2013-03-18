@@ -17,6 +17,7 @@
 #include "Places.h"
 #include "Activity.h"
 #include "HospitalStayManager.h"
+#include "Calendar.h"
 
 namespace mrsa {
 
@@ -142,7 +143,7 @@ public:
 	 * Performs the current activity for the specified time
 	 * and weekday / weekend.
 	 */
-	void performActivity(int time, int day_of_year, int year,  bool isWeekday);
+	void performActivity(Calendar& calendar); //int time, int day_of_year, int year,  bool isWeekday);
 
 private:
 	typedef std::vector<Activity> ActivityList;
