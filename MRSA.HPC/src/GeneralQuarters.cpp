@@ -17,8 +17,5 @@ GeneralQuarters::GeneralQuarters(std::vector<std::string>& vec, Risk risk) : Com
 GeneralQuarters::~GeneralQuarters() {
 }
 
-void GeneralQuarters::addPerson(Person* person, int activity_type) {
-	person->goToCompositePlace(this, activity_type);
-}
 
 } /* namespace mrsa */

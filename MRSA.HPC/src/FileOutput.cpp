@@ -30,7 +30,7 @@ void FileOutput::initialize(const std::string& filename) {
 FileOutput* FileOutput::instance() {
 	if (instance_ == 0) {
 		throw std::domain_error(
-				"TransmissionEventRecorder must be initialized before instance() is called");
+				"FileOutput must be initialized before instance() is called");
 	}
 	return instance_;
 }
@@ -51,8 +51,6 @@ FileOutput::FileOutput(const std::string& filename) :
 		filepath = newName;
 	}
 	out.open(filepath.string().c_str());
-	out << "tick,person_id,place_id,place_type,zip_code,event_type" << std::endl;
-	out.flush();
 }
 
 
@@ -69,6 +67,13 @@ FileOutput::~FileOutput() {
 }
 
 std::ostream& FileOutput::operator<<(std::string val) {
+	if (open) {
+		out << val;
+	}
+	return out;
+}
+
+std::ostream& FileOutput::operator<<(double val) {
 	if (open) {
 		out << val;
 	}

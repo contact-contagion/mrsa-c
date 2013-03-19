@@ -162,7 +162,7 @@ public:
 	/**
 	 * Makes this Person go to the specified compoment place.
 	 */
-	void goToCompositePlace(CompositePlace* place, int activity_type);
+	//void goToCompositePlace(CompositePlace* place, int activity_type);
 
 	/**
 	 * Performs the current activity for the specified time

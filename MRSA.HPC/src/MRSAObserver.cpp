@@ -22,6 +22,8 @@
 #include "Constants.h"
 #include "TransmissionEventRecorder.h"
 
+#include "FileOutput.h"
+
 namespace mrsa {
 
 using namespace repast::relogo;
@@ -345,6 +347,10 @@ void MRSAObserver::setup(Properties& props) {
 	propsPtr = &props;
 	Parameters::initialize(props);
 	Parameters* params = Parameters::instance();
+
+	// debug file output
+	//FileOutput::initialize("output/size_check.csv");
+	//(*FileOutput::instance()) << "tick,id,place_type,size" << std::endl;
 
 	// time stamp to mark start of setup
 	std::string time;

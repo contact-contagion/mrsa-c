@@ -14,7 +14,7 @@
 namespace mrsa {
 
 enum CompPlaceType {
-	PRISON = 0, GQ, GYM
+	PRISON = 0, GQ, GYM, SCHOOL
 };
 
 /**
@@ -52,10 +52,12 @@ public:
 			CompPlaceType pType);
 	virtual ~CompositePlace();
 
+	void addPerson(Person* person, int activity_type);
+
 	/**
 	 * Adds a person to a component place in this CompositePlace.
 	 */
-	int addPersonToComponent(Person* person, int activity_type, int compartment_index);
+	//int addPersonToComponent(Person* person, int activity_type, int compartment_index);
 
 	/**
 	 * Runs the mrsa transmission algorithm.
@@ -89,6 +91,7 @@ private:
 	std::vector<ComponentPlace*> components;
 	unsigned int component_max_size_;
 	CompPlaceType placeType_;
+	size_t comp_index;
 };
 
 } /* namespace mrsa */

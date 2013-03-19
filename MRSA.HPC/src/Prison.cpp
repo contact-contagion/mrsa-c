@@ -17,8 +17,5 @@ Prison::Prison(std::vector<std::string>& vec, Risk risk) : CompositePlace(vec, r
 Prison::~Prison() {
 }
 
-void Prison::addPerson(Person* person, int activity_type) {
-	person->goToCompositePlace(this, activity_type);
-}
 
 } /* namespace mrsa */

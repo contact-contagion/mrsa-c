@@ -16,13 +16,6 @@ class Gym : public CompositePlace {
 public:
 	Gym(std::vector<std::string>& vec, Risk risk);
 	virtual ~Gym();
-
-	/**
-	 * Adds a person to this Gym.
-	 *
-	 * @param person the person to add.
-	 */
-	void addPerson(Person* person, int activity_type);
 };
 
 } /* namespace mrsa */

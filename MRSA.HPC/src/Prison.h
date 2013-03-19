@@ -18,13 +18,6 @@ public:
 	Prison(std::vector<std::string>& vec, Risk risk);
 	virtual ~Prison();
 
-	/**
-	 * Adds a person to this GeneralQuarters.
-	 *
-	 * @param person the person to add.
-	 */
-	void addPerson(Person* person, int activity_type);
-
 };
 
 } /* namespace mrsa */

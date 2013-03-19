@@ -16,9 +16,6 @@ Gym::Gym(std::vector<std::string>& vec, Risk risk) : CompositePlace(vec, risk, M
 
 Gym::~Gym() {}
 
-void Gym::addPerson(Person* person, int activity_type) {
-	person->goToCompositePlace(this, activity_type);
-}
 
 
 } /* namespace mrsa */

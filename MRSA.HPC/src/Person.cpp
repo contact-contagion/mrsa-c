@@ -31,7 +31,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(3, -1) {
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(4, -1) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -63,10 +63,11 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 Person::~Person() {
 }
 
-void Person::goToCompositePlace(CompositePlace* place, int activity_type) {
-	const CompPlaceType& type = place->compPlaceType();
-	comp_indices[type] = place->addPersonToComponent(this, activity_type, comp_indices[type]);
-}
+//void Person::goToCompositePlace(CompositePlace* place, int activity_type) {
+//	const CompPlaceType& type = place->compPlaceType();
+//	std::cout << "gotoCompPlace" << std::endl;
+//	comp_indices[type] = place->addPersonToComponent(this, activity_type, comp_indices[type]);
+//}
 
 void Person::validate() {
 	// remove this person from the model if it has no places

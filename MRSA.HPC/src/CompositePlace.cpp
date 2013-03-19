@@ -7,6 +7,7 @@
 
 #include "CompositePlace.h"
 
+
 namespace mrsa {
 
 using namespace std;
@@ -36,7 +37,11 @@ void ComponentPlace::runTransmission() {
 		processColonized(*iter, ta);
 	}
 
-	//std::cout << id_ << ": " << size() << std::endl;
+//	if (size() > 0) {
+//		(*FileOutput::instance())
+//				<< repast::RepastProcess::instance()->getScheduleRunner().currentTick() << ","
+//				<< id_ << "," << type_ << "," << size() << std::endl;
+//	}
 }
 
 size_t ComponentPlace::size() {
@@ -45,7 +50,8 @@ size_t ComponentPlace::size() {
 
 CompositePlace::CompositePlace(std::vector<std::string>& vec, Risk risk,
 		unsigned int component_max_size, CompPlaceType pType) :
-		Place(vec, risk), components(), component_max_size_(component_max_size), placeType_(pType) {
+		Place(vec, risk), components(), component_max_size_(component_max_size), placeType_(pType),
+		comp_index(0) {
 
 	// add an initial component.
 	components.push_back(new ComponentPlace(id_, type_, risk_));
@@ -66,31 +72,23 @@ void CompositePlace::runTransmission() {
 	}
 }
 
-int CompositePlace::addPersonToComponent(Person* person, int activity_type, int compartment_index) {
-	if (compartment_index == -1) {
-		int index = components.size() - 1;
-		ComponentPlace* place = components[components.size() - 1];
-		if (place->size() < component_max_size_) {
-			place->addPerson(person, activity_type);
-		} else {
-			// create a new ComponentPlace
-			place = new ComponentPlace(id_, type_, risk_);
-			place->addPerson(person, activity_type);
-			components.push_back(place);
-			++index;
-		}
-		return index;
-	} else {
-		components[compartment_index]->addPerson(person, activity_type);
-		return compartment_index;
+void CompositePlace::addPerson(Person* person, int activity_type) {
+	ComponentPlace* place = components[comp_index];
+	place->addPerson(person, activity_type);
+	if (place->size() == component_max_size_) {
+		++comp_index;
+		components.push_back(new ComponentPlace(id_, type_, risk_));
 	}
 }
+
+
 
 void CompositePlace::reset() {
 	for (vector<ComponentPlace*>::iterator iter = components.begin(); iter != components.end();
 			++iter) {
 		(*iter)->reset();
 	}
+	comp_index = 0;
 }
 
 /**

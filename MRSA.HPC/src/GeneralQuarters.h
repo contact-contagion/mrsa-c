@@ -19,13 +19,6 @@ public:
 
 	virtual ~GeneralQuarters();
 
-	/**
-	 * Adds a person to this GeneralQuarters.
-	 *
-	 * @param person the person to add.
-	 */
-	void addPerson(Person* person, int activity_type);
-
 };
 
 } /* namespace mrsa */

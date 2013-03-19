@@ -20,6 +20,7 @@ class FileOutput {
 public:
 
 	std::ostream& operator<<(std::string val);
+	std::ostream& operator<<(double val);
 
 	virtual ~FileOutput();
 
