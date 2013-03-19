@@ -35,6 +35,8 @@ void ComponentPlace::runTransmission() {
 	for (PersonIter iter = colonized.begin(); iter != colonized.end(); ++iter) {
 		processColonized(*iter, ta);
 	}
+
+	//std::cout << id_ << ": " << size() << std::endl;
 }
 
 size_t ComponentPlace::size() {

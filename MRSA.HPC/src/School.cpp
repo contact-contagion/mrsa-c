@@ -39,6 +39,8 @@ void AgeGroup::runTransmission() {
 		processColonized(*iter, ta);
 	}
 
+	//std::cout << "school " << id_ << ": " << (uncolonized.size() + infected.size() + colonized.size()) << std::endl;
+
 }
 
 // low risk = 1f
