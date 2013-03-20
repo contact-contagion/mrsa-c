@@ -43,8 +43,9 @@ void Hospital::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
 	float risk_multiplier = 1;
 	if (activity_type_ == 0) risk_multiplier = risk_.a0_;
 	else risk_multiplier = risk_.a1_;
+
 	DiseaseStatus status = ta->runUncolonized(risk_multiplier, 1, 0);
-	if (person->status() == COLONIZED) {
+	if (status == COLONIZED) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
 		person->updateStatus(status, C_FROM_I);
