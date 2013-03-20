@@ -7,7 +7,6 @@
 
 #include "CompositePlace.h"
 
-
 namespace mrsa {
 
 using namespace std;
@@ -50,8 +49,8 @@ size_t ComponentPlace::size() {
 
 CompositePlace::CompositePlace(std::vector<std::string>& vec, Risk risk,
 		unsigned int component_max_size, CompPlaceType pType) :
-		Place(vec, risk), components(), component_max_size_(component_max_size), placeType_(pType),
-		comp_index(0) {
+		Place(vec, risk), components(), component_max_size_(component_max_size), placeType_(pType), comp_index(
+				0) {
 
 	// add an initial component.
 	components.push_back(new ComponentPlace(id_, type_, risk_));
@@ -75,13 +74,13 @@ void CompositePlace::runTransmission() {
 void CompositePlace::addPerson(Person* person, int activity_type) {
 	ComponentPlace* place = components[comp_index];
 	place->addPerson(person, activity_type);
+
 	if (place->size() == component_max_size_) {
 		++comp_index;
-		components.push_back(new ComponentPlace(id_, type_, risk_));
+		if (comp_index == components.size())
+			components.push_back(new ComponentPlace(id_, type_, risk_));
 	}
 }
-
-
 
 void CompositePlace::reset() {
 	for (vector<ComponentPlace*>::iterator iter = components.begin(); iter != components.end();
