@@ -97,7 +97,7 @@ Statistics::Statistics() :
 	RegionMap::instance()->regions(regions);
 	for (size_t i = 0; i < regions.size(); ++i) {
 		//region_stats[regions[i]] = RegionStat(regions[i]);
-		RegionStat stat =  {regions[i], 0, 0, 0, 0, 0, 0};
+		RegionStat stat = { regions[i], 0, 0, 0, 0, 0, 0 };
 		region_stats.insert(std::pair<char, RegionStat>(regions[i], stat));
 	}
 
@@ -163,6 +163,14 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 	for (std::list<StatusStats>::iterator iter = vec.begin(); iter != vec.end(); ++iter) {
 		StatusStats& stats = *iter;
 
+		if (stats.col_cause == C_FROM_C) {
+			++yearly_c_from_c;
+			++region_stat.c_from_c;
+		} else if (stats.col_cause == C_FROM_I) {
+			++yearly_c_from_i;
+			++region_stat.c_from_i;
+		}
+
 		if (stats.duration != 0) {
 			if (stats.status == INFECTED) {
 				++i_count;
@@ -183,13 +191,6 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 				++c_count;
 				++(p_stats.colonized_count);
 				++region_stat.colonization_incidence;
-				if (stats.col_cause == C_FROM_C) {
-					++yearly_c_from_c;
-					++region_stat.c_from_c;
-				} else if (stats.col_cause == C_FROM_I) {
-					++yearly_c_from_i;
-					++region_stat.c_from_i;
-				}
 
 				p_stats.colonization_duration += stats.duration;
 				p_stats.from_colonization += stats.colonized_persons;
