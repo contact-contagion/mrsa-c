@@ -151,6 +151,10 @@ public:
 		return places_.household;
 	}
 
+	const bool seekCare() const {
+		return seek_care;
+	}
+
 	/**
 	 * Initializes treatment within this Person's household.
 	 */
@@ -191,7 +195,7 @@ private:
 
 	DiseaseStatusUpdater status_;
 	double entered_hospital_time, entered_prison_time;
-	std::vector<int> comp_indices;
+	bool seek_care;
 
 	/**
 	 * Changes this Person's place to the specified place.

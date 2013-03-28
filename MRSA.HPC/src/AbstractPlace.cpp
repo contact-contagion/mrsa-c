@@ -90,10 +90,10 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 void AbstractPlace::processInfected(Person* person, TransmissionAlgorithm* ta) {
 	if (person->canStatusChange()) {
 		InfectionStatus status = person->infectionStatus();
-		if (status == NONE)
-			person->updateInfectionStatus(ta->runInfected());
+		if (status == NONE) {
+			person->updateInfectionStatus(person->seekCare() ? SEEK_CARE : SELF_CARE);
 
-		else if (status == SELF_CARE) {
+		} else if (status == SELF_CARE) {
 			person->updateStatus(ta->runInfectedSelfCare(), NA);
 		} else if (status == SEEK_CARE) {
 			DiseaseStatus disease_status = ta->runInfectedSeekCare();

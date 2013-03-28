@@ -31,8 +31,7 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(
-				4, -1) {
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), seek_care(false) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -52,6 +51,9 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 		age_ = strToInt(val);
 
 	zip_code = strToUInt(vec[vec.size() - 1]);
+
+	double seek_care_prob = strToDouble(vec[SEEK_CARE_IDX]);
+	seek_care = Random::instance()->nextDouble() < seek_care_prob;
 
 	if (places.household != 0) {
 		((Household*) places.household)->addMember(this);
