@@ -19,8 +19,9 @@ namespace mrsa {
 class FileOutput {
 public:
 
-	std::ostream& operator<<(std::string val);
+	std::ostream& operator<<(const std::string& val);
 	std::ostream& operator<<(double val);
+	std::ostream& operator<<(unsigned int val);
 
 	virtual ~FileOutput();
 

@@ -14,6 +14,8 @@
 #include "StayManager.h"
 #include "PrisonStayManager.h"
 
+#include "FileOutput.h"
+
 namespace mrsa {
 
 using namespace std;
@@ -34,27 +36,30 @@ shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, sh
 	}
 }
 
-shared_ptr<PlaceStayManager> create_prison_stay(shared_ptr<PlaceStayManager>& no_stay_manager, float prison_prob, int duration) {
+PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_duration,
+		unsigned int max_jail_duration) {
 	Random* random = Random::instance();
 	PrisonStayManager* manager(0);
-	// one try per year
-	for (int i = 0; i < 10; ++i) {
+	// one try per year, 10 years
+	for (unsigned int i = 0; i < 10; ++i) {
 		if(random->nextDouble() <= prison_prob) {
 			if (manager == 0) {
 				manager = new PrisonStayManager();
 			}
-			manager->createStayFor(i, duration);
+
+			unsigned int duration = (int)Random::instance()->createUniIntGenerator(min_jail_duration, max_jail_duration).next();
+			manager->createStayFor(0, duration);
 		}
 	}
 
-	if (manager != 0) return shared_ptr<PlaceStayManager>(manager);
-	else return no_stay_manager;
+	return manager;
 }
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration) :
+		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration),
+		min_jail_duration_(min_jail_duration), max_jail_duration_(max_jail_duration),
 		no_stay_manager(new NoStayManager()){
 
 	init();
@@ -63,7 +68,8 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_), no_stay_manager(new NoStayManager()) {
+				creator.min_infection_duration_), min_jail_duration_(creator.min_jail_duration_),
+				max_jail_duration_(creator.max_jail_duration_), no_stay_manager(new NoStayManager()) {
 	init();
 }
 
@@ -87,8 +93,6 @@ Place* PersonsCreator::findPlace(const string id) {
 	}
 	return 0;
 }
-
-bool flip = true;
 
 // creates a Person from a line in the persons data file
 Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer* obs) {
@@ -129,14 +133,24 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	ss << zip;
 	vec.push_back(ss.str());
 
-	// TODO replace with real values when available
-	//places.prison = findPlace("G170312716001P1");
-	float prison_prob = 0;
-	int prison_duration = 30;
+	// TODO replace with real value when available
+	if (places.prison == 0) places.prison = findPlace("G170312716001P1");
+	double prison_prob = strToDouble(vec[JAIL_IDX]);
+	PlaceStayManager* manager(0);
+	if (prison_prob > 0) {
+		manager = create_prison_stay(prison_prob, min_jail_duration_, max_jail_duration_);
+	}
+
+	if (manager == 0)
+		return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+					no_stay_manager, min_infection_duration_);
+	else {
+		return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+					shared_ptr<PlaceStayManager>(manager), min_infection_duration_);
+	}
 
 	// create the Person
-	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), create_prison_stay(no_stay_manager,
-			prison_prob, prison_duration), min_infection_duration_);
+
 }
 
 }

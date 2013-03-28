@@ -19,7 +19,7 @@ class AbstractStayManager : public PlaceStayManager {
 public:
 
 	/**
-	 * Creates an AbstractStayManager with 10 years of 0, 0 StayData.
+	 * Creates an AbstractStayManager with years of 0, 0 StayData.
 	 */
 	AbstractStayManager(size_t years);
 
@@ -29,7 +29,6 @@ public:
 protected:
 	std::vector<StayData> stay_data;
 	unsigned int duration, start_day;
-
 };
 
 } /* namespace mrsa */

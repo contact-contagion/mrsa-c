@@ -66,7 +66,14 @@ FileOutput::~FileOutput() {
 	close();
 }
 
-std::ostream& FileOutput::operator<<(std::string val) {
+std::ostream& FileOutput::operator<<(const std::string& val) {
+	if (open) {
+		out << val;
+	}
+	return out;
+}
+
+std::ostream& FileOutput::operator<<(unsigned int val) {
 	if (open) {
 		out << val;
 	}

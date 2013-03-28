@@ -166,10 +166,12 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 		throw invalid_argument("Error opening: " + personsFile);
 
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
+	Parameters* params = Parameters::instance();
 
 	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration);
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration,
+			params->getDoubleParameter(MIN_JAIL_DURATION), params->getDoubleParameter(MAX_JAIL_DURATION));
 	// First line is the header info so we create one less
 	// than the number of lines in the file.
 	personType = create<Person>(lines - 1, pCreator);

@@ -10,12 +10,14 @@
 
 namespace mrsa {
 
-AbstractStayManager::AbstractStayManager(size_t years) : stay_data(years, std::make_pair(0u, 0u)), duration(0), start_day(0) {
+AbstractStayManager::AbstractStayManager(size_t years) :
+		stay_data(years, std::make_pair(0u, 0u)), duration(0), start_day(0) {
 }
 
 AbstractStayManager::~AbstractStayManager() {
 }
 
+int count = 0;
 bool AbstractStayManager::inPlace(int year, int day) {
 	bool ret_val = false;
 

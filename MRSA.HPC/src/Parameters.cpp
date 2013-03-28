@@ -50,6 +50,9 @@ const std::string THETA = "theta";
 const std::string GAMMA = "gamma";
 const std::string Z = "z";
 
+const std::string MIN_JAIL_DURATION = "minimum.jail.stay";
+const std::string MAX_JAIL_DURATION = "maximum.jail.stay";
+
 Parameters* Parameters::instance_ = 0;
 
 Parameters::Parameters(repast::Properties& props) : props_(props),

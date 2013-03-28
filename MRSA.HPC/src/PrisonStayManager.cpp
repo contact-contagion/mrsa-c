@@ -17,7 +17,7 @@ PrisonStayManager::PrisonStayManager() :
 PrisonStayManager::~PrisonStayManager() {
 }
 
-void PrisonStayManager::createStayFor(int year, int duration) {
+void PrisonStayManager::createStayFor(int year, unsigned int duration) {
 	stay_data[year] =
 			(std::pair<unsigned int, unsigned int>(
 					(unsigned int) repast::Random::instance()->createUniIntGenerator(1,

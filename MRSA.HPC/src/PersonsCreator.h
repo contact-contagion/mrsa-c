@@ -31,7 +31,8 @@ public:
 	 * specified file and using the specified map to
 	 * look up the Persons' places.
 	 */
-	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration);
+	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration,
+			unsigned int min_jail_duration, unsigned int max_jail_duration);
 	PersonsCreator(const PersonsCreator& creator);
 	virtual ~PersonsCreator();
 
@@ -44,6 +45,7 @@ private:
 	CSVReader reader;
 	std::map<std::string, Place*>* places;
 	float min_infection_duration_;
+	unsigned int min_jail_duration_, max_jail_duration_;
 	boost::shared_ptr<PlaceStayManager> no_stay_manager;
 
 	/**

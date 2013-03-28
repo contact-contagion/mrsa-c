@@ -125,7 +125,7 @@ void createPersons(Observer* obs, AgentSet<Person>& persons, std::vector<Place*>
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2);
+	PersonsCreator pCreator("../test_data/people.csv", &placeMap, 2, 10, 30);
 	obs->create<Person>(count, pCreator);
 	obs->get(persons);
 }

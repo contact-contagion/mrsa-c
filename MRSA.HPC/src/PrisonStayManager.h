@@ -21,7 +21,7 @@ public:
 	/**
 	 * Creates a prison stay for the specified year, and of the specified duration.
 	 */
-	void createStayFor(int year, int duration);
+	void createStayFor(int year, unsigned int duration);
 };
 
 } /* namespace mrsa */

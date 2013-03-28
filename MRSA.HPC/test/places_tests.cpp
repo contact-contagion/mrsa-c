@@ -34,7 +34,7 @@ BOOST_AUTO_TEST_CASE(comp_places) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator(props.getProperty("persons.file"), &placeMap, 7.0f);
+	PersonsCreator pCreator(props.getProperty("persons.file"), &placeMap, 7.0f, 10, 30);
 	obs->create<Person>(400, pCreator);
 
 	AgentSet<Person> persons;
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE(event_recorder) {
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator(props.getProperty("persons.file"), &placeMap, 7.0f);
+	PersonsCreator pCreator(props.getProperty("persons.file"), &placeMap, 7.0f, 10, 30);
 	obs->create<Person>(2, pCreator);
 
 	AgentSet<Person> persons;

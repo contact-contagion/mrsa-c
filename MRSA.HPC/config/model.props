@@ -3,8 +3,8 @@ random.seed = 1
 BaseSweepNumber = 0
 
 #stop.at = 720
-stop.at = 17520.5
-#stop.at = 8760.5
+#stop.at = 17520.5
+stop.at = 8760.5
 #17520.5 
 #8760.5
 
@@ -50,6 +50,10 @@ theta = 0.5
 gamma = 0.5
 # probability of self-care infected to uncolonized, else colonized
 z = 0.5
+
+# in days
+minimum.jail.stay = 40
+maximum.jail.stay = 80
 
 # whether or not seek and destroy for household members of 
 # infected persons is enabled

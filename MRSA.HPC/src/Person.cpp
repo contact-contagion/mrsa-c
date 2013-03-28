@@ -31,7 +31,8 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
 				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
 				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(4, -1) {
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), comp_indices(
+				4, -1) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -49,7 +50,6 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	val = trim(val);
 	if (val.length() > 0)
 		age_ = strToInt(val);
-
 
 	zip_code = strToUInt(vec[vec.size() - 1]);
 
@@ -115,13 +115,15 @@ void Person::performActivity(Calendar& calendar) {
 //	if (personId() == "5511519") {
 //		has 7 days in hospital so good for testing hosp code.
 //	}
+
 	if (hosp_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
 		changePlace(places_.hospital, 0);
 
-	} else if (prison_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.prison != 0) {
+	} else if (prison_manager_->inPlace(calendar.year, calendar.day_of_year)
+			&& places_.prison != 0) {
 		if (entered_prison_time == 0) {
 			entered_prison_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
@@ -183,7 +185,6 @@ void Person::changePlace(Place* place, int activity_type) {
 		places_.current = place;
 	}
 
-
 	if (entered_hospital_time != 0 && (place == 0 || place->placeType() != HOSPITAL_TYPE)) {
 		Statistics::getInstance()->incrementHospitalStayCount();
 		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
@@ -193,12 +194,12 @@ void Person::changePlace(Place* place, int activity_type) {
 	}
 
 	if (entered_prison_time != 0 && (place == 0 || place->placeType() != PRISON_TYPE)) {
-			Statistics::getInstance()->incrementPrisonStayCount();
-			double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
-					- entered_prison_time;
-			Statistics::getInstance()->incrementPrisonDurationCount(duration);
-			entered_prison_time = 0;
-		}
+		Statistics::getInstance()->incrementPrisonStayCount();
+		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
+				- entered_prison_time;
+		Statistics::getInstance()->incrementPrisonDurationCount(duration);
+		entered_prison_time = 0;
+	}
 
 	// regardless of whether this Person has changed its
 	// current place, this method should only be called once
