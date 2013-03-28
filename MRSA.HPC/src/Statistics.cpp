@@ -106,16 +106,26 @@ Statistics::Statistics() :
 Statistics::~Statistics() {
 }
 
-void Statistics::incrementColonizationCount(const std::string& type) {
+void Statistics::incrementColonizationCount(const std::string& type, const unsigned int zip_code) {
 	increment_map_count(colonization_count_map, type);
+	if (type == PRISON_TYPE) {
+		jail_stats.incrementColonizationCount(zip_code);
+	} else if (type == HOSPITAL_TYPE) {
+		hospital_stats.incrementColonizationCount(zip_code);
+	}
 }
 
 void Statistics::incrementColonizationFromInfection() {
 	++colonization_from_infection_override;
 }
 
-void Statistics::incrementInfectionCount(const std::string& type) {
+void Statistics::incrementInfectionCount(const std::string& type, const unsigned int zip_code) {
 	increment_map_count(infection_count_map, type);
+	if (type == PRISON_TYPE) {
+		jail_stats.incrementInfectionCount(zip_code);
+	} else if (type == HOSPITAL_TYPE) {
+		hospital_stats.incrementInfectionCount(zip_code);
+	}
 }
 
 void Statistics::setInitialCounts(repast::relogo::AgentSet<Person>& people) {
@@ -284,13 +294,8 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 	averages.yearly_no_seek_infection_duration += yearly_no_seek_infection_duration;
 	averages.yearly_seek_infection_duration += yearly_seek_infection_duration;
 
-	hospital_stats.colonization_count = get_map_value(colonization_count_map, HOSPITAL_TYPE);
-	hospital_stats.infection_count = get_map_value(infection_count_map, HOSPITAL_TYPE);
-	hospital_stats.addToProps(props, "hospital", year);
-
-	jail_stats.colonization_count = get_map_value(colonization_count_map, PRISON_TYPE);
-	jail_stats.infection_count = get_map_value(infection_count_map, PRISON_TYPE);
-	jail_stats.addToProps(props, "jail", year);
+	hospital_stats.addToProps(props, "hospital", year, false);
+	jail_stats.addToProps(props, "jail", year, true);
 
 	addValToProps(HOUSEHOLD_COL_COUNT, year, props,
 			get_map_value(colonization_count_map, HOUSEHOLD_TYPE));
@@ -513,8 +518,8 @@ void Statistics::createYearlyDataSources(repast::SVDataSetBuilder& builder) {
 			createSVDataSource("avg_colonization_duration",
 					new DDataSourceAdapter(&yearly_colonization_duration), std::plus<double>()));
 
-	hospital_stats.createDataSources("hospital", builder);
-	jail_stats.createDataSources("jail", builder);
+	hospital_stats.createDataSources("hospital", builder, false);
+	jail_stats.createDataSources("jail", builder, true);
 
 	std::string place_names[] = { HOUSEHOLD_TYPE, OTHER_HOUSEHOLD_TYPE, HOSPITAL_TYPE, SCHOOL_TYPE,
 			WORKPLACE_TYPE, GYM_TYPE, NURSING_HOME_TYPE, DORM_TYPE, PRISON_TYPE };

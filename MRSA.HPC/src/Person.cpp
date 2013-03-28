@@ -188,18 +188,18 @@ void Person::changePlace(Place* place, int activity_type) {
 	}
 
 	if (entered_hospital_time != 0 && (place == 0 || place->placeType() != HOSPITAL_TYPE)) {
-		Statistics::getInstance()->incrementHospitalStayCount();
+		Statistics::getInstance()->incrementHospitalStayCount(zip_code);
 		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
 				- entered_hospital_time;
-		Statistics::getInstance()->incrementHospitalDurationCount(duration);
+		Statistics::getInstance()->incrementHospitalDurationCount(duration, zip_code);
 		entered_hospital_time = 0;
 	}
 
 	if (entered_prison_time != 0 && (place == 0 || place->placeType() != PRISON_TYPE)) {
-		Statistics::getInstance()->incrementPrisonStayCount();
+		Statistics::getInstance()->incrementPrisonStayCount(zip_code);
 		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
 				- entered_prison_time;
-		Statistics::getInstance()->incrementPrisonDurationCount(duration);
+		Statistics::getInstance()->incrementPrisonDurationCount(duration, zip_code);
 		entered_prison_time = 0;
 	}
 

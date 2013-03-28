@@ -80,7 +80,7 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 		if (type_ == HOUSEHOLD_TYPE && (person->household() != this)) {
 			place_type = OTHER_HOUSEHOLD_TYPE;
 		}
-		Statistics::getInstance()->incrementColonizationCount(place_type);
+		Statistics::getInstance()->incrementColonizationCount(place_type, person->zipCode());
 		TransmissionEventRecorder::instance()->recordEvent(
 				repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person, this,
 				U_TO_C);
@@ -131,7 +131,7 @@ void AbstractPlace::processColonized(Person* person, TransmissionAlgorithm* ta) 
 	person->updateStatus(status, NA);
 
 	if (status == INFECTED) {
-		Statistics::getInstance()->incrementInfectionCount(type_);
+		Statistics::getInstance()->incrementInfectionCount(type_, person->zipCode());
 		TransmissionEventRecorder::instance()->recordEvent(
 				repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person, this,
 				C_TO_I);

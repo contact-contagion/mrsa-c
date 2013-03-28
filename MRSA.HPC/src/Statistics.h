@@ -123,39 +123,39 @@ public:
 	/**
 	 * Increments the colonization count for the specified place type.
 	 */
-	void incrementColonizationCount(const std::string& type);
+	void incrementColonizationCount(const std::string& type, const unsigned int zip_code);
 
 	/**
 	 * Increments the infection count for the specified place type.
 	 */
-	void incrementInfectionCount(const std::string& type);
+	void incrementInfectionCount(const std::string& type, const unsigned int zip_code);
 
 	/**
 	 * Increments the hospital stay count.
 	 */
-	void incrementHospitalStayCount() {
-		hospital_stats.incrementStayCount();
+	void incrementHospitalStayCount(unsigned int zip_code) {
+		hospital_stats.incrementStayCount(zip_code);
 	}
 
 	/**
 	 * Increments the hospital stay duration count by the specified amount.
 	 */
-	void incrementHospitalDurationCount(double hours) {
-		hospital_stats.incrementDuration(hours);
+	void incrementHospitalDurationCount(double hours, unsigned int zip_code) {
+		hospital_stats.incrementDuration(hours, zip_code);
 	}
 
 	/**
 	 * Increments the prison stay count.
 	 */
-	void incrementPrisonStayCount() {
-		jail_stats.incrementStayCount();
+	void incrementPrisonStayCount(unsigned int zip_code) {
+		jail_stats.incrementStayCount(zip_code);
 	}
 
 	/**
 	 * Increments the prison stay duration count by the specified amount.
 	 */
-	void incrementPrisonDurationCount(double hours) {
-		jail_stats.incrementDuration(hours);
+	void incrementPrisonDurationCount(double hours, unsigned int zip_code) {
+		jail_stats.incrementDuration(hours, zip_code);
 	}
 
 	/**

@@ -26,7 +26,7 @@ summary.output.file = ./output/summary_stats
 event.output.file = ./output/transmission_events.csv
 
 initial.colonization.scaling = 10
-initial.infected.count = 100
+initial.infected.count = 1000
 
 
 # 7 days (24 x 7)

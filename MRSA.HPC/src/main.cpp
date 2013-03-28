@@ -27,7 +27,7 @@ static const int countOfInputRecordValues = 30;
 static const int countOfRecordValues = 46;
 
 const int TYPE_IDX = 1;
-const int YEARLY_DATA_LENGTH = 19;
+const int YEARLY_DATA_LENGTH = 35;
 const int MAX_YEAR = 5;
 
 using namespace boost::assign;
@@ -134,7 +134,8 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 		"hourly.output.file", "yearly.output.file", "summary.output.file",
 
 		// Parameters:
-		"seek.care.fraction", "initial.colonization.fraction", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
+		"initial.colonization.scaling", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
+		"minimum.jail.stay", "maximum.jail.stay",
 
 		// Risks:
 		"Hospital_0_PAR", "Hospital_0_TIP", "Hospital_0_AIP", "Hospital_0_X", "Hospital_1_PAR", "Hospital_1_TIP", "Hospital_1_AIP", "Hospital_1_X",
@@ -170,8 +171,14 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 
 		std::string yearly_data[YEARLY_DATA_LENGTH] = {"infections_incidence", "colonizations_incidence", "infections_prevalence",
 				"colonizations_prevalence", "hospital_colonizations", "hospital_infections", "hospital_stays",
-				"hospital_days", "jail_colonizations", "jail_infections", "jail_stays",
-				"jail_days", HOUSEHOLD_COL_COUNT, OTHER_H_COL_COUNT, WORKPLACE_COL_COUNT,
+				"hospital_days",
+				"jail_colonizations", "jail_infections", "jail_stays", "jail_days",
+				"jail_colonizations_N", "jail_infections_N", "jail_stays_N", "jail_days_N",
+				"jail_colonizations_S", "jail_infections_S", "jail_stays_S", "jail_days_S",
+				"jail_colonizations_W", "jail_infections_W", "jail_stays_W", "jail_days_W",
+				"jail_colonizations_C", "jail_infections_C", "jail_stays_C", "jail_days_C",
+
+				HOUSEHOLD_COL_COUNT, OTHER_H_COL_COUNT, WORKPLACE_COL_COUNT,
 				SCHOOL_COL_COUNT, GYM_COL_COUNT, DORM_COL_COUNT, NURSING_HOME_COL_COUNT
 		};
 
