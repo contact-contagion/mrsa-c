@@ -95,12 +95,6 @@ private:
 	 */
 	void createPlaces(repast::Properties& props, std::map<std::string, Place*>* placeMap);
 
-	/**
-	 * Assigns randomly selected persons a disease status of colonized or infected based on
-	 * parameters in the properties.
-	 */
-	void initializeDiseaseStatus(repast::Properties& props, repast::relogo::AgentSet<Person>& people);
-
 };
 
 } /* namespace mrsa */

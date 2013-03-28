@@ -13,6 +13,7 @@
 #include "Constants.h"
 #include "StayManager.h"
 #include "PrisonStayManager.h"
+#include "Parameters.h"
 
 #include "FileOutput.h"
 
@@ -60,7 +61,11 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration),
 		min_jail_duration_(min_jail_duration), max_jail_duration_(max_jail_duration),
-		no_stay_manager(new NoStayManager()){
+		initial_infection_count(0), colonization_scaling(0),
+		no_stay_manager(new NoStayManager()) {
+
+	initial_infection_count = strToUInt(Parameters::instance()->getStringParameter(INITIAL_INFECTION_COUNT));
+	colonization_scaling = Parameters::instance()->getDoubleParameter(COLONIZATION_SCALING);
 
 	init();
 }
@@ -69,7 +74,9 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
 				creator.min_infection_duration_), min_jail_duration_(creator.min_jail_duration_),
-				max_jail_duration_(creator.max_jail_duration_), no_stay_manager(new NoStayManager()) {
+				max_jail_duration_(creator.max_jail_duration_),
+				initial_infection_count(creator.initial_infection_count), colonization_scaling(creator.colonization_scaling),
+				no_stay_manager(new NoStayManager()) {
 	init();
 }
 
@@ -141,16 +148,25 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		manager = create_prison_stay(prison_prob, min_jail_duration_, max_jail_duration_);
 	}
 
+	Person* p = 0;
+
 	if (manager == 0)
-		return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+		p = new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
 					no_stay_manager, min_infection_duration_);
 	else {
-		return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+		p = new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
 					shared_ptr<PlaceStayManager>(manager), min_infection_duration_);
 	}
 
-	// create the Person
+	Random* random = Random::instance();
+	double p_mrsa = strToDouble(vec[P_MRSA_IDX]);
+	if (random->nextDouble() < p_mrsa * initial_infection_count) {
+		p->updateStatus(INFECTED);
+	} else if (random->nextDouble() < p_mrsa * initial_infection_count * colonization_scaling) {
+		p->updateStatus(COLONIZED);
+	}
 
+	return p;
 }
 
 }

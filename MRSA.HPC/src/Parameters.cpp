@@ -27,7 +27,7 @@ const std::string YEARLY_OUTPUT_FILE = "yearly.output.file";
 const std::string SUMMARY_OUTPUT_FILE = "summary.output.file";
 const std::string EVENT_OUTPUT_FILE = "event.output.file";
 
-const std::string COLONIZATION_FRAC = "initial.colonization.fraction";
+const std::string COLONIZATION_SCALING = "initial.colonization.scaling";
 const std::string INITIAL_INFECTION_COUNT = "initial.infected.count";
 const std::string INFECTION_PERIOD = "minimum.infection.period";
 const std::string FASTER_SCALING = "faster.response.scaling.factor";

@@ -19,15 +19,14 @@ activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv
 
 
 risk.file = ../data/new_risk_file_102612.csv 
-init.c_and_i.file = ../data/colonization_infection_init.csv
 
 hourly.output.file = ./output/hourly_data
 yearly.output.file = ./output/yearly_data
 summary.output.file = ./output/summary_stats
 event.output.file = ./output/transmission_events.csv
 
-#initial.colonization.fraction = 0.03
-#initial.infected.count = 34
+initial.colonization.scaling = 10
+initial.infected.count = 100
 
 
 # 7 days (24 x 7)

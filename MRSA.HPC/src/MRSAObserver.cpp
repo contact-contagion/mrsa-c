@@ -191,100 +191,6 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	get(people);
 }
 
-// initialize the disease state of all the persons in the model
-// from some initial parameters.
-void MRSAObserver::initializeDiseaseStatus(Properties& props, AgentSet<Person>& people) {
-
-	// put them in zip code buckets
-	std::map<unsigned int, vector<Person*> > persons_by_zip;
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-		Person* person = (*iter);
-		std::map<unsigned int, vector<Person*> >::iterator iter = persons_by_zip.find(
-				person->zipCode());
-		if (iter == persons_by_zip.end()) {
-			std::vector<Person*> vec;
-			vec.push_back(person);
-			persons_by_zip.insert(
-					std::pair<unsigned int, vector<Person*> >(person->zipCode(), vec));
-		} else {
-			iter->second.push_back(person);
-		}
-	}
-
-	Random* random = Random::instance();
-	unsigned int colonized = 0, infected = 0;
-	for (std::map<unsigned int, vector<Person*> >::iterator iter = persons_by_zip.begin();
-			iter != persons_by_zip.end(); ++iter) {
-		stringstream ss, ss1;
-		ss << iter->first << "_colonized";
-		double col_frac = strToDouble(props.getProperty(ss.str()));
-		ss1 << iter->first << "_infected";
-		double infected_frac = strToDouble(props.getProperty(ss1.str()));
-		vector<Person*>& persons = iter->second;
-		for (vector<Person*>::iterator iter = persons.begin(); iter != persons.end(); ++iter) {
-			double draw = random->nextDouble();
-			if (draw <= col_frac) {
-				(*iter)->updateStatus(COLONIZED);
-				++colonized;
-			} else  {
-				(*iter)->updateStatus(UNCOLONIZED);
-			}
-		}
-
-		size_t infected_count = (size_t)(persons.size() * infected_frac);
-		size_t current_count = 0;
-		infected_count = infected_count > people.size() - colonized ? people.size() - colonized : infected_count;
-		repast::shuffleList(persons);
-		for (size_t i = 0; i < persons.size(); ++i) {
-			Person* p = persons[i];
-			if (p->status() == UNCOLONIZED) {
-				p->updateStatus(INFECTED);
-				++current_count;
-				++infected;
-				if (current_count == infected_count) break;
-			}
-		}
-
-	}
-
-	// set the specified fraction of persons to colonized
-	// using a random draw.
-//	double diseaseFrac = strToDouble(props.getProperty(COLONIZATION_FRAC));
-//	Random* random = Random::instance();
-//	unsigned int colonized = 0;
-//	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-//		Person* person = (*iter);
-//		if (random->nextDouble() <= diseaseFrac) {
-//			person->updateStatus(COLONIZED);
-//			++colonized;
-//		} else {
-//			person->updateStatus(UNCOLONIZED);
-//		}
-//	}
-
-	//std::cout << "init colonized: " << colonized << std::endl;
-	//std::cout << "init infected: " << infected << std::endl;
-
-	// shuffle the list of people and set the first
-	// N to infected, assuming he / she is not colonized.
-//	people.shuffle();
-//	unsigned int infected = strToUInt(props.getProperty(INITIAL_INFECTION_COUNT));
-//	infected = infected > people.size() - colonized ? people.size() - colonized : infected;
-//	if (infected > 0) {
-//		unsigned int count = 0;
-//		for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-//			Person* p = (*iter);
-//			// infect if colonized
-//			if (p->status() == UNCOLONIZED) {
-//				p->updateStatus(INFECTED);
-//				++count;
-//				// enough colonized so break.
-//				if (count == infected)
-//					break;
-//			}
-//		}
-//	}
-}
 
 void MRSAObserver::calcYearlyStats() {
 	yearCounter++;
@@ -395,9 +301,15 @@ void MRSAObserver::setup(Properties& props) {
 	AgentSet<Person> people;
 	get(people);
 
-	// initialize the disease status for each person.
-	initializeDiseaseStatus(props, people);
-	//people.ask(&Person::goToHome);
+	int i_count = 0;
+	int c_count = 0;
+	for (size_t i = 0; i < people.size(); ++i) {
+		Person* p = people[i];
+		if (p->status() == INFECTED) ++i_count;
+		else if (p->status() == COLONIZED) ++c_count;
+	}
+
+	std::cout << i_count << ", " << c_count << std::endl;
 
 	// initialize the hourly data collection
 	int runNumber = strToInt(props.getProperty("run.number"));

@@ -46,6 +46,8 @@ private:
 	std::map<std::string, Place*>* places;
 	float min_infection_duration_;
 	unsigned int min_jail_duration_, max_jail_duration_;
+	unsigned int initial_infection_count;
+	double colonization_scaling;
 	boost::shared_ptr<PlaceStayManager> no_stay_manager;
 
 	/**

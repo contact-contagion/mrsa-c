@@ -45,7 +45,7 @@ const int H_NIGHTS_5 = 21;
 
 const int JAIL_IDX = 22;
 const int SEEK_CARE_IDX = 23;
-//const int P_MRSA_IDX = 24;
+const int P_MRSA_IDX = 24;
 const int INFECTED_IDX = 25;
 
 

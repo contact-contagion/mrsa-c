@@ -25,7 +25,7 @@ extern const std::string YEARLY_OUTPUT_FILE;
 extern const std::string SUMMARY_OUTPUT_FILE;
 extern const std::string EVENT_OUTPUT_FILE;
 
-extern const std::string COLONIZATION_FRAC;
+extern const std::string COLONIZATION_SCALING;
 extern const std::string INITIAL_INFECTION_COUNT;
 extern const std::string INFECTION_PERIOD;
 extern const std::string FASTER_SCALING;
