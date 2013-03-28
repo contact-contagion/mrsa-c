@@ -14,6 +14,7 @@ using namespace repast;
 
 const int PLACE_ID_IDX = 0;
 const int PLACE_TYPE_IDX = 1;
+const int ZIP_IDX = 6;
 // skip name and persons as we don't use them
 // in the model.
 //const int NAME_IDX = 2;
@@ -23,7 +24,7 @@ const int LON_IDX = 5;
 
 // creates a Place from the data in the vector and with the specified risk.
 Place::Place(std::vector<std::string>& vec, Risk risk) : id_(vec[PLACE_ID_IDX]), type_(vec[PLACE_TYPE_IDX]),
-		longitude(0), latitude(0), risk_(risk) {
+		longitude(0), latitude(0), risk_(risk), zip_code(strToUInt(trim(vec[ZIP_IDX]))) {
 
 	std::string val = vec[LAT_IDX];
 	val = trim(val);
@@ -36,7 +37,8 @@ Place::Place(std::vector<std::string>& vec, Risk risk) : id_(vec[PLACE_ID_IDX]),
 		longitude = strToDouble(val);
 }
 
-Place::Place(std::string id, std::string type, Risk risk) : id_(id), type_(type), longitude(0), latitude(0), risk_(risk) {}
+Place::Place(std::string id, std::string type, Risk risk, unsigned int zip) : id_(id), type_(type), longitude(0), latitude(0), risk_(risk),
+		zip_code(zip) {}
 
 Place::~Place() {
 }

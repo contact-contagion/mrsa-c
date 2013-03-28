@@ -23,7 +23,7 @@ class AbstractPlace: public Place {
 
 public:
 	AbstractPlace(std::vector<std::string>& vec, Risk risk);
-	AbstractPlace(std::string id, std::string type, Risk risk);
+	AbstractPlace(std::string id, std::string type, Risk risk, unsigned int zip);
 	virtual ~AbstractPlace();
 
 	/**

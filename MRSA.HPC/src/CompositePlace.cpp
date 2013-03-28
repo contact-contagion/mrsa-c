@@ -11,8 +11,8 @@ namespace mrsa {
 
 using namespace std;
 
-ComponentPlace::ComponentPlace(string id, string type, Risk risk) :
-		AbstractPlace(id, type, risk) {
+ComponentPlace::ComponentPlace(string id, string type, Risk risk, unsigned int zip) :
+		AbstractPlace(id, type, risk, zip) {
 
 }
 
@@ -53,7 +53,7 @@ CompositePlace::CompositePlace(std::vector<std::string>& vec, Risk risk,
 				0) {
 
 	// add an initial component.
-	components.push_back(new ComponentPlace(id_, type_, risk_));
+	components.push_back(new ComponentPlace(id_, type_, risk_, zip_code));
 }
 
 CompositePlace::~CompositePlace() {
@@ -78,7 +78,7 @@ void CompositePlace::addPerson(Person* person, int activity_type) {
 	if (place->size() == component_max_size_) {
 		++comp_index;
 		if (comp_index == components.size())
-			components.push_back(new ComponentPlace(id_, type_, risk_));
+			components.push_back(new ComponentPlace(id_, type_, risk_, zip_code));
 	}
 }
 

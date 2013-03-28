@@ -57,7 +57,7 @@ public:
 	/**
 	 * Creates a place with just a risk and an id.
 	 */
-	Place(std::string id, std::string type, Risk risk);
+	Place(std::string id, std::string type, Risk risk, unsigned int zip);
 
 	virtual ~Place();
 
@@ -92,6 +92,10 @@ public:
 		return type_;
 	}
 
+	const unsigned int zipCode() const {
+		return zip_code;
+	}
+
 protected:
 
 	// id and type of place
@@ -99,6 +103,7 @@ protected:
 	// place location
 	double longitude, latitude;
 	Risk risk_;
+	unsigned int zip_code;
 };
 
 std::ostream& operator<<(std::ostream& os, const Place& place);

@@ -24,7 +24,7 @@ enum CompPlaceType {
 class ComponentPlace: public AbstractPlace {
 
 public:
-	ComponentPlace(std::string id, std::string type, Risk risk);
+	ComponentPlace(std::string id, std::string type, Risk risk, unsigned int zip);
 	virtual ~ComponentPlace();
 
 	/**

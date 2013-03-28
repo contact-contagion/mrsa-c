@@ -19,8 +19,8 @@ AbstractPlace::AbstractPlace(std::vector<std::string>& vec, Risk risk) :
 		Place(vec, risk), activity_type_(0), infected(), colonized(), uncolonized() {
 }
 
-AbstractPlace::AbstractPlace(std::string id, std::string type, Risk risk) :
-		Place(id, type, risk), activity_type_(0), infected(), colonized(), uncolonized() {
+AbstractPlace::AbstractPlace(std::string id, std::string type, Risk risk, unsigned int zip) :
+		Place(id, type, risk, zip), activity_type_(0), infected(), colonized(), uncolonized() {
 }
 
 AbstractPlace::~AbstractPlace() {
