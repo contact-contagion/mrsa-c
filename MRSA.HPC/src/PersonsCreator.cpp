@@ -121,14 +121,13 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 		places.other_households.push_back(findPlace(other_hh_id));
 	}
 
-	// TODO remove when zip code info is in Persons file
-	if (flip) {
-		vec[ZIP_CODE_IDX] = "60615";
-		flip = false;
-	} else {
-		vec[ZIP_CODE_IDX] = "60625";
-		flip = true;
-	}
+
+	unsigned int zip = 0;
+	if (places.household != 0) zip = places.household->zipCode();
+	else if (places.group_quarters != 0) zip = places.group_quarters->zipCode();
+	stringstream ss;
+	ss << zip;
+	vec.push_back(ss.str());
 
 	// TODO replace with real values when available
 	//places.prison = findPlace("G170312716001P1");

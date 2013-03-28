@@ -50,8 +50,8 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	if (val.length() > 0)
 		age_ = strToInt(val);
 
-	if (vec.size() >= 23)
-		zip_code = strToUInt(vec[ZIP_CODE_IDX]);
+
+	zip_code = strToUInt(vec[vec.size() - 1]);
 
 	if (places.household != 0) {
 		((Household*) places.household)->addMember(this);
