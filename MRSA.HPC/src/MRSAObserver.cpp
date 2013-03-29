@@ -30,21 +30,17 @@ using namespace repast::relogo;
 using namespace repast;
 using namespace std;
 
-// counts the number of lines in the specified file.
-// We need to know this because we have to tell the Observer how
-// many persons to create and each line in the file is a person.
-int line_count(const std::string& file) {
-	int numLines = 0;
-	ifstream in(file.c_str());
-	if (!in.is_open())
-		return -1;
-
-	string line;
-	while (getline(in, line))
-		++numLines;
-	in.close();
-
-	return numLines;
+// counts the number of lines in the specified  persons file.
+// and puts the line count and sum of the p_mrsa column the output arguments
+void line_count(const std::string& file, unsigned int& line_count, double& p_mrsa_sum) {
+	CSVReader reader(file);
+	vector<string> vec;
+	// skip the header
+	reader.skip(1);
+	while (reader.next(vec)) {
+		p_mrsa_sum += strToDouble(vec[P_MRSA_IDX]);
+		++line_count;
+	}
 }
 
 MRSAObserver::MRSAObserver() :
@@ -158,12 +154,12 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 
 	const string personsFile = props.getProperty(PERSONS_FILE);
 
+	unsigned int lines = 0;
+	double p_mrsa_sum = 0;
 	// count the lines in the file so we know how many
 	// persons to create: one per line.
-	int lines = line_count(personsFile);
-
-	if (lines == -1)
-		throw invalid_argument("Error opening: " + personsFile);
+	line_count(personsFile, lines, p_mrsa_sum);
+	//std::cout << lines << ", " << p_mrsa_sum << std::endl;
 
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
 	Parameters* params = Parameters::instance();
@@ -171,10 +167,11 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
 	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration,
-			params->getDoubleParameter(MIN_JAIL_DURATION), params->getDoubleParameter(MAX_JAIL_DURATION));
-	// First line is the header info so we create one less
-	// than the number of lines in the file.
-	personType = create<Person>(lines - 1, pCreator);
+			params->getDoubleParameter(MIN_JAIL_DURATION), params->getDoubleParameter(MAX_JAIL_DURATION),
+			p_mrsa_sum);
+	// create N number of persons, where N is the number of non-header
+	// lines in the persons file
+	personType = create<Person>(lines, pCreator);
 
 	// get all the created Persons and validate them.
 	AgentSet<Person> people;
@@ -301,6 +298,7 @@ void MRSAObserver::setup(Properties& props) {
 	AgentSet<Person> people;
 	get(people);
 
+	/*
 	int i_count = 0;
 	int c_count = 0;
 	for (size_t i = 0; i < people.size(); ++i) {
@@ -308,8 +306,8 @@ void MRSAObserver::setup(Properties& props) {
 		if (p->status() == INFECTED) ++i_count;
 		else if (p->status() == COLONIZED) ++c_count;
 	}
-
 	std::cout << i_count << ", " << c_count << std::endl;
+	*/
 
 	// initialize the hourly data collection
 	int runNumber = strToInt(props.getProperty("run.number"));

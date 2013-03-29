@@ -58,10 +58,10 @@ PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_d
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration) :
+		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration, double p_mrsa_sum) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration),
 		min_jail_duration_(min_jail_duration), max_jail_duration_(max_jail_duration),
-		initial_infection_count(0), colonization_scaling(0),
+		initial_infection_count(0), colonization_scaling(0), p_mrsa_sum_(p_mrsa_sum),
 		no_stay_manager(new NoStayManager()) {
 
 	initial_infection_count = strToUInt(Parameters::instance()->getStringParameter(INITIAL_INFECTION_COUNT));
@@ -76,6 +76,7 @@ PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 				creator.min_infection_duration_), min_jail_duration_(creator.min_jail_duration_),
 				max_jail_duration_(creator.max_jail_duration_),
 				initial_infection_count(creator.initial_infection_count), colonization_scaling(creator.colonization_scaling),
+				p_mrsa_sum_(creator.p_mrsa_sum_),
 				no_stay_manager(new NoStayManager()) {
 	init();
 }
@@ -159,7 +160,9 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	}
 
 	Random* random = Random::instance();
-	double p_mrsa = strToDouble(vec[P_MRSA_IDX]);
+	// scale so that all the p_mrsa values would sum to 1,
+	// this reflects the nature of the data.
+	double p_mrsa = strToDouble(vec[P_MRSA_IDX]) / p_mrsa_sum_;
 	//std::cout << p_mrsa << ", " << initial_infection_count << std::endl;
 	if (random->nextDouble() < p_mrsa * initial_infection_count) {
 		p->updateStatus(INFECTED);

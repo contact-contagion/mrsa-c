@@ -32,7 +32,7 @@ public:
 	 * look up the Persons' places.
 	 */
 	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration,
-			unsigned int min_jail_duration, unsigned int max_jail_duration);
+			unsigned int min_jail_duration, unsigned int max_jail_duration, double p_mrsa_sum);
 	PersonsCreator(const PersonsCreator& creator);
 	virtual ~PersonsCreator();
 
@@ -47,7 +47,7 @@ private:
 	float min_infection_duration_;
 	unsigned int min_jail_duration_, max_jail_duration_;
 	unsigned int initial_infection_count;
-	double colonization_scaling;
+	double colonization_scaling, p_mrsa_sum_;
 	boost::shared_ptr<PlaceStayManager> no_stay_manager;
 
 	/**
