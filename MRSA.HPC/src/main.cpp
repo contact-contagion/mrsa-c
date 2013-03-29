@@ -211,7 +211,8 @@ void writePropertiesFromAllProcesses(Properties& props, std::string fileName, bo
 	std::map<std::string, std::string> map;
 	Properties::key_iterator keyIter = props.keys_begin();
 	while (keyIter != props.keys_end()) {
-		map[*keyIter] = props.getProperty(*keyIter);
+		// cast isn't strictly necessary but otherwise eclipse gives spurious error
+		map[*keyIter] = props.getProperty((std::string)(*keyIter));
 		keyIter++;
 	}
 
