@@ -58,8 +58,6 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	if (places.household != 0) {
 		((Household*) places.household)->addMember(this);
 	}
-
-	//std::cout << hospital_stay_duration << std::endl;
 }
 
 Person::~Person() {
@@ -125,11 +123,11 @@ void Person::performActivity(Calendar& calendar) {
 		changePlace(places_.hospital, 0);
 
 	} else if (prison_manager_->inPlace(calendar.year, calendar.day_of_year)
-			&& places_.prison != 0) {
+			&& places_.jail != 0) {
 		if (entered_prison_time == 0) {
 			entered_prison_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
-		changePlace(places_.prison, 0);
+		changePlace(places_.jail, 0);
 	} else {
 		// iterate through the activity list and find the activity
 		// whose time span contains the specified time.

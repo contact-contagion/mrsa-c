@@ -15,16 +15,16 @@ namespace mrsa {
 struct Places {
 
 	Place* household, *group_quarters, *work, *school, *current,
-	*daycare, *gym, *hospital, *prison;
+	*daycare, *gym, *hospital, *jail;
 	std::vector<Place*> other_households;
 
 	Places() : household(0), group_quarters(0), work(0), school(0), current(0),
-			daycare(0), gym(0), hospital(0), prison(0), other_households() {}
+			daycare(0), gym(0), hospital(0), jail(0), other_households() {}
 
 	Places(const Places& p) : household(p.household), group_quarters(p.group_quarters), work(p.work),
 			school(p.school), current(p.current),
 			daycare(p.daycare), gym(p.gym), hospital(p.hospital),
-			prison(p.prison), other_households(p.other_households) {}
+			jail(p.jail), other_households(p.other_households) {}
 };
 
 }

@@ -127,6 +127,8 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	places.daycare = findPlace(daycare_id);
 	const string& hosp_id = vec[HOSPITAL_ID_IDX];
 	places.hospital = findPlace(hosp_id);
+	const string& jail_id = vec[JAIL_ID_IDX];
+	places.jail = findPlace(jail_id);
 
 	for (int i = OTHER_H_START_IDX; i <= OTHER_H_END_IDX; ++i) {
 		const string& other_hh_id = vec[i];
@@ -141,8 +143,6 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	ss << zip;
 	vec.push_back(ss.str());
 
-	// TODO replace with real value when available
-	if (places.prison == 0) places.prison = findPlace("G170312716001P1");
 	double prison_prob = strToDouble(vec[JAIL_IDX]);
 	PlaceStayManager* manager(0);
 	if (prison_prob > 0) {
