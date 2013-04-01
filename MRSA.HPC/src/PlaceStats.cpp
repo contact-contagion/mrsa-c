@@ -34,7 +34,7 @@ void PlaceStats::incrementStayCount(unsigned int zip_code) {
 
 void PlaceStats::incrementDuration(double val, unsigned int zip_code) {
 	duration_ += val;
-	++region_stats[RegionMap::instance()->region(zip_code)].duration;
+	region_stats[RegionMap::instance()->region(zip_code)].duration += val;
 }
 
 void PlaceStats::incrementColonizationCount(unsigned int zip_code) {

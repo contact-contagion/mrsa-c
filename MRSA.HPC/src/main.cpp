@@ -27,7 +27,7 @@ static const int countOfInputRecordValues = 30;
 static const int countOfRecordValues = 46;
 
 const int TYPE_IDX = 1;
-const int YEARLY_DATA_LENGTH = 35;
+const int YEARLY_DATA_LENGTH = 39;
 const int MAX_YEAR = 5;
 
 using namespace boost::assign;
@@ -177,6 +177,7 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 				"jail_colonizations_S", "jail_infections_S", "jail_stays_S", "jail_days_S",
 				"jail_colonizations_W", "jail_infections_W", "jail_stays_W", "jail_days_W",
 				"jail_colonizations_C", "jail_infections_C", "jail_stays_C", "jail_days_C",
+				"jail_colonizations_O", "jail_infections_O", "jail_stays_O", "jail_days_O",
 
 				HOUSEHOLD_COL_COUNT, OTHER_H_COL_COUNT, WORKPLACE_COL_COUNT,
 				SCHOOL_COL_COUNT, GYM_COL_COUNT, DORM_COL_COUNT, NURSING_HOME_COL_COUNT

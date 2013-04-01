@@ -24,6 +24,7 @@
 #include "Workplace.h"
 #include "DefaultPlace.h"
 #include "Constants.h"
+#include "RegionMap.h"
 
 namespace mrsa {
 
@@ -36,6 +37,8 @@ const int RISK_PAR_IDX = 2;
 const int RISK_TIP_IDX = 3;
 const int RISK_AIP_IDX = 4;
 const int RISK_X_IDX = 5;
+
+const int ZIP_GROUP_IDX = 7;
 
 PlaceCreator::PlaceCreator() {
 }
@@ -144,6 +147,8 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 	boost::mpi::communicator* world = RepastProcess::instance()->getCommunicator();
 	reader.skip(world->rank());
 
+	RegionMap* region_map = RegionMap::instance();
+
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
 		string type = vec[TYPE_IDX];
@@ -184,6 +189,8 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		}
 		// add the place to the vector.
 		places.push_back(place);
+
+		region_map->addZipCode(place->zipCode(), strToUInt(vec[ZIP_GROUP_IDX]));
 
 		// skip to the next line to read
 		reader.skip(world->size() - 1);

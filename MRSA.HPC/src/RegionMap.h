@@ -23,6 +23,12 @@ public:
 	static RegionMap* instance();
 
 	/**
+	 * Associates the specified zip code with the specififed region in
+	 * this RegionMap.
+	 */
+	void addZipCode(const unsigned int zip_code, unsigned int region);
+
+	/**
 	 * Gets the region for the specified zip code.
 	 *
 	 * @return  the region for the specified zip code.

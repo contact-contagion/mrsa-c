@@ -49,7 +49,7 @@ PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_d
 			}
 
 			unsigned int duration = (int)Random::instance()->createUniIntGenerator(min_jail_duration, max_jail_duration).next();
-			manager->createStayFor(0, duration);
+			manager->createStayFor(i, duration);
 		}
 	}
 
