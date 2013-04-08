@@ -169,6 +169,7 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// in concert with this MRSAObserver.
 	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration,
 			params->getDoubleParameter(MIN_JAIL_DURATION), params->getDoubleParameter(MAX_JAIL_DURATION),
+			params->getDoubleParameter(PEAK_JAIL_DURATION),
 			p_mrsa_sum);
 	// create N number of persons, where N is the number of non-header
 	// lines in the persons file

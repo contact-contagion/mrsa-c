@@ -52,6 +52,7 @@ const std::string Z = "z";
 
 const std::string MIN_JAIL_DURATION = "minimum.jail.stay";
 const std::string MAX_JAIL_DURATION = "maximum.jail.stay";
+const std::string PEAK_JAIL_DURATION = "peak.jail.stay";
 
 Parameters* Parameters::instance_ = 0;
 

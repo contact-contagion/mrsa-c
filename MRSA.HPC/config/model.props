@@ -8,9 +8,9 @@ stop.at = 17520.5
 #17520.5 
 #8760.5
 
-persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
-places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
-activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+persons.file = ../../MRSA Inputs/geo_subsets/southside/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/southside/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/southside/activities.csv 
 
 #persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
 #places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
@@ -51,8 +51,9 @@ gamma = 0.5
 z = 0.5
 
 # in days
-minimum.jail.stay = 40
-maximum.jail.stay = 80
+minimum.jail.stay = 1
+maximum.jail.stay = 365
+peak.jail.stay = 14
 
 # whether or not seek and destroy for household members of 
 # infected persons is enabled

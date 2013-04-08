@@ -38,7 +38,7 @@ shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, sh
 }
 
 PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_duration,
-		unsigned int max_jail_duration) {
+		unsigned int max_jail_duration, unsigned int peak_jail_duration) {
 	Random* random = Random::instance();
 	PrisonStayManager* manager(0);
 	// one try per year, 10 years
@@ -48,7 +48,8 @@ PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_d
 				manager = new PrisonStayManager();
 			}
 
-			unsigned int duration = (int)Random::instance()->createUniIntGenerator(min_jail_duration, max_jail_duration).next();
+			unsigned int duration = (int)Random::instance()->createTriangleGenerator(min_jail_duration, peak_jail_duration, max_jail_duration).next();
+					//createUniIntGenerator(min_jail_duration, max_jail_duration).next();
 			manager->createStayFor(i, duration);
 		}
 	}
@@ -58,9 +59,10 @@ PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_d
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration, double p_mrsa_sum) :
+		float min_infection_duration, unsigned int min_jail_duration, unsigned int max_jail_duration, unsigned int peak_jail_duration,
+		double p_mrsa_sum) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration),
-		min_jail_duration_(min_jail_duration), max_jail_duration_(max_jail_duration),
+		min_jail_duration_(min_jail_duration), max_jail_duration_(max_jail_duration), peak_jail_duration_(peak_jail_duration),
 		initial_infection_count(0), colonization_scaling(0), p_mrsa_sum_(p_mrsa_sum),
 		no_stay_manager(new NoStayManager()) {
 
@@ -74,7 +76,7 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
 				creator.min_infection_duration_), min_jail_duration_(creator.min_jail_duration_),
-				max_jail_duration_(creator.max_jail_duration_),
+				max_jail_duration_(creator.max_jail_duration_), peak_jail_duration_(creator.peak_jail_duration_),
 				initial_infection_count(creator.initial_infection_count), colonization_scaling(creator.colonization_scaling),
 				p_mrsa_sum_(creator.p_mrsa_sum_),
 				no_stay_manager(new NoStayManager()) {
@@ -146,7 +148,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	double prison_prob = strToDouble(vec[JAIL_IDX]);
 	PlaceStayManager* manager(0);
 	if (prison_prob > 0) {
-		manager = create_prison_stay(prison_prob, min_jail_duration_, max_jail_duration_);
+		manager = create_prison_stay(prison_prob, min_jail_duration_, max_jail_duration_, peak_jail_duration_);
 	}
 
 	Person* p = 0;
