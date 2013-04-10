@@ -20,6 +20,8 @@
 
 namespace mrsa {
 
+extern const std::string JAIL_DISTRIBUTION;
+
 /**
  * Functor that is to create Persons agents.
  *
@@ -32,7 +34,7 @@ public:
 	 * look up the Persons' places.
 	 */
 	PersonsCreator(const std::string& file, std::map<std::string, Place*>* map, float min_infection_duration,
-			unsigned int min_jail_duration, unsigned int max_jail_duration, unsigned int peak_jail_duration_, double p_mrsa_sum);
+			unsigned int min_jail_duration, double p_mrsa_sum);
 	PersonsCreator(const PersonsCreator& creator);
 	virtual ~PersonsCreator();
 

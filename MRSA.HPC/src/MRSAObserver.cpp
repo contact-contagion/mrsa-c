@@ -165,12 +165,14 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
 	Parameters* params = Parameters::instance();
 
+	double mean_jail_duration = params->getDoubleParameter(MEAN_JAIL_DURATION);
+	double min_jail_duration = params->getDoubleParameter(MIN_JAIL_DURATION);
+	_ExponentialGenerator gen(Random::instance()->engine(), boost::exponential_distribution<>(1 / (mean_jail_duration - min_jail_duration)));
+	Random::instance()->putGenerator(JAIL_DISTRIBUTION, new DefaultNumberGenerator<_ExponentialGenerator>(gen));
+
 	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration,
-			params->getDoubleParameter(MIN_JAIL_DURATION), params->getDoubleParameter(MAX_JAIL_DURATION),
-			params->getDoubleParameter(PEAK_JAIL_DURATION),
-			p_mrsa_sum);
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, min_jail_duration, p_mrsa_sum);
 	// create N number of persons, where N is the number of non-header
 	// lines in the persons file
 	personType = create<Person>(lines, pCreator);
