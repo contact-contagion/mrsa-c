@@ -21,8 +21,9 @@ enum InfectionStatus {
 	NONE, SELF_CARE, SEEK_CARE
 };
 
+// this needs to be renamed to transmission cause
 enum ColonizationCause {
-	NA, C_FROM_C, C_FROM_I
+	NA, C_FROM_C, C_FROM_I, I_FROM_C, C
 };
 
 }
