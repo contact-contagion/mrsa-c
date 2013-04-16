@@ -62,18 +62,22 @@ MRSAObserver::~MRSAObserver() {
 
 // called each tick
 void MRSAObserver::go() {
+	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
+	// start the sim at very end of JUNE
+	if (tick < YEAR_START)
+		return;
+
 	// reset the hourly stats, as they are per tick.
 	Statistics* stats = Statistics::getInstance();
 	stats->resetHourlyStats();
 	calendar.increment();
 
-	int tick = (int) RepastProcess::instance()->getScheduleRunner().currentTick();
 	// print out time stamp each simulated month
 	// on process 0
 	if (RepastProcess::instance()->rank() == 0 && tick % 720 == 0) {
 		std::string time;
 		repast::timestamp(time);
-		std::cout << time << " -- Month: " << (tick / 720) << std::endl;
+		std::cout << time << " -- Month: " << (tick / 720 - 6) << std::endl;
 	}
 
 	// for each person,
@@ -167,12 +171,15 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 
 	double mean_jail_duration = params->getDoubleParameter(MEAN_JAIL_DURATION);
 	double min_jail_duration = params->getDoubleParameter(MIN_JAIL_DURATION);
-	_ExponentialGenerator gen(Random::instance()->engine(), boost::exponential_distribution<>(1 / (mean_jail_duration - min_jail_duration)));
-	Random::instance()->putGenerator(JAIL_DISTRIBUTION, new DefaultNumberGenerator<_ExponentialGenerator>(gen));
+	_ExponentialGenerator gen(Random::instance()->engine(),
+			boost::exponential_distribution<>(1 / (mean_jail_duration - min_jail_duration)));
+	Random::instance()->putGenerator(JAIL_DISTRIBUTION,
+			new DefaultNumberGenerator<_ExponentialGenerator>(gen));
 
 	// A PersonsCreator is used as a functor to create the persons
 	// in concert with this MRSAObserver.
-	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, min_jail_duration, p_mrsa_sum);
+	PersonsCreator pCreator(personsFile, placeMap, min_infection_duration, min_jail_duration,
+			p_mrsa_sum);
 	// create N number of persons, where N is the number of non-header
 	// lines in the persons file
 	personType = create<Person>(lines, pCreator);
@@ -191,7 +198,6 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	people.clear();
 	get(people);
 }
-
 
 void MRSAObserver::calcYearlyStats() {
 	yearCounter++;
@@ -215,17 +221,17 @@ void MRSAObserver::initializeYearlyDataCollection(const string& file) {
 	// 8760 = 24 * 365
 	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();
 	// schedule calcYearlyStats at year + .15
-	runner.scheduleEvent(8760.15, 8760.0,
+	runner.scheduleEvent(8760.15 + YEAR_START, 8760.0,
 			Schedule::FunctorPtr(
 					new MethodFunctor<MRSAObserver>(this, &MRSAObserver::calcYearlyStats)));
 	// schedule record at year + .2
-	runner.scheduleEvent(8760.2, 8760.0,
+	runner.scheduleEvent(8760.2 + YEAR_START, 8760.0,
 			Schedule::FunctorPtr(new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::record)));
 	// schedule write at year + .3
-	runner.scheduleEvent(8760.3, 8760.0,
+	runner.scheduleEvent(8760.3 + YEAR_START, 8760.0,
 			Schedule::FunctorPtr(new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::write)));
 	// schedule write at year + .4
-	runner.scheduleEvent(8760.4, 8760.0,
+	runner.scheduleEvent(8760.4 + YEAR_START, 8760.0,
 			Schedule::FunctorPtr(
 					new MethodFunctor<Statistics>(stats, &Statistics::resetYearlyStats)));
 
@@ -241,9 +247,18 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 			repast::RepastProcess::instance()->getScheduleRunner().schedule());
 	stats->createHourlyDataSources(builder);
 
-	// add the data set to this Observer, which automatically
-	// schedules the data collection, data writing etc.
-	addDataSet(builder.createDataSet());
+	repast::DataSet* ds = builder.createDataSet();
+	// add it to the inherit dataSets vector.
+	// this insures that it will be written on end
+	// and properly cleaned up.
+	Observer::dataSets.push_back(ds);
+
+	ScheduleRunner& runner = RepastProcess::instance()->getScheduleRunner();
+	runner.scheduleEvent(YEAR_START + 1.1, 1,
+			Schedule::FunctorPtr(new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::record)));
+	Schedule::FunctorPtr dsWrite = Schedule::FunctorPtr(
+			new MethodFunctor<repast::DataSet>(ds, &repast::DataSet::write));
+	runner.scheduleEvent(YEAR_START + 100.2, 100, dsWrite);
 }
 
 void MRSAObserver::atEnd() {
@@ -302,16 +317,16 @@ void MRSAObserver::setup(Properties& props) {
 	AgentSet<Person> people;
 	get(people);
 
-
 	int i_count = 0;
 	int c_count = 0;
 	for (size_t i = 0; i < people.size(); ++i) {
 		Person* p = people[i];
-		if (p->status() == INFECTED) ++i_count;
-		else if (p->status() == COLONIZED) ++c_count;
+		if (p->status() == INFECTED)
+			++i_count;
+		else if (p->status() == COLONIZED)
+			++c_count;
 	}
 	std::cout << i_count << ", " << c_count << std::endl;
-
 
 	// initialize the hourly data collection
 	int runNumber = strToInt(props.getProperty("run.number"));

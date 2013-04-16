@@ -9,6 +9,7 @@
 
 #include "DiseaseStatusUpdater.h"
 #include "Parameters.h"
+#include "Constants.h"
 
 namespace mrsa {
 
@@ -35,6 +36,10 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status, ColonizationCause 
 	if (status_ == UNCOLONIZED && (status == COLONIZED || status == INFECTED)) {
 		// set timestamp
 		timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
+		// hack to allow sim to start on the 1/2 year
+		if (timestamp == 0 && cause == FROM_INIT) {
+			timestamp = YEAR_START;
+		}
 
 		StatusStats stats = { status, NONE, 0.0f, 0.0f, cause};
 

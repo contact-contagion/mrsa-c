@@ -94,6 +94,7 @@ public:
 		eoy_prevalence_infected = eoy_prevalence_colonized = 0;
 		yearly_c_from_c = yearly_c_from_i = yearly_i_to_c_from_na = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
+		yearly_household_colonizations = yearly_other_household_colonizations = 0;
 		colonization_count_map.clear();
 		infection_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
@@ -218,7 +219,7 @@ private:
 	// these vars are calculated then exposed via the TDataSource API
 	// in order to log them using RepastHPC data collection.
 	double yearly_infected_r0, yearly_colonized_r0, yearly_r0;
-	long yearly_infected, yearly_colonized;
+	long yearly_infected, yearly_colonized, yearly_household_colonizations, yearly_other_household_colonizations;
 	long eoy_prevalence_infected, eoy_prevalence_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
