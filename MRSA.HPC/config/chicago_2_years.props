@@ -1,0 +1,79 @@
+# Filename = Chicago_model.props
+
+random.seed = 1
+
+BaseSweepNumber = 0
+
+# half year = 4380.0;
+#stop.at = 720
+#stop.at = 17520.5
+# includes half year hack
+stop.at = 21900.5
+# two years:
+#21900.5
+# one year:
+#13140.5
+
+persons.file = ../../MRSA Inputs/geo_subsets/chicago/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/chicago/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/chicago/activities.csv 
+
+#persons.file = ../../../../input_files/geo_subsets/chicago/people.csv 
+#places.file = ../../../../input_files/geo_subsets/chicago/places.csv
+#activities.file = ../../../../input_files/geo_subsets/chicago/activities.csv 
+
+# risk file new_risk_file_040313.csv - changed PAR values to reflect Chick's MRSA documentation
+# specifically, increased PAR values to 2 for "Nursing Home" and "Prison"
+risk.file = ../data/new_risk_file_040313.csv 
+ 
+
+hourly.output.file =  ./output/chicago_2/hourly_data
+yearly.output.file =  ./output/chicago_2/yearly_data
+summary.output.file = ./output/chicago_2/summary_stats
+event.output.file = ./output/chicago_2/transmission_events.csv
+
+# [(.065)*2,927,761]/900 = 211.45; where 6.5% is fixed, 2,927,761 = population chicago, 900 = initial.infected.count
+initial.colonization.scaling = 211
+# [2,927,761*(680/100,000)*(16.5)]/365 = 899.99 -> use 900
+initial.infected.count = 900
+
+# 7 days (24 x 7)
+minimum.infection.period = 168
+# an additional 7 days after the minimum
+seek.care.infection.period = 168
+# an additional 12 days after the minimum
+self.care.infection.period = 288
+
+# below are the new transmission parameters from Chick on April 10, 2013
+a = 7.690e-05
+b = 1.54e-04
+e = 9.613e-05
+
+# probability of seeking care or not once infected
+alpha = 0.5
+# probability of seeking care infected to uncolonized, else colonized
+theta = 0.82
+# probability of each household member of seeking care infected
+# moving to uncolonized, else colonized
+gamma = 0.5
+# probability of self-care infected to uncolonized, else colonized
+z = 0.64
+
+# in days
+minimum.jail.stay = 1
+mean.jail.stay = 37
+
+# whether or not seek and destroy for household members of 
+# infected persons is enabled
+seek.and.destroy.enabled = false
+
+# world definition props
+min.x = 0
+min.y = 0
+max.x = 0
+max.y = 0
+grid.buffer = 0
+
+# these must multiply to total number of processes
+proc.per.x = 1
+proc.per.y = 1
