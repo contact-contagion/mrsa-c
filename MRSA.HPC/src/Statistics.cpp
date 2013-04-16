@@ -184,8 +184,12 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 		if (stats.duration != 0) {
 			if (stats.status == INFECTED) {
 				++i_count;
-				++(p_stats.infection_count);
-				++region_stat.infection_incidence;
+				// only count infections if they have not been
+				// caused by initialization
+				if (stats.col_cause != NA) {
+					++(p_stats.infection_count);
+					++region_stat.infection_incidence;
+				}
 				p_stats.infection_duration += stats.duration;
 				if (stats.infection_status == SEEK_CARE) {
 					p_stats.seek_infection_duration += stats.duration;
@@ -199,8 +203,12 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 
 			} else if (stats.status == COLONIZED) {
 				++c_count;
-				++(p_stats.colonized_count);
-				++region_stat.colonization_incidence;
+				// only count colonizations if they have not been
+				// caused by initialization
+				if (stats.col_cause != NA) {
+					++(p_stats.colonized_count);
+					++region_stat.colonization_incidence;
+				}
 
 				p_stats.colonization_duration += stats.duration;
 				p_stats.from_colonization += stats.colonized_persons;
@@ -242,10 +250,12 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 		Person* p = (*iter);
 		updateCountsFromStatsVector(p, p_stats);
 		p->status_.resetYearlyCounts();
-		if (p->status() == INFECTED) {
+		// only count infections / colonizations that have been caused during the model run
+		// and not as part of initialization
+		if (p->status() == INFECTED && p->status_.yearly_status_stats.back().col_cause != NA) {
 			++region_stats[region_map->region(p->zipCode())].infection_prevalence;
 			++eoy_prevalence_infected;
-		} else if (p->status() == COLONIZED) {
+		} else if (p->status() == COLONIZED && p->status_.yearly_status_stats.back().col_cause != NA) {
 			++region_stats[region_map->region(p->zipCode())].colonization_prevalence;
 			++eoy_prevalence_colonized;
 		}
