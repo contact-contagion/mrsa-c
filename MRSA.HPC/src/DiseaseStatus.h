@@ -23,7 +23,7 @@ enum InfectionStatus {
 
 // this needs to be renamed to transmission cause
 enum ColonizationCause {
-	NA, C_FROM_C, C_FROM_I, I_FROM_C, C
+	NA, FROM_INIT, UC_TO_C_FROM_C, UC_TO_C_FROM_I, I_TO_C_FROM_NA, C_TO_I_FROM_NA
 };
 
 }

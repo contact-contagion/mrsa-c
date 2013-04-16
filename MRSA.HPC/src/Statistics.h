@@ -16,7 +16,7 @@ struct RegionStat {
 	char region;
 	long infection_incidence, colonization_incidence;
 	long infection_prevalence, colonization_prevalence;
-	long c_from_i, c_from_c;
+	long c_from_i, c_from_c, i_to_c_from_na;
 
 	//RegionStat(const char& r) : region(r), infection_incidence(0), colonization_incidence(0),
 	//		infection_prevalence(0), colonization_prevalence(0), c_from_i(0), c_from_c(0) {
@@ -25,7 +25,7 @@ struct RegionStat {
 
 	void reset() {
 		infection_incidence = colonization_incidence = infection_prevalence =
-				colonization_prevalence = c_from_i = c_from_c = 0;
+				colonization_prevalence = c_from_i = c_from_c = i_to_c_from_na = 0;
 	}
 };
 
@@ -92,7 +92,7 @@ public:
 	void resetYearlyStats() {
 		yearly_infected = yearly_colonized = 0;
 		eoy_prevalence_infected = eoy_prevalence_colonized = 0;
-		yearly_c_from_c = yearly_c_from_i = 0;
+		yearly_c_from_c = yearly_c_from_i = yearly_i_to_c_from_na = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
 		colonization_count_map.clear();
 		infection_count_map.clear();
@@ -222,7 +222,7 @@ private:
 	long eoy_prevalence_infected, eoy_prevalence_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
-	long yearly_c_from_i, yearly_c_from_c;
+	long yearly_c_from_i, yearly_c_from_c, yearly_i_to_c_from_na;
 
 	long total_c_from_i, total_c_from_c;
 	double total_infected, total_colonized;

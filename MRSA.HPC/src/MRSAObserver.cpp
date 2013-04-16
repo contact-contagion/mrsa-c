@@ -302,7 +302,7 @@ void MRSAObserver::setup(Properties& props) {
 	AgentSet<Person> people;
 	get(people);
 
-	/*
+
 	int i_count = 0;
 	int c_count = 0;
 	for (size_t i = 0; i < people.size(); ++i) {
@@ -311,7 +311,7 @@ void MRSAObserver::setup(Properties& props) {
 		else if (p->status() == COLONIZED) ++c_count;
 	}
 	std::cout << i_count << ", " << c_count << std::endl;
-	*/
+
 
 	// initialize the hourly data collection
 	int runNumber = strToInt(props.getProperty("run.number"));

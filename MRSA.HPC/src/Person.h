@@ -87,7 +87,7 @@ public:
 	/**
 	 * Update this Person's disease status to the specified status.
 	 */
-	void updateStatus(DiseaseStatus status, ColonizationCause cause = NA);
+	void updateStatus(DiseaseStatus status, ColonizationCause cause);
 
 	/**
 	 * Gets whether or not this Person's disease status can change. For example,

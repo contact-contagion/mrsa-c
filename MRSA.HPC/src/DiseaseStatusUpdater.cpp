@@ -59,7 +59,7 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status, ColonizationCause 
 			// set time stamp.
 			timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
-			StatusStats stats = { status, NONE, 0.0f, 0.0f, C};
+			StatusStats stats = { status, NONE, 0.0f, 0.0f, C_TO_I_FROM_NA};
 			yearly_status_stats.push_back(stats);
 		}
 
@@ -83,7 +83,7 @@ void DiseaseStatusUpdater::updateStatus(DiseaseStatus status, ColonizationCause 
 			// set timestamp
 			timestamp = repast::RepastProcess::instance()->getScheduleRunner().currentTick();
 
-			StatusStats stats = { status, NONE, 0.0f, 0.0f, I_FROM_C};
+			StatusStats stats = { status, NONE, 0.0f, 0.0f, I_TO_C_FROM_NA};
 			yearly_status_stats.push_back(stats);
 		}
 		infection_status_ = NONE;

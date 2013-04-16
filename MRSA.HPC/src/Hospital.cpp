@@ -48,7 +48,7 @@ void Hospital::processUncolonized(Person* person, TransmissionAlgorithm* ta) {
 	if (status == COLONIZED) {
 		// person has become colonized, so increment the
 		// colonization count for places of this type
-		person->updateStatus(status, C_FROM_I);
+		person->updateStatus(status, UC_TO_C_FROM_I);
 		Statistics::getInstance()->incrementColonizationCount(type_, person->zipCode());
 		TransmissionEventRecorder::instance()->recordEvent(repast::RepastProcess::instance()->getScheduleRunner().currentTick(), person,
 								this, U_TO_C);

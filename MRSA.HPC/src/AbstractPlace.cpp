@@ -59,7 +59,7 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 	if (status == COLONIZED) {
 
 		if (infected.size() > 0) {
-			person->updateStatus(status, C_FROM_I);
+			person->updateStatus(status, UC_TO_C_FROM_I);
 			// increment the pro-rated number of people colonized by the infectious
 			// persons in this place.
 			float colonizations_caused = 1.0f / infected.size();
@@ -67,7 +67,7 @@ void AbstractPlace::processUncolonized(Person* person, TransmissionAlgorithm* ta
 				(*iter)->incrementColonizationsCaused(colonizations_caused);
 			}
 		} else if (colonized.size() > 0) {
-			person->updateStatus(status, C_FROM_C);
+			person->updateStatus(status, UC_TO_C_FROM_C);
 			float colonizations_caused = 1.0f / colonized.size();
 			for (PersonIter iter = colonized.begin(); iter != colonized.end(); ++iter) {
 				(*iter)->incrementColonizationsCaused(colonizations_caused);

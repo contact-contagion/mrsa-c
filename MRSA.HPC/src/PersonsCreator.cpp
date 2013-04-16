@@ -166,9 +166,9 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	double p_mrsa = strToDouble(vec[P_MRSA_IDX]) / p_mrsa_sum_;
 	//std::cout << p_mrsa << ", " << initial_infection_count << std::endl;
 	if (random->nextDouble() < p_mrsa * initial_infection_count) {
-		p->updateStatus(INFECTED);
+		p->updateStatus(INFECTED, FROM_INIT);
 	} else if (random->nextDouble() < p_mrsa * initial_infection_count * colonization_scaling) {
-		p->updateStatus(COLONIZED);
+		p->updateStatus(COLONIZED, FROM_INIT);
 	}
 
 	return p;
