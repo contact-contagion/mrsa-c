@@ -14,7 +14,7 @@
 namespace mrsa {
 
 PlaceStats::PlaceStats() :
-		infection_count(0), colonization_count(0), stay_count(0), duration_(0), col_fraction(0), region_stats(){
+		infection_count(0), colonization_count(0), stay_count(0), duration_(0), col_fraction(0), region_stats() {
 
 	std::vector<char> regions;
 	RegionMap::instance()->regions(regions);
@@ -54,8 +54,8 @@ void PlaceStats::createDataSources(const std::string& key_prefix, repast::SVData
 					new LDataSourceAdapter(&colonization_count), std::plus<double>()));
 
 	builder.addDataSource(
-				repast::createSVDataSource(key_prefix + "_colonization_fraction",
-						new DDataSourceAdapter(&col_fraction), std::plus<double>()));
+			repast::createSVDataSource(key_prefix + "_colonization_fraction",
+					new DDataSourceAdapter(&col_fraction), std::plus<double>()));
 
 	builder.addDataSource(
 			repast::createSVDataSource(key_prefix + "_infections",
@@ -86,13 +86,16 @@ void PlaceStats::createDataSources(const std::string& key_prefix, repast::SVData
 					repast::createSVDataSource(key_prefix + "_infections_" + region,
 							new LDataSourceAdapter(&stat.infection_count), std::plus<double>()));
 
-			builder.addDataSource(
-					repast::createSVDataSource(key_prefix + "_stays_" + region,
-							new LDataSourceAdapter(&stat.stay_count), std::plus<double>()));
+			if (key_prefix == "jail" || key_prefix == "hospital") {
+				builder.addDataSource(
+						repast::createSVDataSource(key_prefix + "_stays_" + region,
+								new LDataSourceAdapter(&stat.stay_count), std::plus<double>()));
 
-			builder.addDataSource(
-					repast::createSVDataSource(key_prefix + "_days_" + region,
-							new HoursToDaysDataSourceAdapter(&stat.duration), std::plus<double>()));
+				builder.addDataSource(
+						repast::createSVDataSource(key_prefix + "_days_" + region,
+								new HoursToDaysDataSourceAdapter(&stat.duration),
+								std::plus<double>()));
+			}
 		}
 	}
 }

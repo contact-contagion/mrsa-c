@@ -312,25 +312,25 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 	place_stats[PRISON_TYPE].addToProps(props, "jail", year, true);
 	place_stats[HOSPITAL_TYPE].addToProps(props, "hospital", year, false);
 
-	addValToProps(HOUSEHOLD_COL_COUNT, year, props,  place_stats[HOUSEHOLD_TYPE].colonization_count));
-	addValToProps(OTHER_H_COL_COUNT, year, props, place_stats[OTHER_HOUSEHOLD_TYPE].colonization_count));
-	addValToProps(SCHOOL_COL_COUNT, year, props, place_stats[SCHOOL_TYPE].colonization_count));
-	addValToProps(WORKPLACE_COL_COUNT, year, props, place_stats[WORKPLACE_TYPE].colonization_count));
-	addValToProps(GYM_COL_COUNT, year, props, place_stats[GYM_TYPE].colonization_count));
-	addValToProps(DORM_COL_COUNT, year, props, place_stats[DORM_TYPE].colonization_count));
-	addValToProps(NURSING_HOME_COL_COUNT, year, props, place_stats[NURSING_HOME_TYPE].colonization_count));
+	addValToProps(HOUSEHOLD_COL_COUNT, year, props,  place_stats[HOUSEHOLD_TYPE].colonization_count);
+	addValToProps(OTHER_H_COL_COUNT, year, props, place_stats[OTHER_HOUSEHOLD_TYPE].colonization_count);
+	addValToProps(SCHOOL_COL_COUNT, year, props, place_stats[SCHOOL_TYPE].colonization_count);
+	addValToProps(WORKPLACE_COL_COUNT, year, props, place_stats[WORKPLACE_TYPE].colonization_count);
+	addValToProps(GYM_COL_COUNT, year, props, place_stats[GYM_TYPE].colonization_count);
+	addValToProps(DORM_COL_COUNT, year, props, place_stats[DORM_TYPE].colonization_count);
+	addValToProps(NURSING_HOME_COL_COUNT, year, props, place_stats[NURSING_HOME_TYPE].colonization_count);
 
 	// get the total number of colonizations by summing the
 	// colonization at X place counts
 	double total = 0;
 	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
 			iter != place_stats.end(); ++iter) {
-		total += iter->second.colonization_count
+		total += iter->second.colonization_count;
 	}
 
 	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
 			iter != place_stats.end(); ++iter) {
-		total += iter->second.updateColonizationFraction(total);
+		iter->second.updateColonizationFraction(total);
 	}
 }
 
@@ -545,6 +545,34 @@ void Statistics::createYearlyDataSources(repast::SVDataSetBuilder& builder) {
 	place_stats[NURSING_HOME_TYPE].createDataSources(NURSING_HOME_TYPE, builder, true);
 	place_stats[DORM_TYPE].createDataSources(DORM_TYPE, builder, true);
 }
+
+/**
+	 * Increments the hospital stay count.
+	 */
+	void Statistics:: incrementHospitalStayCount(unsigned int zip_code) {
+		place_stats[HOSPITAL_TYPE].incrementStayCount(zip_code);
+	}
+
+	/**
+	 * Increments the hospital stay duration count by the specified amount.
+	 */
+	void Statistics:: incrementHospitalDurationCount(double hours, unsigned int zip_code) {
+		place_stats[HOSPITAL_TYPE].incrementDuration(hours, zip_code);
+	}
+
+	/**
+	 * Increments the prison stay count.
+	 */
+	void Statistics:: incrementPrisonStayCount(unsigned int zip_code) {
+		place_stats[PRISON_TYPE].incrementStayCount(zip_code);
+	}
+
+	/**
+	 * Increments the prison stay duration count by the specified amount.
+	 */
+void Statistics:: incrementPrisonDurationCount(double hours, unsigned int zip_code) {
+		place_stats[PRISON_TYPE].incrementDuration(hours, zip_code);
+	}
 
 TotalSum::TotalSum(Statistics* stats) :
 		repast::TDataSource<double>(), stats_(stats) {

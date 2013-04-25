@@ -135,30 +135,22 @@ public:
 	/**
 	 * Increments the hospital stay count.
 	 */
-	void incrementHospitalStayCount(unsigned int zip_code) {
-		place_stats[HOSPITAL_TYPE].incrementStayCount(zip_code);
-	}
+	void incrementHospitalStayCount(unsigned int zip_code);
 
 	/**
 	 * Increments the hospital stay duration count by the specified amount.
 	 */
-	void incrementHospitalDurationCount(double hours, unsigned int zip_code) {
-		place_stats[HOSPITAL_TYPE].incrementDuration(hours, zip_code);
-	}
+	void incrementHospitalDurationCount(double hours, unsigned int zip_code);
 
 	/**
 	 * Increments the prison stay count.
 	 */
-	void incrementPrisonStayCount(unsigned int zip_code) {
-		place_stats[PRISON_TYPE].incrementStayCount(zip_code);
-	}
+	void incrementPrisonStayCount(unsigned int zip_code);
 
 	/**
 	 * Increments the prison stay duration count by the specified amount.
 	 */
-	void incrementPrisonDurationCount(double hours, unsigned int zip_code) {
-		place_stats[PRISON_TYPE].incrementDuration(hours, zip_code);
-	}
+	void incrementPrisonDurationCount(double hours, unsigned int zip_code);
 
 	/**
 	 * Counts the specified Person, incrementing
