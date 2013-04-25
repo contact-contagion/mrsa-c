@@ -39,7 +39,7 @@ void line_count(const std::string& file, unsigned int& line_count, double& p_mrs
 	// skip the header
 	reader.skip(1);
 	while (reader.next(vec)) {
-		p_mrsa_sum += strToDouble(vec[P_MRSA_IDX]);
+		p_mrsa_sum += strToDouble(vec[get_mrsa_prob_idx()]);
 		++line_count;
 	}
 }

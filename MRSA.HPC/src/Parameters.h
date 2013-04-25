@@ -50,7 +50,10 @@ extern const std::string Z;
 
 extern const std::string MIN_JAIL_DURATION;
 extern const std::string MEAN_JAIL_DURATION;
-//extern const std::string PEAK_JAIL_DURATION;
+
+extern const std::string MRSA_PROB_COLUMN;
+extern const std::string P_2001;
+extern const std::string P_2006;
 
 /**
  * Parameters singleton that contains the model properties.

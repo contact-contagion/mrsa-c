@@ -46,8 +46,9 @@ const int H_NIGHTS_5 = 21;
 const int JAIL_IDX = 22;
 const int JAIL_ID_IDX = 23;
 const int SEEK_CARE_IDX = 24;
-const int P_MRSA_IDX = 25;
-const int INFECTED_IDX = 26;
+const int P_MRSA_2001_IDX = 25;
+const int P_MRSA_2006_IDX= 26;
+const int INFECTED_IDX = 27;
 
 
 // forward declaration

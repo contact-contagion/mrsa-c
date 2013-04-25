@@ -23,6 +23,12 @@ namespace mrsa {
 extern const std::string JAIL_DISTRIBUTION;
 
 /**
+ * Returns the column index that contains the initail mrsa
+ * infection probabilities.
+ */
+int get_mrsa_prob_idx();
+
+/**
  * Functor that is to create Persons agents.
  *
  */

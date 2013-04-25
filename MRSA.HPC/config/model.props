@@ -30,6 +30,10 @@ event.output.file = ./output/transmission_events.csv
 initial.colonization.scaling = 204
 initial.infected.count = 13
 
+# which column of the two p_mrsa2001 and p_mrsa2006 to
+# use to set the initial mrsa infected count
+initial.mrsa.probability.column = p_mrsa2006
+
 
 # 7 days (24 x 7)
 minimum.infection.period = 168

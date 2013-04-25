@@ -52,7 +52,10 @@ const std::string Z = "z";
 
 const std::string MIN_JAIL_DURATION = "minimum.jail.stay";
 const std::string MEAN_JAIL_DURATION = "mean.jail.stay";
-//const std::string PEAK_JAIL_DURATION = "peak.jail.stay";
+
+const std::string MRSA_PROB_COLUMN = "initial.mrsa.probability.column";
+const std::string P_2001 = "p_mrsa2001";
+const std::string P_2006 = "p_mrsa2006";
 
 Parameters* Parameters::instance_ = 0;
 

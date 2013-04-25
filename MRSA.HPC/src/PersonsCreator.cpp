@@ -25,6 +25,11 @@ using namespace boost;
 
 const std::string JAIL_DISTRIBUTION = "jail.distribution";
 
+int get_mrsa_prob_idx() {
+	if (Parameters::instance()->getStringParameter(MRSA_PROB_COLUMN) == P_2001) return P_MRSA_2001_IDX;
+	return P_MRSA_2006_IDX;
+}
+
 shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<PlaceStayManager>& no_stay_manager) {
 	unsigned int y1_length = strToUInt(data[H_NIGHTS_1]);
 	unsigned int y2_length = strToUInt(data[H_NIGHTS_2]);
@@ -163,7 +168,7 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	Random* random = Random::instance();
 	// scale so that all the p_mrsa values would sum to 1,
 	// this reflects the nature of the data.
-	double p_mrsa = strToDouble(vec[P_MRSA_IDX]) / p_mrsa_sum_;
+	double p_mrsa = strToDouble(vec[get_mrsa_prob_idx()]) / p_mrsa_sum_;
 	//std::cout << p_mrsa << ", " << initial_infection_count << std::endl;
 	if (random->nextDouble() < p_mrsa * initial_infection_count) {
 		p->updateStatus(INFECTED, FROM_INIT);
