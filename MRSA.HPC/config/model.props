@@ -2,11 +2,11 @@ random.seed = 1
 
 BaseSweepNumber = 0
 
-# half year = 4380.0;
+## half year = 4380.0;
 #stop.at = 720
 #stop.at = 17520.5
 # includes half year hack
-stop.at = 21900.5
+stop.at = 48180.5
 # two years:
 #21900.5
 # one year:
@@ -27,8 +27,8 @@ yearly.output.file = ./output/yearly_data
 summary.output.file = ./output/summary_stats
 event.output.file = ./output/transmission_events.csv
 
-initial.colonization.scaling = 10
-initial.infected.count = 30
+initial.colonization.scaling = 204
+initial.infected.count = 13
 
 
 # 7 days (24 x 7)
@@ -38,9 +38,14 @@ seek.care.infection.period = 168
 # an additional 12 days after the minimum
 self.care.infection.period = 288
 
-a = 1.92e-05
-b = 1.05e-05
-e = 6.69e-05
+# below are the new transmission parameters from Chick on April 16, 2013
+a = 3.90152e-05
+#b = 0.000105
+# x .08
+b = 0.0000084
+#e = 0.0002196
+# x .6
+e = 0.00013176
 
 # probability of seeking care or not once infected
 alpha = 0.5
