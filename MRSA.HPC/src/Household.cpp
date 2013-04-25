@@ -62,8 +62,9 @@ void Household::treatHousehold() {
 		// if draw fails then status remains as it was
 		if (p->status() != UNCOLONIZED && p != source_infectee
 				&& repast::Random::instance()->nextDouble() <= cure_probability) {
+			DiseaseStatus status = p->status();
 			p->updateStatus(UNCOLONIZED, NA);
-			if (p->status() == INFECTED) {
+			if (status == INFECTED) {
 				TransmissionEventRecorder::instance()->recordEvent(
 						repast::RepastProcess::instance()->getScheduleRunner().currentTick(), p,
 						this, I_TO_U);
