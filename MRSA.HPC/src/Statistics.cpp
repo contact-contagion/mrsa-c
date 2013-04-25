@@ -88,11 +88,11 @@ Statistics::Statistics() :
 
 		hourly_infected(0), hourly_colonized(0), hourly_uncolonized(0), newly_infected(0), newly_colonized(
 				0), yearly_infected_r0(0), yearly_colonized_r0(0), yearly_r0(0), yearly_infected(0), yearly_colonized(
-				0), yearly_household_colonizations(0), yearly_other_household_colonizations(0), eoy_prevalence_infected(
+				0), eoy_prevalence_infected(
 				0), eoy_prevalence_colonized(0), yearly_no_seek_infection_duration(0), yearly_seek_infection_duration(
 				0), yearly_infection_duration(0), yearly_colonization_duration(0), yearly_c_from_i(
 				0), yearly_c_from_c(0), yearly_i_to_c_from_na(0), total_c_from_i(0), total_c_from_c(
-				0), total_infected(0), total_colonized(0), colonization_from_infection_override(0), hospital_stats(), jail_stats(), colonization_count_map(), infection_count_map(), region_stats(), averages() {
+				0), total_infected(0), total_colonized(0), colonization_from_infection_override(0), place_stats(), region_stats(), averages() {
 
 	std::vector<char> regions;
 	RegionMap::instance()->regions(regions);
@@ -102,18 +102,22 @@ Statistics::Statistics() :
 		region_stats.insert(std::pair<char, RegionStat>(regions[i], stat));
 	}
 
+	place_stats.insert(std::pair<std::string, PlaceStats>(HOUSEHOLD_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(OTHER_HOUSEHOLD_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(HOSPITAL_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(SCHOOL_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(WORKPLACE_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(GYM_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(NURSING_HOME_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(DORM_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(PRISON_TYPE, PlaceStats()));
 }
 
 Statistics::~Statistics() {
 }
 
 void Statistics::incrementColonizationCount(const std::string& type, const unsigned int zip_code) {
-	increment_map_count(colonization_count_map, type);
-	if (type == PRISON_TYPE) {
-		jail_stats.incrementColonizationCount(zip_code);
-	} else if (type == HOSPITAL_TYPE) {
-		hospital_stats.incrementColonizationCount(zip_code);
-	}
+	place_stats[type].incrementColonizationCount(zip_code);
 }
 
 void Statistics::incrementColonizationFromInfection() {
@@ -121,12 +125,7 @@ void Statistics::incrementColonizationFromInfection() {
 }
 
 void Statistics::incrementInfectionCount(const std::string& type, const unsigned int zip_code) {
-	increment_map_count(infection_count_map, type);
-	if (type == PRISON_TYPE) {
-		jail_stats.incrementInfectionCount(zip_code);
-	} else if (type == HOSPITAL_TYPE) {
-		hospital_stats.incrementInfectionCount(zip_code);
-	}
+	place_stats[type].incrementInfectionCount(zip_code);
 }
 
 void Statistics::setInitialCounts(repast::relogo::AgentSet<Person>& people) {
@@ -310,40 +309,28 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 	averages.yearly_no_seek_infection_duration += yearly_no_seek_infection_duration;
 	averages.yearly_seek_infection_duration += yearly_seek_infection_duration;
 
-	hospital_stats.addToProps(props, "hospital", year, false);
-	jail_stats.addToProps(props, "jail", year, true);
+	place_stats[PRISON_TYPE].addToProps(props, "jail", year, true);
+	place_stats[HOSPITAL_TYPE].addToProps(props, "hospital", year, false);
 
-	addValToProps(HOUSEHOLD_COL_COUNT, year, props,
-			get_map_value(colonization_count_map, HOUSEHOLD_TYPE));
-	addValToProps(OTHER_H_COL_COUNT, year, props,
-			get_map_value(colonization_count_map, OTHER_HOUSEHOLD_TYPE));
-	addValToProps(SCHOOL_COL_COUNT, year, props,
-			get_map_value(colonization_count_map, SCHOOL_TYPE));
-	addValToProps(WORKPLACE_COL_COUNT, year, props,
-			get_map_value(colonization_count_map, WORKPLACE_TYPE));
-	addValToProps(GYM_COL_COUNT, year, props, get_map_value(colonization_count_map, GYM_TYPE));
-	addValToProps(DORM_COL_COUNT, year, props, get_map_value(colonization_count_map, DORM_TYPE));
-	addValToProps(NURSING_HOME_COL_COUNT, year, props,
-			get_map_value(colonization_count_map, NURSING_HOME_TYPE));
-
-	yearly_household_colonizations = get_map_value(colonization_count_map, HOUSEHOLD_TYPE);
-	yearly_other_household_colonizations = get_map_value(colonization_count_map,
-			OTHER_HOUSEHOLD_TYPE);
+	addValToProps(HOUSEHOLD_COL_COUNT, year, props,  place_stats[HOUSEHOLD_TYPE].colonization_count));
+	addValToProps(OTHER_H_COL_COUNT, year, props, place_stats[OTHER_HOUSEHOLD_TYPE].colonization_count));
+	addValToProps(SCHOOL_COL_COUNT, year, props, place_stats[SCHOOL_TYPE].colonization_count));
+	addValToProps(WORKPLACE_COL_COUNT, year, props, place_stats[WORKPLACE_TYPE].colonization_count));
+	addValToProps(GYM_COL_COUNT, year, props, place_stats[GYM_TYPE].colonization_count));
+	addValToProps(DORM_COL_COUNT, year, props, place_stats[DORM_TYPE].colonization_count));
+	addValToProps(NURSING_HOME_COL_COUNT, year, props, place_stats[NURSING_HOME_TYPE].colonization_count));
 
 	// get the total number of colonizations by summing the
 	// colonization at X place counts
 	double total = 0;
-	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
-			++iter) {
-		total += iter->second;
+	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+			iter != place_stats.end(); ++iter) {
+		total += iter->second.colonization_count
 	}
 
-	// for each place in the colonization_count_map, get the fraction of colonizations
-	// that occured in that place
-	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
-			++iter) {
-		double val = iter->second;
-		iter->second = val / total;
+	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+			iter != place_stats.end(); ++iter) {
+		total += iter->second.updateColonizationFraction(total);
 	}
 }
 
@@ -547,31 +534,16 @@ void Statistics::createYearlyDataSources(repast::SVDataSetBuilder& builder) {
 			createSVDataSource("avg_colonization_duration",
 					new DDataSourceAdapter(&yearly_colonization_duration), std::plus<double>()));
 
-	hospital_stats.createDataSources("hospital", builder, false);
-	jail_stats.createDataSources("jail", builder, true);
 
-	yearly_household_colonizations = get_map_value(colonization_count_map, HOUSEHOLD_TYPE);
-	yearly_other_household_colonizations = get_map_value(colonization_count_map,
-			OTHER_HOUSEHOLD_TYPE);
-
-	builder.addDataSource(
-			createSVDataSource("household_colonization_count",
-					new LDataSourceAdapter(&yearly_household_colonizations), std::plus<double>()));
-
-	builder.addDataSource(
-			createSVDataSource("other_household_colonization_count",
-					new LDataSourceAdapter(&yearly_other_household_colonizations),
-					std::plus<double>()));
-
-	std::string place_names[] = { HOUSEHOLD_TYPE, OTHER_HOUSEHOLD_TYPE, HOSPITAL_TYPE, SCHOOL_TYPE,
-			WORKPLACE_TYPE, GYM_TYPE, NURSING_HOME_TYPE, DORM_TYPE, PRISON_TYPE };
-	for (int i = 0; i < 9; i++) {
-		std::string prefix = place_names[i] == "gym" ? "sports_facilities" : place_names[i];
-		std::string header = prefix + "_colonization_fraction";
-		builder.addDataSource(
-				createSVDataSource(header, new PlaceCount(&colonization_count_map, place_names[i]),
-						std::plus<double>()));
-	}
+	place_stats[PRISON_TYPE].createDataSources("jail", builder, true);
+	place_stats[HOSPITAL_TYPE].createDataSources("hospital", builder, true);
+	place_stats[HOUSEHOLD_TYPE].createDataSources(HOUSEHOLD_TYPE, builder, true);
+	place_stats[OTHER_HOUSEHOLD_TYPE].createDataSources(OTHER_HOUSEHOLD_TYPE, builder, true);
+	place_stats[SCHOOL_TYPE].createDataSources(SCHOOL_TYPE, builder, true);
+	place_stats[WORKPLACE_TYPE].createDataSources(WORKPLACE_TYPE, builder, true);
+	place_stats[GYM_TYPE].createDataSources("sports_facilities", builder, true);
+	place_stats[NURSING_HOME_TYPE].createDataSources(NURSING_HOME_TYPE, builder, true);
+	place_stats[DORM_TYPE].createDataSources(DORM_TYPE, builder, true);
 }
 
 TotalSum::TotalSum(Statistics* stats) :

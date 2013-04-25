@@ -164,7 +164,7 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// count the lines in the file so we know how many
 	// persons to create: one per line.
 	line_count(personsFile, lines, p_mrsa_sum);
-	//std::cout << lines << ", " << p_mrsa_sum << std::endl;
+	std::cout << lines << ", " << p_mrsa_sum << std::endl;
 
 	float min_infection_duration = (float) strToDouble(props.getProperty(MIN_INFECT_PERIOD));
 	Parameters* params = Parameters::instance();

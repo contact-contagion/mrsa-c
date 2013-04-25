@@ -94,15 +94,16 @@ public:
 		eoy_prevalence_infected = eoy_prevalence_colonized = 0;
 		yearly_c_from_c = yearly_c_from_i = yearly_i_to_c_from_na = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
-		yearly_household_colonizations = yearly_other_household_colonizations = 0;
-		colonization_count_map.clear();
-		infection_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
 		colonization_from_infection_override = 0;
-		hospital_stats.reset();
-		jail_stats.reset();
 
-		for (std::map<char, RegionStat>::iterator iter = region_stats.begin(); iter != region_stats.end(); ++iter) {
+		for (std::map<char, RegionStat>::iterator iter = region_stats.begin();
+				iter != region_stats.end(); ++iter) {
+			iter->second.reset();
+		}
+
+		for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+				iter != place_stats.end(); ++iter) {
 			iter->second.reset();
 		}
 	}
@@ -135,28 +136,28 @@ public:
 	 * Increments the hospital stay count.
 	 */
 	void incrementHospitalStayCount(unsigned int zip_code) {
-		hospital_stats.incrementStayCount(zip_code);
+		place_stats[HOSPITAL_TYPE].incrementStayCount(zip_code);
 	}
 
 	/**
 	 * Increments the hospital stay duration count by the specified amount.
 	 */
 	void incrementHospitalDurationCount(double hours, unsigned int zip_code) {
-		hospital_stats.incrementDuration(hours, zip_code);
+		place_stats[HOSPITAL_TYPE].incrementDuration(hours, zip_code);
 	}
 
 	/**
 	 * Increments the prison stay count.
 	 */
 	void incrementPrisonStayCount(unsigned int zip_code) {
-		jail_stats.incrementStayCount(zip_code);
+		place_stats[PRISON_TYPE].incrementStayCount(zip_code);
 	}
 
 	/**
 	 * Increments the prison stay duration count by the specified amount.
 	 */
 	void incrementPrisonDurationCount(double hours, unsigned int zip_code) {
-		jail_stats.incrementDuration(hours, zip_code);
+		place_stats[PRISON_TYPE].incrementDuration(hours, zip_code);
 	}
 
 	/**
@@ -219,7 +220,7 @@ private:
 	// these vars are calculated then exposed via the TDataSource API
 	// in order to log them using RepastHPC data collection.
 	double yearly_infected_r0, yearly_colonized_r0, yearly_r0;
-	long yearly_infected, yearly_colonized, yearly_household_colonizations, yearly_other_household_colonizations;
+	long yearly_infected, yearly_colonized;
 	long eoy_prevalence_infected, eoy_prevalence_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
@@ -229,10 +230,8 @@ private:
 	double total_infected, total_colonized;
 
 	long colonization_from_infection_override;
-	PlaceStats hospital_stats, jail_stats;
 
-	std::map<std::string, double> colonization_count_map;
-	std::map<std::string, double> infection_count_map;
+	std::map<std::string, PlaceStats> place_stats;
 	std::map<char, RegionStat> region_stats;
 	YearlyAvg averages;
 };

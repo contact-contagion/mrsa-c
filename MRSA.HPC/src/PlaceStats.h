@@ -51,6 +51,10 @@ public:
 		}
 	}
 
+	void updateColonizationFraction(double colonization_sum) {
+		col_fraction = colonization_sum == 0 ? 0 : colonization_count / colonization_sum;
+	}
+
 	void addToProps(repast::Properties& props, const std::string& key_prefix, int year, bool include_region);
 
 	long infection_count, colonization_count;
@@ -58,6 +62,7 @@ public:
 	long stay_count;
 	// total duration in hours
 	double duration_;
+	double col_fraction;
 
 	std::map<char, RegionPlaceStat> region_stats;
 };
