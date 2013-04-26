@@ -6,7 +6,9 @@ BaseSweepNumber = 0
 #stop.at = 720
 #stop.at = 17520.5
 # includes half year hack
-stop.at = 91980.0
+stop.at = 48180.5
+
+# 10 years: 91980.0
 #stop.at = 48180.5
 # two years:
 #21900.5
@@ -33,6 +35,7 @@ initial.infected.count = 13
 
 # which column of the two p_mrsa2001 and p_mrsa2006 to
 # use to set the initial mrsa infected count
+
 initial.mrsa.probability.column = p_mrsa2006
 
 
@@ -43,14 +46,10 @@ seek.care.infection.period = 168
 # an additional 12 days after the minimum
 self.care.infection.period = 288
 
-# below are the new transmission parameters from Chick on April 16, 2013
-a = 3.90152e-05
-#b = 0.000105
-# x .08
-b = 0.0000084
-#e = 0.0002196
-# x .6
-e = 0.00013176
+# below are the new transmission parameters from Mike 4/25
+a = 4.10686e-05
+b = 5.25e-06
+e = 1.5921e-04
 
 # probability of seeking care or not once infected
 alpha = 0.5
