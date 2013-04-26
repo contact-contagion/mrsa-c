@@ -6,7 +6,8 @@ BaseSweepNumber = 0
 #stop.at = 720
 #stop.at = 17520.5
 # includes half year hack
-stop.at = 48180.5
+stop.at = 91980.0
+#stop.at = 48180.5
 # two years:
 #21900.5
 # one year:
