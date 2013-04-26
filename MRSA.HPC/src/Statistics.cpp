@@ -243,14 +243,16 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 	}
 }
 
-void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
+void Statistics::yearEnded(repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator begin,
+		repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator end, int year,
 		repast::Properties& props) {
 	PersonStats p_stats = { };
 
 	RegionMap* region_map = RegionMap::instance();
 	// get yearly stats from each person.
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-		Person* p = (*iter);
+	//for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
+	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = begin; iter != end; ++iter) {
+		Person* p = (Person*)((*iter).get());
 		updateCountsFromStatsVector(p, p_stats);
 		p->status_.resetYearlyCounts();
 		// only count infections / colonizations that have been caused during the model run

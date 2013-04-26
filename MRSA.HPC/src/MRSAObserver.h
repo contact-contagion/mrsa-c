@@ -59,7 +59,7 @@ private:
 	int personType;
 
 	std::vector<Place*> places;
-	repast::relogo::AgentSet<Person>* people_;
+	//repast::relogo::AgentSet<Person>* people_;
 	std::string summary_output_file;
 	Calendar calendar;
 

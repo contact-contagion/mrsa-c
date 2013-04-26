@@ -168,7 +168,8 @@ public:
 	 * Calculate stats at the end of a year using the set of
 	 * persons.
 	 */
-	void yearEnded(repast::relogo::AgentSet<Person>& people, int year, repast::Properties& props);
+	void yearEnded(repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator begin,
+			repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator, int year, repast::Properties& props);
 
 	/**
 	 * Calculates the summary stats and writes them to the specified file.

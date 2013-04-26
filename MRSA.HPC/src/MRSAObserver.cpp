@@ -45,15 +45,10 @@ void line_count(const std::string& file, unsigned int& line_count, double& p_mrs
 }
 
 MRSAObserver::MRSAObserver() :
-		personType(0), places(0), people_(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(
-				0) {
+		personType(0), places(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(0) {
 }
 
 MRSAObserver::~MRSAObserver() {
-	// delete the permanent AgentSet used to hold the
-	// population.
-	delete people_;
-
 	// delete each place from the list of places.
 	for (vector<Place*>::iterator iter = places.begin(); iter != places.end(); ++iter) {
 		delete (*iter);
@@ -81,8 +76,11 @@ void MRSAObserver::go() {
 	}
 
 	// for each person,
-	for (unsigned int i = 0, n = people_->size(); i < n; i++) {
-		Person* person = (*people_)[i];
+
+	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
+		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
+		//Person* person = (*people_)[i];
+		Person* person = static_cast<Person*>((*iter).get());
 		// perform the activity for the specified time and day_of_week
 		person->performActivity(calendar);
 		// update the stats -- update the disease status counts
@@ -184,6 +182,14 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// lines in the persons file
 	personType = create<Person>(lines, pCreator);
 
+	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
+		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
+		//Person* person = (*people_)[i];
+		Person* person  = static_cast<Person*>((*iter).get());
+		person->validate();
+	}
+
+	/*
 	// get all the created Persons and validate them.
 	AgentSet<Person> people;
 	get(people);
@@ -197,11 +203,12 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 
 	people.clear();
 	get(people);
+	*/
 }
 
 void MRSAObserver::calcYearlyStats() {
 	yearCounter++;
-	Statistics::getInstance()->yearEnded(*people_, yearCounter, *propsPtr);
+	Statistics::getInstance()->yearEnded(context.byTypeBegin(personType), context.byTypeEnd(personType), yearCounter, *propsPtr);
 }
 
 void MRSAObserver::initializeYearlyDataCollection(const string& file) {
@@ -262,7 +269,7 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 }
 
 void MRSAObserver::atEnd() {
-	Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file, *propsPtr);
+	//Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file, *propsPtr);
 	TransmissionEventRecorder::instance()->close();
 }
 
@@ -351,8 +358,8 @@ void MRSAObserver::setup(Properties& props) {
 	// them each iteration which will be slow. We do this here because
 	// prevoius setup type methods may have altered the initial set of
 	// persons.
-	people_ = new AgentSet<Person>();
-	get(*people_);
+	//people_ = new AgentSet<Person>();
+	//get(*people_);
 
 	// no long set the initial stat counts
 	//Statistics* stats = Statistics::getInstance();
