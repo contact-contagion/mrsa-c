@@ -11,7 +11,7 @@
 namespace mrsa {
 
 PrisonStayManager::PrisonStayManager() :
-		AbstractStayManager(10) {
+		AbstractStayManager(11) {
 }
 
 PrisonStayManager::~PrisonStayManager() {

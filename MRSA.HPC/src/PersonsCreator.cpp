@@ -47,8 +47,8 @@ shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, sh
 PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_duration) {
 	Random* random = Random::instance();
 	PrisonStayManager* manager(0);
-	// one try per year, 10 years
-	for (unsigned int i = 0; i < 10; ++i) {
+	// one try per year, 11 years
+	for (unsigned int i = 0; i < 11; ++i) {
 		if(random->nextDouble() <= prison_prob) {
 			if (manager == 0) {
 				manager = new PrisonStayManager();

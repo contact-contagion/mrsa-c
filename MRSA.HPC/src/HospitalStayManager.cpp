@@ -14,7 +14,7 @@ namespace mrsa {
 
 HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2_length,
 		unsigned int y3_length, unsigned int y4_length, unsigned int y5_length) :
-		AbstractStayManager(10) {
+		AbstractStayManager(11) {
 
 	unsigned int start = y1_length < 364 ? (unsigned int) repast::Random::instance()->createUniIntGenerator(1,
 			365 - y1_length).next() : 1;
@@ -40,6 +40,13 @@ HospitalStayManager::HospitalStayManager(unsigned int y1_length, unsigned int y2
 				365 - y5_length).next() : 1;
 	if (y5_length > 364) y5_length = 365;
 	stay_data[4] =(std::pair<unsigned int, unsigned int>(start, y5_length));
+
+	// repeat 5 - 9
+	stay_data[5] = stay_data[0];
+	stay_data[6] = stay_data[1];
+	stay_data[7] = stay_data[2];
+	stay_data[8] = stay_data[3];
+	stay_data[9] = stay_data[4];
 }
 
 HospitalStayManager::~HospitalStayManager() {
