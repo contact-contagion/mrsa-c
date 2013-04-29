@@ -7,6 +7,8 @@
 
 #include <map>
 
+#include <sys/resource.h>
+
 #include "repast_hpc/SVDataSetBuilder.h"
 #include "repast_hpc/DataSet.h"
 // for timestamp
@@ -30,6 +32,14 @@ namespace mrsa {
 using namespace repast::relogo;
 using namespace repast;
 using namespace std;
+
+std::string get_mem() {
+	rusage r_usage;
+	getrusage(RUSAGE_SELF, &r_usage);
+	std::stringstream str;
+	str << "Memory Usage: " << (r_usage.ru_maxrss / 1024.0 / 1024.0) << " MB";
+	return str.str();
+}
 
 // counts the number of lines in the specified  persons file.
 // and puts the line count and sum of the p_mrsa column the output arguments
@@ -72,7 +82,8 @@ void MRSAObserver::go() {
 	if (RepastProcess::instance()->rank() == 0 && tick % 720 == 0) {
 		std::string time;
 		repast::timestamp(time);
-		std::cout << time << " -- Month: " << (tick / 720 - 6) << std::endl;
+		std::cout << time << " -- Month: " << (tick / 720 - 6) << ", " << get_mem() << std::endl;
+
 	}
 
 	// for each person,
@@ -182,11 +193,19 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	// lines in the persons file
 	personType = create<Person>(lines, pCreator);
 
+	std::vector<Person*> to_kill;
 	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
 		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		//Person* person = (*people_)[i];
 		Person* person  = static_cast<Person*>((*iter).get());
-		person->validate();
+		if (!person->validate()) {
+			to_kill.push_back(person);
+		}
+	}
+
+	std::cout << "to kill size: " << to_kill.size() << std::endl;
+	for (size_t i = 0, n = to_kill.size(); i < n; ++i) {
+		(to_kill[i])->die();
 	}
 
 	/*
@@ -372,7 +391,7 @@ void MRSAObserver::setup(Properties& props) {
 					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
 
 	repast::timestamp(time);
-	std::cout << "Setup Finished at " << time << std::endl;
+	std::cout << "Setup Finished at " << time << ", " << get_mem() << std::endl;
 }
 
 } /* namespace mrsa */

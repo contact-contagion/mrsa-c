@@ -67,9 +67,9 @@ public:
 	virtual ~Person();
 
 	/**
-	 * If this Person has no Places, then it kills itself.
+	 * If this Person has no Places, return false.
 	 */
-	void validate();
+	bool validate();
 
 	/**
 	 * Initialize the activity vectors for this Person, return true on successful

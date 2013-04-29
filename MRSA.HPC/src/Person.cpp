@@ -69,13 +69,10 @@ Person::~Person() {
 //	comp_indices[type] = place->addPersonToComponent(this, activity_type, comp_indices[type]);
 //}
 
-void Person::validate() {
-	// remove this person from the model if it has no places
-	if (places_.school == 0 && places_.household == 0 && places_.work == 0
-			&& places_.group_quarters == 0)
-		die();
-	//if (places_.household == 0)
-	//	die();
+bool Person::validate() {
+	// remove this person from the model if it has home type places
+	return !(places_.school == 0 && places_.household == 0 && places_.work == 0
+			&& places_.group_quarters == 0);
 }
 
 bool Person::canStatusChange() {
