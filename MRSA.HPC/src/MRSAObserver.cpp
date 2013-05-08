@@ -7,6 +7,11 @@
 
 #include <map>
 
+#ifdef __APPLE__
+	#include <mach/task.h>
+	#include <mach/mach.h>
+#endif
+
 #include <sys/resource.h>
 
 #include "repast_hpc/SVDataSetBuilder.h"
@@ -33,11 +38,32 @@ using namespace repast::relogo;
 using namespace repast;
 using namespace std;
 
+#ifdef __APPLE__
+int getmem (unsigned long long *rss, unsigned long long *vs)
+{
+    struct task_basic_info_64 t_info;
+    mach_msg_type_number_t t_info_count = TASK_BASIC_INFO_64_COUNT;
+
+    if (KERN_SUCCESS != task_info(mach_task_self(),
+       TASK_BASIC_INFO_64, (task_info_t)&t_info, &t_info_count))
+    {
+        return -1;
+    }
+    *rss = t_info.resident_size;
+    *vs  = t_info.virtual_size;
+    return 0;
+}
+#endif
+
 std::string get_mem() {
-	rusage r_usage;
-	getrusage(RUSAGE_SELF, &r_usage);
+
+	unsigned long long rss = 0, vss = 0;
+#ifdef __APPLE__
+	getmem(&rss, &vss);
+#endif
 	std::stringstream str;
-	str << "Memory Usage: " << (r_usage.ru_maxrss / 1024.0 / 1024.0) << " MB";
+	str << "Real Memory Usage: " << (rss / 1024.0 /1024.0) << " MB, Virtual Memory Usage: " << (vss / 1024.0 / 1024.0) << " MB";
+			/*(r_usage.ru_maxrss / 1024.0 / 1024.0) << " MB"; */
 	return str.str();
 }
 
