@@ -292,6 +292,12 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 					props.getProperty("input.record.location") : "output/mrsa_model_INPUT.csv");
 	writePropertiesFromAllProcesses(props, inputRecordLocation);
 
+
+        std::stringstream  eventOutputFile;
+	eventOutputFile << props.getProperty("event.output.file") << "_" << props.getProperty("run.number") << ".csv";
+        props.putProperty("event.output.file", eventOutputFile.str());
+
+
 	try {
 		// create a simulation runner to run the MRSA model.
 		SimulationRunner runner(&sub);
