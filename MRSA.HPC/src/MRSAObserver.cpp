@@ -88,7 +88,8 @@ void MRSAObserver::go() {
 
 	// for each person,
 
-	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
+	for (AgentIter iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType);
+			++iter) {
 		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		//Person* person = (*people_)[i];
 		Person* person = static_cast<Person*>((*iter).get());
@@ -123,15 +124,13 @@ void MRSAObserver::initializeActivities(Properties& props) {
 	ActivityCreator creator;
 	creator.run(props.getProperty(ACTIVITIES_FILE), map);
 
-	// map should now have list of activities by id
-	// match these up to persons.
-	AgentSet<Person> people;
-	get(people);
-
 	// each person finds his / her list of activities
 	// in the map
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
-		Person* person = (*iter);
+	for (AgentIter iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType);
+			++iter) {
+		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
+		//Person* person = (*people_)[i];
+		Person* person = static_cast<Person*>((*iter).get());
 		//std::cout << (*person) << std::endl;
 		if (!person->initializeActivities(map)) {
 			// if the person can't find its activities then
@@ -194,40 +193,41 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 	personType = create<Person>(lines, pCreator);
 
 	std::vector<Person*> to_kill;
-	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
+	for (AgentIter iter =
+			context.byTypeBegin(personType); iter != context.byTypeEnd(personType); ++iter) {
 		//for (unsigned int i = 0, n = people_->size(); i < n; i++) {
 		//Person* person = (*people_)[i];
-		Person* person  = static_cast<Person*>((*iter).get());
+		Person* person = static_cast<Person*>((*iter).get());
 		if (!person->validate()) {
 			to_kill.push_back(person);
 		}
 	}
 
-	std::cout << "to kill size: " << to_kill.size() << std::endl;
 	for (size_t i = 0, n = to_kill.size(); i < n; ++i) {
 		(to_kill[i])->die();
 	}
 
 	/*
-	// get all the created Persons and validate them.
-	AgentSet<Person> people;
-	get(people);
+	 // get all the created Persons and validate them.
+	 AgentSet<Person> people;
+	 get(people);
 
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
-		Person* person = (*iter);
-		// check if a person was assigned any places, and if not
-		// then remove the person with die().
-		person->validate();
-	}
+	 for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); iter++) {
+	 Person* person = (*iter);
+	 // check if a person was assigned any places, and if not
+	 // then remove the person with die().
+	 person->validate();
+	 }
 
-	people.clear();
-	get(people);
-	*/
+	 people.clear();
+	 get(people);
+	 */
 }
 
 void MRSAObserver::calcYearlyStats() {
 	yearCounter++;
-	Statistics::getInstance()->yearEnded(context.byTypeBegin(personType), context.byTypeEnd(personType), yearCounter, *propsPtr);
+	Statistics::getInstance()->yearEnded(context.byTypeBegin(personType),
+			context.byTypeEnd(personType), yearCounter, *propsPtr);
 }
 
 void MRSAObserver::initializeYearlyDataCollection(const string& file) {
@@ -340,13 +340,12 @@ void MRSAObserver::setup(Properties& props) {
 
 	// initialize the activities
 	initializeActivities(props);
-	AgentSet<Person> people;
-	get(people);
 
 	int i_count = 0;
 	int c_count = 0;
-	for (size_t i = 0; i < people.size(); ++i) {
-		Person* p = people[i];
+	for (AgentIter iter = context.byTypeBegin(personType); iter != context.byTypeEnd(personType);
+			++iter) {
+		Person* p = static_cast<Person*>((*iter).get());
 		if (p->status() == INFECTED)
 			++i_count;
 		else if (p->status() == COLONIZED)

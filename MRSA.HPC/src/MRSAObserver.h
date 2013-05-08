@@ -56,6 +56,8 @@ public:
 
 private:
 
+	typedef repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator AgentIter;
+
 	int personType;
 
 	std::vector<Place*> places;
