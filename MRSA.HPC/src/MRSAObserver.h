@@ -67,6 +67,7 @@ private:
 
 	repast::Properties* propsPtr;
 	int yearCounter;
+	unsigned long long person_count;
 
 	/**
 	 * Load the activities and assign them to persons.

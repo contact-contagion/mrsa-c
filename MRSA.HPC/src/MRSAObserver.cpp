@@ -13,6 +13,7 @@
 #endif
 
 #include <sys/resource.h>
+#include <time.h>
 
 #include "repast_hpc/SVDataSetBuilder.h"
 #include "repast_hpc/DataSet.h"
@@ -38,6 +39,14 @@ using namespace repast::relogo;
 using namespace repast;
 using namespace std;
 
+struct Timings {
+	double setup_time;
+	time_t run_start, run_end;
+	unsigned long long mem_use;
+};
+
+Timings timings;
+
 #ifdef __APPLE__
 int getmem (unsigned long long *rss, unsigned long long *vs)
 {
@@ -49,6 +58,11 @@ int getmem (unsigned long long *rss, unsigned long long *vs)
     {
         return -1;
     }
+
+    if (timings.mem_use < t_info.resident_size) {
+    	timings.mem_use = t_info.resident_size;
+    }
+
     *rss = t_info.resident_size;
     *vs  = t_info.virtual_size;
     return 0;
@@ -62,7 +76,7 @@ std::string get_mem() {
 	getmem(&rss, &vss);
 #endif
 	std::stringstream str;
-	str << "Real Memory Usage: " << (rss / 1024.0 /1024.0) << " MB, Virtual Memory Usage: " << (vss / 1024.0 / 1024.0) << " MB";
+	str << "RM: " << (rss / 1024.0 /1024.0) << " MB, VM: " << (vss / 1024.0 / 1024.0) << " MB";
 			/*(r_usage.ru_maxrss / 1024.0 / 1024.0) << " MB"; */
 	return str.str();
 }
@@ -81,7 +95,8 @@ void line_count(const std::string& file, unsigned int& line_count, double& p_mrs
 }
 
 MRSAObserver::MRSAObserver() :
-		personType(0), places(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(0) {
+		personType(0), places(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(0),
+		person_count(0){
 }
 
 MRSAObserver::~MRSAObserver() {
@@ -227,6 +242,7 @@ void MRSAObserver::createPersons(Properties& props, map<string, Place*>* placeMa
 		if (!person->validate()) {
 			to_kill.push_back(person);
 		}
+		++person_count;
 	}
 
 	for (size_t i = 0, n = to_kill.size(); i < n; ++i) {
@@ -316,10 +332,17 @@ void MRSAObserver::initializeHourlyDataCollection(const string& file) {
 void MRSAObserver::atEnd() {
 	//Statistics::getInstance()->calculateSummaryStats(*people_, summary_output_file, *propsPtr);
 	TransmissionEventRecorder::instance()->close();
+
+	time(&timings.run_end);
+	std::cout << (timings.setup_time / 60) << "," << (difftime(timings.run_end, timings.run_start) / 60) << "," <<
+			(timings.mem_use / 1024.0 / 1024.0) << "," << person_count << "," << places.size() << std::endl;
 }
 
 // entry point for model setup.
 void MRSAObserver::setup(Properties& props) {
+	time_t start;
+	time(&start);
+
 	propsPtr = &props;
 	Parameters::initialize(props);
 	Parameters* params = Parameters::instance();
@@ -329,9 +352,9 @@ void MRSAObserver::setup(Properties& props) {
 	//(*FileOutput::instance()) << "tick,id,place_type,size" << std::endl;
 
 	// time stamp to mark start of setup
-	std::string time;
-	repast::timestamp(time);
-	std::cout << "Setup Started at " << time << std::endl;
+	std::string time_str;
+	repast::timestamp(time_str);
+	std::cout << "Setup Started at " << time_str << std::endl;
 
 	TransmissionEventRecorder::initialize(props.getProperty(EVENT_OUTPUT_FILE));
 
@@ -415,8 +438,12 @@ void MRSAObserver::setup(Properties& props) {
 			Schedule::FunctorPtr(
 					new MethodFunctor<MRSAObserver>(this, &mrsa::MRSAObserver::atEnd)));
 
-	repast::timestamp(time);
-	std::cout << "Setup Finished at " << time << ", " << get_mem() << std::endl;
+	time_t finish;
+	time(&finish);
+	timings.setup_time = difftime(finish, start);
+	repast::timestamp(time_str);
+	std::cout << "Setup Finished at " << time_str << ", " << get_mem() << std::endl;
+	time(&timings.run_start);
 }
 
 } /* namespace mrsa */
