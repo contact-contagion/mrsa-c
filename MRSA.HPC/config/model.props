@@ -1,4 +1,4 @@
-random.seed = 1
+#random.seed = -1
 
 BaseSweepNumber = 0
 
