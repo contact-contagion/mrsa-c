@@ -116,9 +116,6 @@ std::string get_mem() {
 	return str.str();
 }
 
-<<<<<<< HEAD
-
-=======
 // counts the number of lines in the specified  persons file.
 // and puts the line count and sum of the p_mrsa column the output arguments
 void line_count(const std::string& file, unsigned int& line_count, double& p_mrsa_sum) {
@@ -131,7 +128,6 @@ void line_count(const std::string& file, unsigned int& line_count, double& p_mrs
 		++line_count;
 	}
 }
->>>>>>> refs/heads/development
 
 MRSAObserver::MRSAObserver() :
 		personType(0), places(0), summary_output_file(), calendar(), propsPtr(0), yearCounter(0),

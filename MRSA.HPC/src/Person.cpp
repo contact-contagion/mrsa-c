@@ -147,12 +147,8 @@ void Person::performActivity(Calendar& calendar) {
 //	if (personId() == "5511519") {
 //		has 7 days in hospital so good for testing hosp code.
 //	}
-<<<<<<< HEAD
-	if (hosp_manager_->inHospital(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
-=======
 
 	if (hosp_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
->>>>>>> refs/heads/development
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}

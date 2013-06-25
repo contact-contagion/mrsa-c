@@ -92,7 +92,6 @@ CompositePlace::~CompositePlace() {
 }
 
 void CompositePlace::runTransmission() {
-	int i = 1;
 	for (vector<ComponentPlace*>::iterator iter = components.begin(); iter != components.end();
 			++iter) {
 		(*iter)->runTransmission();
