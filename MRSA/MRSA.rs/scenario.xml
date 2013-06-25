@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<Scenario>
-  <repast.simphony.dataLoader.engine.ClassNameDataLoaderAction file="repast.simphony.dataLoader.engine.ClassNameDataLoaderAction_0.xml" context="MRSA"/>
-  <repast.simphony.data.engine.DefaultDataGathererDescriptorAction file="repast.simphony.data.engine.DefaultDataGathererDescriptorAction_1.xml" context="MRSA"/>
-  <repast.simphony.chart.engine.DefaultXYChartOutputterDescriptorAction file="repast.simphony.chart.engine.DefaultXYChartOutputterDescriptorAction_2.xml" context="MRSA"/>
-  <repast.simphony.userpanel.ui.DefaultUserPanelDescriptorAction file="repast.simphony.userpanel.ui.DefaultUserPanelDescriptorAction_3.xml" context="MRSA"/>
-  <repast.simphony.action.display context="default_observer_context" file="repast.simphony.action.display_relogoDefault.xml"/>
-  <model.initializer class="repast.simphony.relogo.ReLogoInitializer"/>
-</Scenario>
