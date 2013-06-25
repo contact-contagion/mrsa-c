@@ -1,4 +1,69 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+/*
  * MRSAObserver.cpp
  *
  *  Created on: Apr 17, 2012
@@ -30,7 +95,7 @@
 #include "Constants.h"
 #include "TransmissionEventRecorder.h"
 
-//#include "FileOutput.h"
+#include "FileOutput.h"
 //#include "RegionMap.h"
 
 namespace mrsa {
@@ -347,10 +412,6 @@ void MRSAObserver::setup(Properties& props) {
 	Parameters::initialize(props);
 	Parameters* params = Parameters::instance();
 
-	// debug file output
-	//FileOutput::initialize("output/size_check.csv");
-	//(*FileOutput::instance()) << "tick,id,place_type,size" << std::endl;
-
 	// time stamp to mark start of setup
 	std::string time_str;
 	repast::timestamp(time_str);
@@ -405,13 +466,11 @@ void MRSAObserver::setup(Properties& props) {
 	// initialize the hourly data collection
 	int runNumber = strToInt(props.getProperty("run.number"));
 
-//	initializeHourlyDataCollection(params->getStringParameter(HOURLY_OUTPUT_FILE));
 	std::stringstream hourlyDataFileName;
 	hourlyDataFileName << props.getProperty(HOURLY_OUTPUT_FILE) << "_" << runNumber << ".csv";
 	initializeHourlyDataCollection(hourlyDataFileName.str());
 
 	// initialize yearly data collection
-//	initializeYearlyDataCollection(params->getStringParameter(YEARLY_OUTPUT_FILE));
 	std::stringstream yearlyDataFileName;
 	yearlyDataFileName << props.getProperty(YEARLY_OUTPUT_FILE) << "_" << runNumber << ".csv";
 	initializeYearlyDataCollection(yearlyDataFileName.str());
@@ -420,6 +479,9 @@ void MRSAObserver::setup(Properties& props) {
 	std::stringstream summaryOutputFileName;
 	summaryOutputFileName << props.getProperty(SUMMARY_OUTPUT_FILE) << "_" << runNumber << ".txt";
 	summary_output_file = summaryOutputFileName.str();
+
+	//FileOutput::initialize("contact_events.csv");
+	//(*FileOutput::instance()) << "time, place, place_type, persons" << std::endl;
 
 	// get a permanent set of people so we don't have to retrieve
 	// them each iteration which will be slow. We do this here because

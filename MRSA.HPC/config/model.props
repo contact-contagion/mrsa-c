@@ -3,10 +3,9 @@
 BaseSweepNumber = 0
 
 ## half year = 4380.0;
-#stop.at = 720
 #stop.at = 17520.5
 # includes half year hack
-stop.at = 13140.5
+stop.at = 4428.5
 
 # 5 years
 #48180.5
@@ -18,13 +17,13 @@ stop.at = 13140.5
 # one year:
 #13140.5
 
-persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
-places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
-activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
+persons.file = ../../MRSA Inputs/geo_subsets/chicago/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/chicago/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/chicago/activities.csv 
 
-#persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
-#places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
-#activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
+#persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
+#places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
+#activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
 
 risk.file = ../data/new_risk_file_040313.csv 
 
