@@ -1,3 +1,68 @@
+/*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 #include <boost/mpi.hpp>
 #include <boost/serialization/map.hpp>
 #include <boost/algorithm/string.hpp>
@@ -16,21 +81,19 @@
 
 #include "MRSAObserver.h"
 #include "CSVReader.h"
+#include "../src/utility.h"
+#include "Constants.h"
 
 using namespace repast;
 using namespace relogo;
 using namespace mrsa;
 
-const int TYPE_IDX = 1;
-const int RISK_PLACE_TYPE_IDX = 0;
-const int RISK_ACT_TYPE_IDX = 1;
-const int RISK_PAR_IDX = 2;
-const int RISK_TIP_IDX = 3;
-const int RISK_AIP_IDX = 4;
-const int RISK_X_IDX = 5;
-
 static const int countOfInputRecordValues = 30;
 static const int countOfRecordValues = 46;
+
+const int TYPE_IDX = 1;
+const int YEARLY_DATA_LENGTH = 39;
+const int MAX_YEAR = 5;
 
 using namespace boost::assign;
 
@@ -80,7 +143,7 @@ void setPropertiesForSweep(Properties& props, int sweepIndex) {
 		int* sizes = new int[list.size()];
 		int* index = new int[list.size()];
 		std::vector<std::vector<std::string> > valArray;
-		for (int i = 0; i < list.size(); i++) {
+		for (size_t i = 0; i < list.size(); i++) {
 			sizes[i] = 1;
 			index[i] = 0;
 			if (props.contains(list[i])) {
@@ -121,7 +184,7 @@ void setPropertiesForSweep(Properties& props, int sweepIndex) {
 }
 
 void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
-	if (!output) {
+
 		keylist +=
 		// Basic Info:
 				"run.number", "date_time.run", "run.time", "random.seed", "stop.at",
@@ -136,7 +199,8 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 		"hourly.output.file", "yearly.output.file", "summary.output.file",
 
 		// Parameters:
-		"seek.care.fraction", "initial.colonization.fraction", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
+		"initial.colonization.scaling", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
+		"minimum.jail.stay", "maximum.jail.stay",
 
 		// Risks:
 		"Hospital_0_PAR", "Hospital_0_TIP", "Hospital_0_AIP", "Hospital_0_X", "Hospital_1_PAR", "Hospital_1_TIP", "Hospital_1_AIP", "Hospital_1_X",
@@ -159,60 +223,52 @@ void getKeysToWrite(std::vector<std::string>& keylist, bool output = false) {
 
 		// Spatial for ReLogo
 		"min.x", "min.y", "max.x", "max.y", "grid.buffer", "proc.per.x", "proc.per.y";
-	} else {
+	if (output) {
 		keylist +=
-		// Basic Info:
-				"run.number", "date_time.run", "run.time", "random.seed", "stop.at",
-
-		// Obsolete?
-		"seek.and.destroy.at", "seek.and.destroy.cure.fraction",
-
-		// Input files:
-		"persons.file", "places.file", "activities.file", "risk.file",
-
-		// Output files:
-		"hourly.output.file", "yearly.output.file", "summary.output.file",
-
-		// Parameters:
-		"seek.care.fraction", "initial.colonization.fraction", "initial.infected.count", "minimum.infection.period", "a", "b", "e",
-
-		// Risks:
-		"Hospital_0_PAR", "Hospital_0_TIP", "Hospital_0_AIP", "Hospital_0_X", "Hospital_1_PAR", "Hospital_1_TIP", "Hospital_1_AIP", "Hospital_1_X",
-
-		"Workplace_0_PAR", "Workplace_0_TIP", "Workplace_0_AIP", "Workplace_0_X", "Workplace_1_PAR", "Workplace_1_TIP", "Workplace_1_AIP", "Workplace_1_X",
-
-		"Household_0_PAR", "Household_0_TIP", "Household_0_AIP", "Household_0_X", "Household_1_PAR", "Household_1_TIP", "Household_1_AIP", "Household_1_X",
-
-		"School_0_PAR", "School_0_TIP", "School_0_AIP", "School_0_X", "School_1_PAR", "School_1_TIP", "School_1_AIP", "School_1_X",
-
-		"Gym_0_PAR", "Gym_0_TIP", "Gym_0_AIP", "Gym_0_X","Gym_1_PAR", "Gym_1_TIP", "Gym_1_AIP", "Gym_1_X",
-
-		"Nursing_Home_0_PAR", "Nursing_Home_0_TIP", "Nursing_Home_0_AIP", "Nursing_Home_0_X","Nursing_Home_1_PAR", "Nursing_Home_1_TIP", "Nursing_Home_1_AIP",
-		"Nursing_Home_1_X",
-
-		"Prison_0_PAR", "Prison_0_TIP", "Prison_0_AIP", "Prison_0_X", "Prison_1_PAR", "Prison_1_TIP", "Prison_1_AIP", "Prison_1_X",
-
-		"College_Dorm_0_PAR", "College_Dorm_0_TIP", "College_Dorm_0_AIP", "College_Dorm_0_X", "College_Dorm_1_PAR", "College_Dorm_1_TIP", "College_Dorm_1_AIP",
-		"College_Dorm_1_X",
-
-
-		// Spatial for ReLogo
-		"min.x", "min.y", "max.x", "max.y", "grid.buffer", "proc.per.x", "proc.per.y",
 
 		// Output
 		"process.count", "run.time",
 
 		// Summary Statistics
-		"total_infections", "colonizations", "total_from_infection", "total_from_colonization",
-		/*
-		 "avg_infected_r0",
-		 "avg_colonized_r0",
-		 */
+		"total_infections", "colonizations", "total_from_infection", "total_from_colonization";
+
+
+
+		std::string yearly_data[YEARLY_DATA_LENGTH] = {"infections_incidence", "colonizations_incidence", "infections_prevalence",
+				"colonizations_prevalence", "hospital_colonizations", "hospital_infections", "hospital_stays",
+				"hospital_days",
+				"jail_colonizations", "jail_infections", "jail_stays", "jail_days",
+				"jail_colonizations_N", "jail_infections_N", "jail_stays_N", "jail_days_N",
+				"jail_colonizations_S", "jail_infections_S", "jail_stays_S", "jail_days_S",
+				"jail_colonizations_W", "jail_infections_W", "jail_stays_W", "jail_days_W",
+				"jail_colonizations_C", "jail_infections_C", "jail_stays_C", "jail_days_C",
+				"jail_colonizations_O", "jail_infections_O", "jail_stays_O", "jail_days_O",
+
+				HOUSEHOLD_COL_COUNT, OTHER_H_COL_COUNT, WORKPLACE_COL_COUNT,
+				SCHOOL_COL_COUNT, GYM_COL_COUNT, DORM_COL_COUNT, NURSING_HOME_COL_COUNT
+		};
+
+		for (int i = 0; i < YEARLY_DATA_LENGTH; ++i) {
+			for (int j = 1; j <= MAX_YEAR; ++j) {
+				std::stringstream ss;
+				ss << yearly_data[i] << "_year_" << j;
+				keylist.push_back(ss.str());
+			}
+		}
+
 
 		// By Year Stats
-		"infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4", "infections_incidence_year_5", "colonizations_incidence_year_1", "colonizations_incidence_year_2", "colonizations_incidence_year_3", "colonizations_incidence_year_4", "colonizations_incidence_year_5", "infections_prevalence_year_1", "infections_prevalence_year_2", "infections_prevalence_year_3", "infections_prevalence_year_4", "infections_prevalence_year_5", "colonizations_prevalence_year_1", "colonizations_prevalence_year_2", "colonizations_prevalence_year_3", "colonizations_prevalence_year_4", "colonizations_prevalence_year_5",
-
-		"hospital_colonizations_year_1", "hospital_colonizations_year_2", "hospital_colonizations_year_3", "hospital_colonizations_year_4", "hospital_colonizations_year_5", "hospital_infections_year_1", "hospital_infections_year_2", "hospital_infections_year_3", "hospital_infections_year_4", "hospital_infections_year_5", "hospital_stays_year_1", "hospital_stays_year_2", "hospital_stays_year_3", "hospital_stays_year_4", "hospital_stays_year_5", "hospital_days_year_1", "hospital_days_year_2", "hospital_days_year_3", "hospital_days_year_4", "hospital_days_year_5";
+//		"infections_incidence_year_1", "infections_incidence_year_2", "infections_incidence_year_3", "infections_incidence_year_4",
+//		"infections_incidence_year_5", "colonizations_incidence_year_1", "colonizations_incidence_year_2", "colonizations_incidence_year_3",
+//		"colonizations_incidence_year_4", "colonizations_incidence_year_5", "infections_prevalence_year_1", "infections_prevalence_year_2",
+//		"infections_prevalence_year_3", "infections_prevalence_year_4", "infections_prevalence_year_5", "colonizations_prevalence_year_1",
+//		"colonizations_prevalence_year_2", "colonizations_prevalence_year_3", "colonizations_prevalence_year_4", "colonizations_prevalence_year_5",
+//
+//		"hospital_colonizations_year_1", "hospital_colonizations_year_2", "hospital_colonizations_year_3", "hospital_colonizations_year_4",
+//		"hospital_colonizations_year_5", "hospital_infections_year_1", "hospital_infections_year_2", "hospital_infections_year_3",
+//		"hospital_infections_year_4", "hospital_infections_year_5", "hospital_stays_year_1", "hospital_stays_year_2", "hospital_stays_year_3",
+//		"hospital_stays_year_4", "hospital_stays_year_5", "hospital_days_year_1", "hospital_days_year_2", "hospital_days_year_3", "hospital_days_year_4",
+//		"hospital_days_year_5";
 	}
 }
 
@@ -221,7 +277,8 @@ void writePropertiesFromAllProcesses(Properties& props, std::string fileName, bo
 	std::map<std::string, std::string> map;
 	Properties::key_iterator keyIter = props.keys_begin();
 	while (keyIter != props.keys_end()) {
-		map[*keyIter] = props.getProperty(*keyIter);
+		// cast isn't strictly necessary but otherwise eclipse gives spurious error
+		map[*keyIter] = props.getProperty((std::string)(*keyIter));
 		keyIter++;
 	}
 
@@ -247,63 +304,6 @@ void writePropertiesFromAllProcesses(Properties& props, std::string fileName, bo
 	}
 }
 
-void loadRisks(Properties& props) {
-  if(!props.contains("risk.file")) return;
-  std::string risk_file = props.getProperty("risk.file");
-  CSVReader reader(risk_file);
-  std::vector<std::string> vec;
-  std::set<std::string> placeNamesSet;
-  std::stringstream placeNames;
-
-  // skip the first header line.
-  reader.next(vec);
-
-  // read each line and depending on the type, create that type of place.
-  while (reader.next(vec)) {
-    std::string type = vec[RISK_PLACE_TYPE_IDX];
-    if((placeNamesSet.insert(type).second)){
-      if(placeNames.str().size() > 0) placeNames << ",";
-      placeNames << type;
-    }
-
-    boost::replace_all(type, " ", "_");
-
-    int act_type = repast::strToInt(vec[RISK_ACT_TYPE_IDX]);
-
-    std::stringstream PAR;
-    PAR << type << "_" << act_type << "_PAR";
-    if(!props.contains(PAR.str()))
-        props.putProperty(PAR.str(), (float) repast::strToDouble(vec[RISK_PAR_IDX]));
-
-    std::stringstream TIP;
-    TIP << type << "_" << act_type << "_TIP";
-    if(!props.contains(TIP.str()))
-        props.putProperty(TIP.str(), (float) repast::strToDouble(vec[RISK_TIP_IDX]));
-
-    std::stringstream AIP;
-    AIP << type << "_" << act_type << "_AIP";
-    if(!props.contains(AIP.str()))
-        props.putProperty(AIP.str(), (float) repast::strToDouble(vec[RISK_AIP_IDX]));
-
-    std::stringstream X;
-    X << type << "_" << act_type << "_X";
-    if(!props.contains(X.str()))
-    	props.putProperty(X.str(), (float) repast::strToDouble(vec[RISK_X_IDX]));
-
-    props.putProperty("place.types", placeNames.str());
-
-  }
-
-
-	/*
-	 for (std::map<string, Risk>::iterator iter = map.begin(); iter != map.end(); ++iter) {
-	 Risk& risk = iter->second;
-	 std::cout << iter->first << ": a0 = " << risk.a0_ << ", a1 = " << risk.a1_ << ", b0 = "
-	 << risk.b0_  << ", b1= " << risk.b1_ << std::endl;
-	 }
-	 */
-}
-
 /**
  * Runs the MRSA model with the specified model.props file and
  * optional model prop command line values.
@@ -313,7 +313,8 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 	// create a properties object from the props file.
 	Properties props(propsFile, argc, argv, &world);
 
-	loadRisks(props);
+	mrsa::load_risks(props);
+	mrsa::load_init_col_inf_fractions(props);
 
 	// add a starting time property
 	std::string time;
@@ -355,6 +356,12 @@ void runModel(std::string propsFile, std::string config, int argc, char ** argv)
 			props.contains("input.record.location") ?
 					props.getProperty("input.record.location") : "output/mrsa_model_INPUT.csv");
 	writePropertiesFromAllProcesses(props, inputRecordLocation);
+
+
+        std::stringstream  eventOutputFile;
+	eventOutputFile << props.getProperty("event.output.file") << "_" << props.getProperty("run.number") << ".csv";
+        props.putProperty("event.output.file", eventOutputFile.str());
+
 
 	try {
 		// create a simulation runner to run the MRSA model.

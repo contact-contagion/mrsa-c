@@ -1,3 +1,36 @@
+/*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #define BOOST_TEST_DYN_LINK
 
 #include <sstream>
@@ -7,6 +40,7 @@
 #include "../src/PersonsCreator.h"
 #include "../src/ActivityCreator.h"
 #include "../src/Person.h"
+#include "../src/utility.h"
 
 #include "ObserverSetup.h"
 
@@ -20,50 +54,73 @@ std::string intToString(int i) {
 	return out.str();
 }
 
-BOOST_FIXTURE_TEST_SUITE(creator_tests, ObserverSetup);
+BOOST_FIXTURE_TEST_SUITE(creator_tests, ObserverSetup)
+;
 
 BOOST_AUTO_TEST_CASE(place_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", "../data/risk.csv", places);
+	Properties props("../config/model.props");
+	load_risks(props);
+	creator.run("../test_data/places2.csv", props, places);
 
-	BOOST_REQUIRE_EQUAL(places.size(), (size_t)13);
+	BOOST_REQUIRE_EQUAL(places.size(), (size_t)9);
 
-	std::string ids[] = {"10049883", "10051140", "10052705", "1703101010000001",
-		"1703101010000020", "170993001101", "170993001102", "170993001104", "170993001118", "2038461", "2038468",
-		"G170313904001C01", "4196117"};
-
-	std::string types[] = {"hospital", "hospital", "hospital", "workplace", "workplace",
-		"school", "school", "school", "school", "household", "household", "college dorm",
-		"gym"
-	};
-
-	for (unsigned int i = 0; i < 13; ++i) {
-		BOOST_CHECK_EQUAL((places[i])->placeId(), ids[i]);
-		BOOST_CHECK_EQUAL((places[i])->placeType(), types[i]);
+	vector<string> vec;
+	CSVReader reader("../test_data/places2.csv");
+	reader.skip(1);
+	for (unsigned int i = 0; i < 9; ++i) {
+		reader.next(vec);
+		BOOST_CHECK_EQUAL((places[i])->placeId(), vec[0]);
+		string type = vec[1];
+		// lower case the type for easier, less error prone comparisons
+		std::transform(type.begin(), type.end(), type.begin(), ::tolower);
+		BOOST_CHECK_EQUAL((places[i])->placeType(), type);
+		BOOST_CHECK_EQUAL(places[i]->zipCode(), strToUInt(vec[6]));
 	}
+}
+
+Person* find_person(AgentSet<Person>& persons, const string& id) {
+	for (size_t i = 0; i < persons.size(); ++i) {
+		if (persons[i]->personId() == id) return persons[i];
+	}
+	return 0;
 }
 
 BOOST_AUTO_TEST_CASE(people_creator) {
 	PlaceCreator creator;
 	vector<Place*> places;
-	creator.run("../test_data/places.csv", "../data/risk.csv", places);
+	Properties props("../config/model.props");
+	load_risks(props);
+	creator.run("../test_data/places2.csv", props, places);
+
 	std::map<std::string, Place*> placeMap;
 	for (int i = 0, n = places.size(); i < n; i++) {
 		Place* place = places[i];
 		placeMap.insert(pair<string, Place*>(place->placeId(), place));
 	}
 
-	PersonsCreator pCreator("../test_data/people1.csv", &placeMap, 7.0f);
-	obs->create<Person>(14, pCreator);
+	PersonsCreator pCreator("../test_data/persons2.csv", &placeMap, 7.0f, 10, 30);
+	obs->create<Person>(9, pCreator);
 
 	AgentSet<Person> persons;
 	obs->get(persons);
+	BOOST_REQUIRE_EQUAL(persons.size(), 9);
 
-	BOOST_REQUIRE_EQUAL(persons.size(), 14);
+	vector<string> vec;
+	CSVReader reader("../test_data/persons2.csv");
+	reader.skip(1);
 
+	for (int i = 0; i < 9; ++i) {
+		reader.next(vec);
+		Person* p = find_person(persons, vec[0]);
+		BOOST_REQUIRE_NE((void*)0, p);
+		BOOST_REQUIRE_EQUAL(p->zipCode(), p->household()->zipCode());
+		BOOST_REQUIRE_EQUAL(p->household()->placeId(), vec[1]);
+	}
+
+	/*
 	std::set<string> expected;
-
 	for (int i = 0; i < 14; ++i) {
 		int id = 5450835 + i;
 		expected.insert(intToString(id));
@@ -76,6 +133,7 @@ BOOST_AUTO_TEST_CASE(people_creator) {
 		BOOST_REQUIRE(iter != expected.end());
 		expected.erase(iter);
 	}
+	*/
 }
 
 BOOST_AUTO_TEST_CASE(activity_creator) {
@@ -119,5 +177,4 @@ BOOST_AUTO_TEST_CASE(activity_creator) {
 	BOOST_REQUIRE_EQUAL(act.id(), "6203-182-1997-2");
 	BOOST_REQUIRE_EQUAL(act.getPlaceType(), "Other");
 }
-
 BOOST_AUTO_TEST_SUITE_END()

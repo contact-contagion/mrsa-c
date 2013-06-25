@@ -1,4 +1,69 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+/*
  * School.cpp
  *
  *  Created on: Apr 25, 2012
@@ -14,76 +79,15 @@ namespace mrsa {
 
 using namespace std;
 
-AgeGroup::AgeGroup(std::string id, std::string type, Risk risk) :
-		AbstractPlace(id, type, risk) {
 
+const unsigned int MAX_SCHOOL_COMPONENT_SIZE = 30;
+
+School::School(std::vector<std::string>& vec, Risk risk) : CompositePlace(vec, risk, MAX_SCHOOL_COMPONENT_SIZE, SCHOOL) {
 }
 
-AgeGroup::~AgeGroup() {
-}
-
-void AgeGroup::runTransmission() {
-	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-
-	// uncolonized must always go first so that the infected and colonized persons
-	// if they cause a colonization of the uncolonized are still in that infected or
-	// colonized state.
-	for (PersonIter iter = uncolonized.begin(); iter != uncolonized.end(); ++iter) {
-		processUncolonized(*iter, ta);
-	}
-	for (PersonIter iter = infected.begin(); iter != infected.end(); ++iter) {
-		processInfected(*iter, ta);
-	}
-
-	for (PersonIter iter = colonized.begin(); iter != colonized.end(); ++iter) {
-		processColonized(*iter, ta);
-	}
-
-}
-
-// low risk = 1f
-School::School(std::vector<std::string>& vec, Risk risk) :
-		Place(vec,  risk), person_map() {
-}
 
 School::~School() {
-	// delete the AgeGroups.
-	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
-		delete iter->second;
-	}
-}
 
-// adds the person to the age group for that person.
-void School::addPerson(Person* person, int activity_type) {
-
-	int age = person->age();
-	// find the AgeGroup for age.
-	AgeGroupMapIter iter = person_map.find(age);
-	if (iter == person_map.end()) {
-		// create a new AgeGroup and
-		// add the person to it.
-		AgeGroup* grp = new AgeGroup(id_, type_, risk_);
-		grp->addPerson(person, activity_type);
-		// put the AgeGroup in the map.
-		person_map.insert(pair<int, AgeGroup*>(age, grp));
-	} else {
-		// add the person to found AgeGroup.s
-		iter->second->addPerson(person, activity_type);
-	}
-}
-
-void School::runTransmission() {
-	// run the transmission algorithm for all the AgeGroups.
-	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
-		iter->second->runTransmission();
-	}
-}
-
-void School::reset() {
-	// reset all the age groups.
-	for (AgeGroupMapIter iter = person_map.begin(); iter != person_map.end(); ++iter) {
-		iter->second->reset();
-	}
 }
 
 } /* namespace mrsa */

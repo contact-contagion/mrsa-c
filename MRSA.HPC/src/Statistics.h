@@ -1,3 +1,36 @@
+/*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #ifndef Statistics_H_
 #define Statistics_H_
 
@@ -7,8 +40,27 @@
 #include "repast_hpc/TDataSource.h"
 
 #include "Person.h"
+#include "PlaceStats.h"
 
 namespace mrsa {
+
+struct RegionStat {
+
+	char region;
+	long infection_incidence, colonization_incidence;
+	long infection_prevalence, colonization_prevalence;
+	long c_from_i, c_from_c, i_to_c_from_na;
+
+	//RegionStat(const char& r) : region(r), infection_incidence(0), colonization_incidence(0),
+	//		infection_prevalence(0), colonization_prevalence(0), c_from_i(0), c_from_c(0) {
+
+	//}
+
+	void reset() {
+		infection_incidence = colonization_incidence = infection_prevalence =
+				colonization_prevalence = c_from_i = c_from_c = i_to_c_from_na = 0;
+	}
+};
 
 // captures yearly averages, used
 // to compute the total averages.
@@ -73,15 +125,20 @@ public:
 	void resetYearlyStats() {
 		yearly_infected = yearly_colonized = 0;
 		eoy_prevalence_infected = eoy_prevalence_colonized = 0;
-		yearly_c_from_c = yearly_c_from_i = 0;
+		yearly_c_from_c = yearly_c_from_i = yearly_i_to_c_from_na = 0;
 		yearly_colonization_duration = yearly_infection_duration = 0;
-		colonization_count_map.clear();
-		infection_count_map.clear();
 		yearly_infected_r0 = yearly_colonized_r0 = 0;
-		hospital_stays = 0;
-		hospital_stay_duration = 0;
-		hospital_infections = hospital_colonizations = 0;
 		colonization_from_infection_override = 0;
+
+		for (std::map<char, RegionStat>::iterator iter = region_stats.begin();
+				iter != region_stats.end(); ++iter) {
+			iter->second.reset();
+		}
+
+		for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+				iter != place_stats.end(); ++iter) {
+			iter->second.reset();
+		}
 	}
 
 	/**
@@ -101,26 +158,32 @@ public:
 	/**
 	 * Increments the colonization count for the specified place type.
 	 */
-	void incrementColonizationCount(const std::string& type);
+	void incrementColonizationCount(const std::string& type, const unsigned int zip_code);
 
 	/**
 	 * Increments the infection count for the specified place type.
 	 */
-	void incrementInfectionCount(const std::string& type);
+	void incrementInfectionCount(const std::string& type, const unsigned int zip_code);
 
 	/**
 	 * Increments the hospital stay count.
 	 */
-	void incrementHospitalStayCount() {
-		++hospital_stays;
-	}
+	void incrementHospitalStayCount(unsigned int zip_code);
 
 	/**
 	 * Increments the hospital stay duration count by the specified amount.
 	 */
-	void incrementHospitalDurationCount(double hours) {
-		hospital_stay_duration += hours;
-	}
+	void incrementHospitalDurationCount(double hours, unsigned int zip_code);
+
+	/**
+	 * Increments the prison stay count.
+	 */
+	void incrementPrisonStayCount(unsigned int zip_code);
+
+	/**
+	 * Increments the prison stay duration count by the specified amount.
+	 */
+	void incrementPrisonDurationCount(double hours, unsigned int zip_code);
 
 	/**
 	 * Counts the specified Person, incrementing
@@ -138,7 +201,8 @@ public:
 	 * Calculate stats at the end of a year using the set of
 	 * persons.
 	 */
-	void yearEnded(repast::relogo::AgentSet<Person>& people, int year, repast::Properties& props);
+	void yearEnded(repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator begin,
+			repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator, int year, repast::Properties& props);
 
 	/**
 	 * Calculates the summary stats and writes them to the specified file.
@@ -148,6 +212,17 @@ public:
 	 */
 	void calculateSummaryStats(repast::relogo::AgentSet<Person>& people, const std::string& file,
 			repast::Properties& props);
+
+	/**
+	 * Creates data sources that produce yearly data and adds them to the specified builder
+	 */
+	void createYearlyDataSources(repast::SVDataSetBuilder& builder);
+
+	/**
+	 * Creates the data sources that produce hourly data and adds them to the
+	 * specified builder.
+	 */
+	void createHourlyDataSources(repast::SVDataSetBuilder& builder);
 
 private:
 	typedef std::map<unsigned int, unsigned long>::const_iterator ConstHistIter;
@@ -175,49 +250,16 @@ private:
 	long eoy_prevalence_infected, eoy_prevalence_colonized;
 	double yearly_no_seek_infection_duration, yearly_seek_infection_duration;
 	double yearly_infection_duration, yearly_colonization_duration;
-	long yearly_c_from_i, yearly_c_from_c;
+	long yearly_c_from_i, yearly_c_from_c, yearly_i_to_c_from_na;
 
 	long total_c_from_i, total_c_from_c;
 	double total_infected, total_colonized;
 
-	long hospital_stays;
-	double hospital_stay_duration;
-	double hospital_colonizations, hospital_infections;
 	long colonization_from_infection_override;
 
-	std::map<std::string, double> colonization_count_map;
-	std::map<std::string, double> infection_count_map;
+	std::map<std::string, PlaceStats> place_stats;
+	std::map<char, RegionStat> region_stats;
 	YearlyAvg averages;
-};
-
-/**
- * Adapts long stat vars to the TDataSource interface.
- */
-class LDataSourceAdapter: public repast::TDataSource<double> {
-
-public:
-	LDataSourceAdapter(long* stat);
-	virtual ~LDataSourceAdapter();
-
-	double getData();
-
-private:
-	long* stat_;
-};
-
-/**
- * Adapts double stat vars to the TDataSource interface.
- */
-class DDataSourceAdapter: public repast::TDataSource<double> {
-
-public:
-	DDataSourceAdapter(double* stat);
-	virtual ~DDataSourceAdapter();
-
-	double getData();
-
-private:
-	double* stat_;
 };
 
 /**
@@ -236,25 +278,6 @@ public:
 
 private:
 	Statistics* stats_;
-};
-
-/**
- * Adapts map double values to the TDataSource API. The constructor
- * takes a map key and a map. getData returns the current value
- * for that key.
- */
-class PlaceCount: public repast::TDataSource<double> {
-
-public:
-	PlaceCount(std::map<std::string, double>* place_map, const std::string& place_name);
-	virtual ~PlaceCount();
-
-	double getData();
-
-private:
-
-	std::map<std::string, double>* place_map_;
-	std::string place_name_;
 };
 
 } /* namespace mrsa */

@@ -1,4 +1,69 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+/*
  * PlaceCreator.cpp
  *
  *  Created on: Apr 17, 2012
@@ -18,9 +83,13 @@
 #include "Household.h"
 #include "School.h"
 #include "Hospital.h"
+#include "Prison.h"
+#include "Gym.h"
+#include "GeneralQuarters.h"
 #include "Workplace.h"
 #include "DefaultPlace.h"
 #include "Constants.h"
+#include "RegionMap.h"
 
 namespace mrsa {
 
@@ -33,6 +102,8 @@ const int RISK_PAR_IDX = 2;
 const int RISK_TIP_IDX = 3;
 const int RISK_AIP_IDX = 4;
 const int RISK_X_IDX = 5;
+
+const int ZIP_GROUP_IDX = 7;
 
 PlaceCreator::PlaceCreator() {
 }
@@ -141,6 +212,8 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 	boost::mpi::communicator* world = RepastProcess::instance()->getCommunicator();
 	reader.skip(world->rank());
 
+	RegionMap* region_map = RegionMap::instance();
+
 	// read each line and depending on the type, create that type of place.
 	while (reader.next(vec)) {
 		string type = vec[TYPE_IDX];
@@ -153,7 +226,7 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		Risk& risk = iter->second;
 
 		Place* place = 0;
-		if (type == SCHOOL_TYPE || type == GYM_TYPE) {
+		if (type == SCHOOL_TYPE) {
 			place = new School(vec, risk);
 			///std::cout << "making a school" << std::endl;
 		} else if (type == HOUSEHOLD_TYPE) {
@@ -165,6 +238,14 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		} else if (type == HOSPITAL_TYPE) {
 			place = new Hospital(vec, risk);
 			//std::cout << "making a hospital" << std::endl;
+		} else if (type == DORM_TYPE || type == NURSING_HOME_TYPE) {
+			place = new GeneralQuarters(vec, risk);
+			//std::cout << "making a " << type << std::endl;
+		} else if (type == PRISON_TYPE) {
+			place = new Prison(vec, risk);
+			//std::cout << "making a " << type << std::endl;
+		} else if (type == GYM_TYPE) {
+			place = new Gym(vec, risk);
 		} else {
 			// if the type is not one we have a specific place for
 			// yet, then create a DefaultPlace.
@@ -173,6 +254,8 @@ void PlaceCreator::run(const string& places_file, Properties& props, vector<Plac
 		}
 		// add the place to the vector.
 		places.push_back(place);
+
+		region_map->addZipCode(place->zipCode(), strToUInt(vec[ZIP_GROUP_IDX]));
 
 		// skip to the next line to read
 		reader.skip(world->size() - 1);

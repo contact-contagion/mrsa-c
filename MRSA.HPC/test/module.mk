@@ -1,7 +1,8 @@
 SOURCES = main.cpp \
 		creators_tests.cpp \
 		transmission_tests.cpp \
-		csvreader_tests.cpp
+		csvreader_tests.cpp \
+		places_tests.cpp
 #		data_tests.cpp 
           
           

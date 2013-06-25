@@ -1,4 +1,39 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+
+/*
  * Person.cpp
  *
  *  Created on: Apr 17, 2012
@@ -11,6 +46,8 @@
 
 #include "Person.h"
 #include "Household.h"
+#include "Prison.h"
+#include "GeneralQuarters.h"
 #include "Parameters.h"
 #include "Constants.h"
 #include "Statistics.h"
@@ -23,11 +60,13 @@ using namespace boost;
 using namespace std;
 
 Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-		Places places, shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration) :
-		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), places_(places), hosp_manager_(
-				hosp_manager), tucaseid_weekday(vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(
-				vec[TUCASE_ID_WEEKEND_IDX]), relate(0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
-				min_infection_duration), entered_hospital_time(0) {
+		Places places, shared_ptr<PlaceStayManager> hosp_manager,
+		shared_ptr<PlaceStayManager> prison_manager, float min_infection_duration) :
+		Turtle(id, obs), person_id(vec[PERSON_ID_IDX]), zip_code(0), places_(places), hosp_manager_(
+				hosp_manager), prison_manager_(prison_manager), tucaseid_weekday(
+				vec[TUCASE_ID_WEEKDAY_IDX]), tucaseid_weekend(vec[TUCASE_ID_WEEKEND_IDX]), relate(
+				0), sex(0), age_(0), weekday_acts(), weekend_acts(), status_(
+				min_infection_duration), entered_hospital_time(0), entered_prison_time(0), seek_care(false) {
 
 	// parse the string values into ints for
 	// relate, sex and age fields.
@@ -46,24 +85,29 @@ Person::Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<st
 	if (val.length() > 0)
 		age_ = strToInt(val);
 
+	zip_code = strToUInt(vec[vec.size() - 1]);
+
+	double seek_care_prob = strToDouble(vec[SEEK_CARE_IDX]);
+	seek_care = Random::instance()->nextDouble() < seek_care_prob;
+
 	if (places.household != 0) {
 		((Household*) places.household)->addMember(this);
 	}
-
-	//std::cout << hospital_stay_duration << std::endl;
 }
 
 Person::~Person() {
-
 }
 
-void Person::validate() {
-	// remove this person from the model if it has no places
-	if (places_.school == 0 && places_.household == 0 && places_.work == 0
-			&& places_.group_quarters == 0)
-		die();
-	//if (places_.household == 0)
-	//	die();
+//void Person::goToCompositePlace(CompositePlace* place, int activity_type) {
+//	const CompPlaceType& type = place->compPlaceType();
+//	std::cout << "gotoCompPlace" << std::endl;
+//	comp_indices[type] = place->addPersonToComponent(this, activity_type, comp_indices[type]);
+//}
+
+bool Person::validate() {
+	// remove this person from the model if it has home type places
+	return !(places_.school == 0 && places_.household == 0 && places_.work == 0
+			&& places_.group_quarters == 0);
 }
 
 bool Person::canStatusChange() {
@@ -103,11 +147,23 @@ void Person::performActivity(Calendar& calendar) {
 //	if (personId() == "5511519") {
 //		has 7 days in hospital so good for testing hosp code.
 //	}
+<<<<<<< HEAD
 	if (hosp_manager_->inHospital(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
+=======
+
+	if (hosp_manager_->inPlace(calendar.year, calendar.day_of_year) && places_.hospital != 0) {
+>>>>>>> refs/heads/development
 		if (entered_hospital_time == 0) {
 			entered_hospital_time = RepastProcess::instance()->getScheduleRunner().currentTick();
 		}
 		changePlace(places_.hospital, 0);
+
+	} else if (prison_manager_->inPlace(calendar.year, calendar.day_of_year)
+			&& places_.jail != 0) {
+		if (entered_prison_time == 0) {
+			entered_prison_time = RepastProcess::instance()->getScheduleRunner().currentTick();
+		}
+		changePlace(places_.jail, 0);
 	} else {
 		// iterate through the activity list and find the activity
 		// whose time span contains the specified time.
@@ -141,8 +197,8 @@ void Person::incrementColonizationsCaused(float colonization_caused) {
 }
 
 // sets the new disease status for this person.
-void Person::updateStatus(DiseaseStatus status) {
-	status_.updateStatus(status);
+void Person::updateStatus(DiseaseStatus status, ColonizationCause cause) {
+	status_.updateStatus(status, cause);
 }
 
 // makes the person to go "home" where home
@@ -166,11 +222,19 @@ void Person::changePlace(Place* place, int activity_type) {
 	}
 
 	if (entered_hospital_time != 0 && (place == 0 || place->placeType() != HOSPITAL_TYPE)) {
-		Statistics::getInstance()->incrementHospitalStayCount();
+		Statistics::getInstance()->incrementHospitalStayCount(zip_code);
 		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
 				- entered_hospital_time;
-		Statistics::getInstance()->incrementHospitalDurationCount(duration);
+		Statistics::getInstance()->incrementHospitalDurationCount(duration, zip_code);
 		entered_hospital_time = 0;
+	}
+
+	if (entered_prison_time != 0 && (place == 0 || place->placeType() != PRISON_TYPE)) {
+		Statistics::getInstance()->incrementPrisonStayCount(zip_code);
+		double duration = RepastProcess::instance()->getScheduleRunner().currentTick()
+				- entered_prison_time;
+		Statistics::getInstance()->incrementPrisonDurationCount(duration, zip_code);
+		entered_prison_time = 0;
 	}
 
 	// regardless of whether this Person has changed its

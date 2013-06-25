@@ -1,4 +1,69 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+/*
  * PersonsCreator.cpp
  *
  *  Created on: Apr 17, 2012
@@ -11,7 +76,10 @@
 
 #include "PersonsCreator.h"
 #include "Constants.h"
-#include "HospitalStayManager.h"
+#include "StayManager.h"
+#include "PrisonStayManager.h"
+#include "Parameters.h"
+
 
 namespace mrsa {
 
@@ -19,8 +87,14 @@ using namespace std;
 using namespace repast;
 using namespace boost;
 
+const std::string JAIL_DISTRIBUTION = "jail.distribution";
 
-shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<IHospitalStayManager>& no_stay_manager) {
+int get_mrsa_prob_idx() {
+	if (Parameters::instance()->getStringParameter(MRSA_PROB_COLUMN) == P_2001) return P_MRSA_2001_IDX;
+	return P_MRSA_2006_IDX;
+}
+
+shared_ptr<PlaceStayManager> create_hospital_stay(const vector<string>& data, shared_ptr<PlaceStayManager>& no_stay_manager) {
 	unsigned int y1_length = strToUInt(data[H_NIGHTS_1]);
 	unsigned int y2_length = strToUInt(data[H_NIGHTS_2]);
 	unsigned int y3_length = strToUInt(data[H_NIGHTS_3]);
@@ -30,15 +104,39 @@ shared_ptr<IHospitalStayManager> create_hospital_stay(const vector<string>& data
 	if (y1_length == 0 && y2_length == 0 && y3_length == 0 && y4_length == 0 && y5_length == 0) {
 		return no_stay_manager;
 	} else {
-		return shared_ptr<IHospitalStayManager>(new HospitalStayManager(y1_length, y2_length, y3_length, y4_length, y5_length));
+		return shared_ptr<PlaceStayManager>(new HospitalStayManager(y1_length, y2_length, y3_length, y4_length, y5_length));
 	}
+}
+
+PlaceStayManager* create_prison_stay(double prison_prob, unsigned int min_jail_duration) {
+	Random* random = Random::instance();
+	PrisonStayManager* manager(0);
+	// one try per year, 11 years
+	for (unsigned int i = 0; i < 11; ++i) {
+		if(random->nextDouble() <= prison_prob) {
+			if (manager == 0) {
+				manager = new PrisonStayManager();
+			}
+
+			unsigned int duration = (int)Random::instance()->getGenerator(JAIL_DISTRIBUTION)->next();
+					//createUniIntGenerator(min_jail_duration, max_jail_duration).next();
+			manager->createStayFor(i, duration + min_jail_duration);
+		}
+	}
+
+	return manager;
 }
 
 
 PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
-		float min_infection_duration) :
+		float min_infection_duration, unsigned int min_jail_duration, double p_mrsa_sum) :
 		reader(file), places(map), min_infection_duration_(min_infection_duration),
-		no_stay_manager(new NoStayManager()){
+		min_jail_duration_(min_jail_duration),
+		initial_infection_count(0), colonization_scaling(0), p_mrsa_sum_(p_mrsa_sum),
+		no_stay_manager(new NoStayManager()) {
+
+	initial_infection_count = strToUInt(Parameters::instance()->getStringParameter(INITIAL_INFECTION_COUNT));
+	colonization_scaling = Parameters::instance()->getDoubleParameter(COLONIZATION_SCALING);
 
 	init();
 }
@@ -46,7 +144,10 @@ PersonsCreator::PersonsCreator(const string& file, map<string, Place*>* map,
 // copy constructor
 PersonsCreator::PersonsCreator(const PersonsCreator& creator) :
 		reader(creator.reader), places(creator.places), min_infection_duration_(
-				creator.min_infection_duration_), no_stay_manager(new NoStayManager()) {
+				creator.min_infection_duration_), min_jail_duration_(creator.min_jail_duration_),
+				initial_infection_count(creator.initial_infection_count), colonization_scaling(creator.colonization_scaling),
+				p_mrsa_sum_(creator.p_mrsa_sum_),
+				no_stay_manager(new NoStayManager()) {
 	init();
 }
 
@@ -96,6 +197,8 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	places.daycare = findPlace(daycare_id);
 	const string& hosp_id = vec[HOSPITAL_ID_IDX];
 	places.hospital = findPlace(hosp_id);
+	const string& jail_id = vec[JAIL_ID_IDX];
+	places.jail = findPlace(jail_id);
 
 	for (int i = OTHER_H_START_IDX; i <= OTHER_H_END_IDX; ++i) {
 		const string& other_hh_id = vec[i];
@@ -103,8 +206,41 @@ Person* PersonsCreator::operator()(repast::AgentId id, repast::relogo::Observer*
 	}
 
 
-	// create the Person
-	return new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager), min_infection_duration_);
+	unsigned int zip = 0;
+	if (places.household != 0) zip = places.household->zipCode();
+	else if (places.group_quarters != 0) zip = places.group_quarters->zipCode();
+	stringstream ss;
+	ss << zip;
+	vec.push_back(ss.str());
+
+	double prison_prob = strToDouble(vec[JAIL_IDX]);
+	PlaceStayManager* manager(0);
+	if (prison_prob > 0) {
+		manager = create_prison_stay(prison_prob, min_jail_duration_);
+	}
+
+	Person* p = 0;
+
+	if (manager == 0)
+		p = new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+					no_stay_manager, min_infection_duration_);
+	else {
+		p = new Person(id, obs, vec, places, create_hospital_stay(vec, no_stay_manager),
+					shared_ptr<PlaceStayManager>(manager), min_infection_duration_);
+	}
+
+	Random* random = Random::instance();
+	// scale so that all the p_mrsa values would sum to 1,
+	// this reflects the nature of the data.
+	double p_mrsa = strToDouble(vec[get_mrsa_prob_idx()]) / p_mrsa_sum_;
+	//std::cout << p_mrsa << ", " << initial_infection_count << std::endl;
+	if (random->nextDouble() < p_mrsa * initial_infection_count) {
+		p->updateStatus(INFECTED, FROM_INIT);
+	} else if (random->nextDouble() < p_mrsa * initial_infection_count * colonization_scaling) {
+		p->updateStatus(COLONIZED, FROM_INIT);
+	}
+
+	return p;
 }
 
 }

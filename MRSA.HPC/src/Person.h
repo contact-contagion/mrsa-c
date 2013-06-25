@@ -1,4 +1,37 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+/*
  * Person.h
  *
  *  Created on: Apr 17, 2012
@@ -43,6 +76,17 @@ const int H_NIGHTS_3 = 19;
 const int H_NIGHTS_4 = 20;
 const int H_NIGHTS_5 = 21;
 
+const int JAIL_IDX = 22;
+const int JAIL_ID_IDX = 23;
+const int SEEK_CARE_IDX = 24;
+const int P_MRSA_2001_IDX = 25;
+const int P_MRSA_2006_IDX= 26;
+const int INFECTED_IDX = 27;
+
+
+// forward declaration
+class CompositePlace;
+
 class Person: public repast::relogo::Turtle {
 
 	friend std::ostream& operator<<(std::ostream& os, const Person& id);
@@ -51,13 +95,14 @@ class Person: public repast::relogo::Turtle {
 public:
 
 	Person(repast::AgentId id, repast::relogo::Observer* obs, std::vector<std::string>& vec,
-			Places places, boost::shared_ptr<IHospitalStayManager> hosp_manager, float min_infection_duration);
+			Places places, boost::shared_ptr<PlaceStayManager> hosp_manager, boost::shared_ptr<PlaceStayManager> prison_manager,
+			float min_infection_duration);
 	virtual ~Person();
 
 	/**
-	 * If this Person has no Places, then it kills itself.
+	 * If this Person has no Places, return false.
 	 */
-	void validate();
+	bool validate();
 
 	/**
 	 * Initialize the activity vectors for this Person, return true on successful
@@ -76,7 +121,7 @@ public:
 	/**
 	 * Update this Person's disease status to the specified status.
 	 */
-	void updateStatus(DiseaseStatus status);
+	void updateStatus(DiseaseStatus status, ColonizationCause cause);
 
 	/**
 	 * Gets whether or not this Person's disease status can change. For example,
@@ -109,6 +154,13 @@ public:
 	}
 
 	/**
+	 * Gets the zip code of this person.
+	 */
+	unsigned int zipCode() const {
+		return zip_code;
+	}
+
+	/**
 	 * Gets the current infection status.
 	 */
 	InfectionStatus infectionStatus() const {
@@ -128,6 +180,17 @@ public:
 	}
 
 	/**
+	 * Gets this Person's household.
+	 */
+	const Place* household() const {
+		return places_.household;
+	}
+
+	const bool seekCare() const {
+		return seek_care;
+	}
+
+	/**
 	 * Initializes treatment within this Person's household.
 	 */
 	void initHouseholdTreatment();
@@ -140,6 +203,11 @@ public:
 	void goToHome();
 
 	/**
+	 * Makes this Person go to the specified compoment place.
+	 */
+	//void goToCompositePlace(CompositePlace* place, int activity_type);
+
+	/**
 	 * Performs the current activity for the specified time
 	 * and weekday / weekend.
 	 */
@@ -150,15 +218,19 @@ private:
 	typedef std::vector<Activity>::const_iterator ActivityIter;
 
 	std::string person_id;
+	unsigned int zip_code;
+
 	Places places_;
-	boost::shared_ptr<IHospitalStayManager> hosp_manager_;
+	boost::shared_ptr<PlaceStayManager> hosp_manager_;
+	boost::shared_ptr<PlaceStayManager> prison_manager_;
 	std::string tucaseid_weekday, tucaseid_weekend;
 	int relate, sex, age_;
 	ActivityList weekday_acts;
 	ActivityList weekend_acts;
 
 	DiseaseStatusUpdater status_;
-	double entered_hospital_time;
+	double entered_hospital_time, entered_prison_time;
+	bool seek_care;
 
 	/**
 	 * Changes this Person's place to the specified place.

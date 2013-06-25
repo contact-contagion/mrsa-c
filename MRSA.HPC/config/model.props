@@ -1,28 +1,45 @@
-random.seed = 1
+#random.seed = -1
 
 BaseSweepNumber = 0
 
-stop.at = 17520.5
-#17520.5 
-#8760.5
+## half year = 4380.0;
+#stop.at = 17520.5
+# includes half year hack
+stop.at = 4428.5
+
+# 5 years
+#48180.5
+
+# 10 years: 91980.0
+#stop.at = 48180.5
+# two years:
+#21900.5
+# one year:
+#13140.5
+
+persons.file = ../../MRSA Inputs/geo_subsets/chicago/people.csv 
+places.file = ../../MRSA Inputs/geo_subsets/chicago/places.csv 
+activities.file = ../../MRSA Inputs/geo_subsets/chicago/activities.csv 
 
 #persons.file = ../../MRSA Inputs/geo_subsets/zip_60615/people.csv 
 #places.file = ../../MRSA Inputs/geo_subsets/zip_60615/places.csv 
 #activities.file = ../../MRSA Inputs/geo_subsets/zip_60615/activities.csv 
 
-persons.file = ../../../../input_files/geo_subsets/zip_60615/people.csv 
-places.file = ../../../../input_files/geo_subsets/zip_60615/places.csv 
-activities.file = ../../../../input_files/geo_subsets/zip_60615/activities.csv 
-
-
-risk.file = ../data/new_risk_file_102612.csv 
+risk.file = ../data/new_risk_file_040313.csv 
 
 hourly.output.file = ./output/hourly_data
 yearly.output.file = ./output/yearly_data
 summary.output.file = ./output/summary_stats
+event.output.file = ./output/transmission_events.csv
 
-initial.colonization.fraction = 0.03
-initial.infected.count = 34
+initial.colonization.scaling = 204
+initial.infected.count = 13
+
+# which column of the two p_mrsa2001 and p_mrsa2006 to
+# use to set the initial mrsa infected count
+
+initial.mrsa.probability.column = p_mrsa2006
+
 
 # 7 days (24 x 7)
 minimum.infection.period = 168
@@ -31,23 +48,28 @@ seek.care.infection.period = 168
 # an additional 12 days after the minimum
 self.care.infection.period = 288
 
-a = 2.59e-05
-b = 2.58e-05
-e = 2.40e-05
+# below are the new transmission parameters from Mike 4/25
+a = 4.10686e-05
+b = 5.25e-06
+e = 1.5921e-04
 
 # probability of seeking care or not once infected
 alpha = 0.5
 # probability of seeking care infected to uncolonized, else colonized
-theta = 0.5
+theta = 0.82
 # probability of each household member of seeking care infected
 # moving to uncolonized, else colonized
 gamma = 0.5
 # probability of self-care infected to uncolonized, else colonized
-z = 0.5
+z = 0.64
+
+# in days
+minimum.jail.stay = 1
+mean.jail.stay = 37
 
 # whether or not seek and destroy for household members of 
 # infected persons is enabled
-seek.and.destroy.enabled = true
+seek.and.destroy.enabled = false
 
 # world definition props
 min.x = 0

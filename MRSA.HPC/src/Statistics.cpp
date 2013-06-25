@@ -1,4 +1,69 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+# MRSA Model
+# 
+# Copyright (c) 2012 University of Chicago and Argonne National Laboratory
+#    All rights reserved.
+#   
+#    Redistribution and use in source and binary forms, with 
+#    or without modification, are permitted provided that the following 
+#    conditions are met:
+#   
+#   	 Redistributions of source code must retain the above copyright notice,
+#   	 this list of conditions and the following disclaimer.
+#   
+#   	 Redistributions in binary form must reproduce the above copyright notice,
+#   	 this list of conditions and the following disclaimer in the documentation
+#   	 and/or other materials provided with the distribution.
+#   
+#   	 Neither the name of the Argonne National Laboratory nor the names of its
+#      contributors may be used to endorse or promote products derived from
+#      this software without specific prior written permission.
+#   
+#    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+#    ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+#    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+#    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+#    CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+#    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+#    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+#    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+#    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+#    EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+/*
  * PersonStats.cpp
  *
  *  Created on: Apr 19, 2012
@@ -9,15 +74,32 @@
 
 #include <boost/filesystem.hpp>
 
+#include "repast_hpc/SVDataSetBuilder.h"
+#include "repast_hpc/DataSet.h"
+
 #include "Statistics.h"
 #include "TransmissionAlgorithm.h"
 #include "Constants.h"
+#include "DataSourceAdapters.h"
+#include "RegionMap.h"
 
 namespace mrsa {
 
 namespace fs = boost::filesystem;
 
 using namespace repast::relogo;
+
+void addValToProps(const std::string& key, int year, repast::Properties& props, long val) {
+	std::stringstream ss;
+	ss << key << "_year_" << year;
+	props.putProperty(ss.str(), val);
+}
+
+void addValToProps(const std::string& key, int year, repast::Properties& props, double val) {
+	std::stringstream ss;
+	ss << key << "_year_" << year;
+	props.putProperty(ss.str(), val);
+}
 
 /**
  * Attempts to find an unused file name. If the specified file
@@ -71,26 +153,44 @@ Statistics::Statistics() :
 
 		hourly_infected(0), hourly_colonized(0), hourly_uncolonized(0), newly_infected(0), newly_colonized(
 				0), yearly_infected_r0(0), yearly_colonized_r0(0), yearly_r0(0), yearly_infected(0), yearly_colonized(
-				0), eoy_prevalence_infected(0), eoy_prevalence_colonized(0), yearly_no_seek_infection_duration(
-				0), yearly_seek_infection_duration(0), yearly_infection_duration(0), yearly_colonization_duration(
-				0), yearly_c_from_i(0), yearly_c_from_c(0), total_c_from_i(0), total_c_from_c(0), total_infected(
-				0), total_colonized(0), hospital_stays(0), hospital_stay_duration(0), hospital_colonizations(
-				0), hospital_infections(0), colonization_from_infection_override(0), colonization_count_map(), infection_count_map(), averages() {
+				0), eoy_prevalence_infected(
+				0), eoy_prevalence_colonized(0), yearly_no_seek_infection_duration(0), yearly_seek_infection_duration(
+				0), yearly_infection_duration(0), yearly_colonization_duration(0), yearly_c_from_i(
+				0), yearly_c_from_c(0), yearly_i_to_c_from_na(0), total_c_from_i(0), total_c_from_c(
+				0), total_infected(0), total_colonized(0), colonization_from_infection_override(0), place_stats(), region_stats(), averages() {
+
+	std::vector<char> regions;
+	RegionMap::instance()->regions(regions);
+	for (size_t i = 0; i < regions.size(); ++i) {
+		//region_stats[regions[i]] = RegionStat(regions[i]);
+		RegionStat stat = { regions[i], 0, 0, 0, 0, 0, 0 };
+		region_stats.insert(std::pair<char, RegionStat>(regions[i], stat));
+	}
+
+	place_stats.insert(std::pair<std::string, PlaceStats>(HOUSEHOLD_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(OTHER_HOUSEHOLD_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(HOSPITAL_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(SCHOOL_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(WORKPLACE_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(GYM_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(NURSING_HOME_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(DORM_TYPE, PlaceStats()));
+	place_stats.insert(std::pair<std::string, PlaceStats>(PRISON_TYPE, PlaceStats()));
 }
 
 Statistics::~Statistics() {
 }
 
-void Statistics::incrementColonizationCount(const std::string& type) {
-	increment_map_count(colonization_count_map, type);
+void Statistics::incrementColonizationCount(const std::string& type, const unsigned int zip_code) {
+	place_stats[type].incrementColonizationCount(zip_code);
 }
 
 void Statistics::incrementColonizationFromInfection() {
 	++colonization_from_infection_override;
 }
 
-void Statistics::incrementInfectionCount(const std::string& type) {
-	increment_map_count(infection_count_map, type);
+void Statistics::incrementInfectionCount(const std::string& type, const unsigned int zip_code) {
+	place_stats[type].incrementInfectionCount(zip_code);
 }
 
 void Statistics::setInitialCounts(repast::relogo::AgentSet<Person>& people) {
@@ -119,18 +219,8 @@ void Statistics::countPerson(Person* person) {
 }
 
 void Statistics::hourEnded() {
-	TransmissionAlgorithm* ta = TransmissionAlgorithm::instance();
-	yearly_c_from_i += ta->colonizedFromInfectionCount();
-	yearly_c_from_c += ta->colonizedFromColonizationCount();
-
-	total_c_from_i += ta->colonizedFromInfectionCount();
-	total_c_from_c += ta->colonizedFromColonizationCount();
-
 	newly_infected = TransmissionAlgorithm::instance()->newlyInfectedCount();
 	newly_colonized = TransmissionAlgorithm::instance()->newlyColonizedCount();
-
-	yearly_colonized += newly_colonized;
-	yearly_infected += newly_infected;
 
 	total_infected += newly_infected;
 	total_colonized += newly_colonized;
@@ -144,12 +234,30 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 
 	int i_count = 0, c_count = 0;
 	double p_from_infection = 0, p_from_colonization = 0;
+	RegionStat& region_stat = region_stats[RegionMap::instance()->region(p->zipCode())];
 	for (std::list<StatusStats>::iterator iter = vec.begin(); iter != vec.end(); ++iter) {
 		StatusStats& stats = *iter;
+
+		if (stats.col_cause == UC_TO_C_FROM_C) {
+			++yearly_c_from_c;
+			++region_stat.c_from_c;
+		} else if (stats.col_cause == UC_TO_C_FROM_I) {
+			++yearly_c_from_i;
+			++region_stat.c_from_i;
+		} else if (stats.col_cause == I_TO_C_FROM_NA) {
+			++yearly_i_to_c_from_na;
+			++region_stat.i_to_c_from_na;
+		}
+
 		if (stats.duration != 0) {
 			if (stats.status == INFECTED) {
 				++i_count;
-				++(p_stats.infection_count);
+				// only count infections if they have not been
+				// caused by initialization
+				if (stats.col_cause != FROM_INIT) {
+					++(p_stats.infection_count);
+					++region_stat.infection_incidence;
+				}
 				p_stats.infection_duration += stats.duration;
 				if (stats.infection_status == SEEK_CARE) {
 					p_stats.seek_infection_duration += stats.duration;
@@ -163,7 +271,13 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 
 			} else if (stats.status == COLONIZED) {
 				++c_count;
-				++(p_stats.colonized_count);
+				// only count colonizations if they have not been
+				// caused by initialization
+				if (stats.col_cause != FROM_INIT) {
+					++(p_stats.colonized_count);
+					++region_stat.colonization_incidence;
+				}
+
 				p_stats.colonization_duration += stats.duration;
 				p_stats.from_colonization += stats.colonized_persons;
 				p_from_colonization += stats.colonized_persons;
@@ -194,37 +308,42 @@ void Statistics::updateCountsFromStatsVector(Person* p, PersonStats& p_stats) {
 	}
 }
 
-void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
+void Statistics::yearEnded(repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator begin,
+		repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator end, int year,
 		repast::Properties& props) {
 	PersonStats p_stats = { };
 
+	RegionMap* region_map = RegionMap::instance();
 	// get yearly stats from each person.
-	for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
-		Person* p = (*iter);
+	//for (AgentSet<Person>::as_iterator iter = people.begin(); iter != people.end(); ++iter) {
+	for (repast::Context<repast::relogo::RelogoAgent>::const_bytype_iterator iter = begin; iter != end; ++iter) {
+		Person* p = (Person*)((*iter).get());
 		updateCountsFromStatsVector(p, p_stats);
 		p->status_.resetYearlyCounts();
-		if (p->status() == INFECTED)
+		// only count infections / colonizations that have been caused during the model run
+		// and not as part of initialization
+		if (p->status() == INFECTED
+				&& p->status_.yearly_status_stats.back().col_cause != FROM_INIT) {
+			++region_stats[region_map->region(p->zipCode())].infection_prevalence;
 			++eoy_prevalence_infected;
-		else if (p->status() == COLONIZED)
+		} else if (p->status() == COLONIZED
+				&& p->status_.yearly_status_stats.back().col_cause != FROM_INIT) {
+			++region_stats[region_map->region(p->zipCode())].colonization_prevalence;
 			++eoy_prevalence_colonized;
+		}
 	}
 
+	yearly_infected = p_stats.infection_count;
+	yearly_colonized = p_stats.colonized_count;
+
+	total_c_from_i += yearly_c_from_i;
+	total_c_from_c += yearly_c_from_c;
+
 	// Add to properties file
-	std::stringstream ss1;
-	ss1 << "infections_incidence_year_" << year;
-	props.putProperty(ss1.str(), yearly_infected);
-
-	std::stringstream ss2;
-	ss2 << "colonizations_incidence_year_" << year;
-	props.putProperty(ss2.str(), yearly_colonized);
-
-	std::stringstream ss3;
-	ss3 << "infections_prevalence_year_" << year;
-	props.putProperty(ss3.str(), eoy_prevalence_infected);
-
-	std::stringstream ss4;
-	ss4 << "colonizations_prevalence_year_" << year;
-	props.putProperty(ss4.str(), eoy_prevalence_colonized);
+	addValToProps("infections_incidence", year, props, yearly_infected);
+	addValToProps("colonizations_incidence", year, props, yearly_colonized);
+	addValToProps("infections_prevalence", year, props, eoy_prevalence_infected);
+	addValToProps("colonizations_prevalence", year, props, eoy_prevalence_colonized);
 
 	yearly_infection_duration = yearly_colonization_duration = 0;
 
@@ -257,41 +376,28 @@ void Statistics::yearEnded(repast::relogo::AgentSet<Person>& people, int year,
 	averages.yearly_no_seek_infection_duration += yearly_no_seek_infection_duration;
 	averages.yearly_seek_infection_duration += yearly_seek_infection_duration;
 
-	hospital_colonizations = get_map_value(colonization_count_map, HOSPITAL_TYPE);
-	hospital_infections = get_map_value(infection_count_map, HOSPITAL_TYPE);
-	// convert this to days from hours.
-	hospital_stay_duration = ceil(hospital_stay_duration / 24);
+	place_stats[PRISON_TYPE].addToProps(props, "jail", year, true);
+	place_stats[HOSPITAL_TYPE].addToProps(props, "hospital", year, false);
 
-	std::stringstream ss5;
-	ss5 << "hospital_colonizations_year_" << year;
-	props.putProperty(ss5.str(), hospital_colonizations);
-
-	std::stringstream ss6;
-	ss6 << "hospital_infections_year_" << year;
-	props.putProperty(ss6.str(), hospital_infections);
-
-	std::stringstream ss7;
-	ss7 << "hospital_stays_year_" << year;
-	props.putProperty(ss7.str(), hospital_stays);
-
-	std::stringstream ss8;
-	ss8 << "hospital_days_year_" << year;
-	props.putProperty(ss8.str(), hospital_stay_duration);
+	addValToProps(HOUSEHOLD_COL_COUNT, year, props,  place_stats[HOUSEHOLD_TYPE].colonization_count);
+	addValToProps(OTHER_H_COL_COUNT, year, props, place_stats[OTHER_HOUSEHOLD_TYPE].colonization_count);
+	addValToProps(SCHOOL_COL_COUNT, year, props, place_stats[SCHOOL_TYPE].colonization_count);
+	addValToProps(WORKPLACE_COL_COUNT, year, props, place_stats[WORKPLACE_TYPE].colonization_count);
+	addValToProps(GYM_COL_COUNT, year, props, place_stats[GYM_TYPE].colonization_count);
+	addValToProps(DORM_COL_COUNT, year, props, place_stats[DORM_TYPE].colonization_count);
+	addValToProps(NURSING_HOME_COL_COUNT, year, props, place_stats[NURSING_HOME_TYPE].colonization_count);
 
 	// get the total number of colonizations by summing the
 	// colonization at X place counts
 	double total = 0;
-	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
-			++iter) {
-		total += iter->second;
+	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+			iter != place_stats.end(); ++iter) {
+		total += iter->second.colonization_count;
 	}
 
-	// for each place in the colonization_count_map, get the fraction of colonizations
-	// that occured in that place
-	for (ColMapIter iter = colonization_count_map.begin(); iter != colonization_count_map.end();
-			++iter) {
-		double val = iter->second;
-		iter->second = val / total;
+	for (std::map<std::string, PlaceStats>::iterator iter = place_stats.begin();
+			iter != place_stats.end(); ++iter) {
+		iter->second.updateColonizationFraction(total);
 	}
 }
 
@@ -338,9 +444,9 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 			<< std::endl << "avg. colonization duration: "
 			<< averages.yearly_colonization_duration / averages.count << std::endl
 			/*
-			<< "avg. infected_r0: " << (averages.yearly_infected_r0 / averages.count) << std::endl
-			<< "avg. colonized_r0: " << (averages.yearly_colonized_r0 / averages.count) << std::endl
-			*/
+			 << "avg. infected_r0: " << (averages.yearly_infected_r0 / averages.count) << std::endl
+			 << "avg. colonized_r0: " << (averages.yearly_colonized_r0 / averages.count) << std::endl
+			 */
 			<< std::endl;
 
 	props.putProperty("total_infections", total_infected);
@@ -348,9 +454,9 @@ void Statistics::calculateSummaryStats(repast::relogo::AgentSet<Person>& people,
 	props.putProperty("total_from_infection", total_c_from_i);
 	props.putProperty("total_from_colonization", total_c_from_c);
 	/*
-	props.putProperty("avg_infected_r0", (averages.yearly_infected_r0 / averages.count));
-	props.putProperty("avg_colonized_r0", (averages.yearly_colonized_r0 / averages.count));
-	*/
+	 props.putProperty("avg_infected_r0", (averages.yearly_infected_r0 / averages.count));
+	 props.putProperty("avg_colonized_r0", (averages.yearly_colonized_r0 / averages.count));
+	 */
 
 	for (ConstHistIter iter = infection_hist.begin(); iter != infection_hist.end(); ++iter) {
 		out << "" << iter->second << " persons infected " << iter->first << " times" << std::endl;
@@ -372,27 +478,168 @@ void Statistics::addToHistogram(unsigned int count, std::map<unsigned int, unsig
 	}
 }
 
-LDataSourceAdapter::LDataSourceAdapter(long* stat) :
-		repast::TDataSource<double>(), stat_(stat) {
+void Statistics::createHourlyDataSources(repast::SVDataSetBuilder& builder) {
+	// data source for counting the number of uncolonized persons
+	builder.addDataSource(
+			repast::createSVDataSource("uncolonized_count",
+					new LDataSourceAdapter(&hourly_uncolonized), std::plus<double>()));
+
+	// data source for counting the number of colonized persons
+	builder.addDataSource(
+			repast::createSVDataSource("colonized_count", new LDataSourceAdapter(&hourly_colonized),
+					std::plus<double>()));
+
+	// data source for counting the number of infected persons
+	builder.addDataSource(
+			repast::createSVDataSource("infection_count", new LDataSourceAdapter(&hourly_infected),
+					std::plus<double>()));
+
+	// data source for the total number of persons
+	TotalSum* tSum = new TotalSum(this);
+	builder.addDataSource(repast::createSVDataSource("total_count", tSum, std::plus<double>()));
+
+	builder.addDataSource(
+			repast::createSVDataSource("newly_infected", new LDataSourceAdapter(&newly_infected),
+					std::plus<double>()));
+
+	builder.addDataSource(
+			repast::createSVDataSource("newly_colonized", new LDataSourceAdapter(&newly_colonized),
+					std::plus<double>()));
+
+	builder.addDataSource(
+			repast::createSVDataSource("running_total_infected",
+					new DDataSourceAdapter(&total_infected), std::plus<double>()));
+
+	builder.addDataSource(
+			repast::createSVDataSource("running_total_colonized",
+					new DDataSourceAdapter(&total_colonized), std::plus<double>()));
 }
 
-LDataSourceAdapter::~LDataSourceAdapter() {
+void Statistics::createYearlyDataSources(repast::SVDataSetBuilder& builder) {
+	builder.addDataSource(
+			createSVDataSource("infection_incidence_count",
+					new LDataSourceAdapter(&yearly_infected), std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("colonized_incidence_count",
+					new LDataSourceAdapter(&yearly_colonized), std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("infection_prevalence_count",
+					new LDataSourceAdapter(&eoy_prevalence_infected), std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("colonized_prevalence_count",
+					new LDataSourceAdapter(&eoy_prevalence_colonized), std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("colonizations_from_infection",
+					new LDataSourceAdapter(&yearly_c_from_i), std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("colonizations_from_colonization",
+					new LDataSourceAdapter(&yearly_c_from_c), std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("infected_to_colonized_count",
+					new LDataSourceAdapter(&yearly_i_to_c_from_na), std::plus<double>()));
+
+	std::vector<char> regions;
+	RegionMap::instance()->regions(regions);
+	for (size_t i = 0; i < regions.size(); ++i) {
+		RegionStat& region_stat = region_stats[regions[i]];
+		std::stringstream ss;
+		ss << regions[i];
+		std::string region(ss.str());
+
+		builder.addDataSource(
+				createSVDataSource("infection_incidence_count_" + region,
+						new LDataSourceAdapter(&(region_stat.infection_incidence)),
+						std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("colonized_incidence_count_" + region,
+						new LDataSourceAdapter(&(region_stat.colonization_incidence)),
+						std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("infection_prevalence_count_" + region,
+						new LDataSourceAdapter(&(region_stat.infection_prevalence)),
+						std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("colonized_prevalence_count_" + region,
+						new LDataSourceAdapter(&(region_stat.colonization_prevalence)),
+						std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("colonizations_from_infection_" + region,
+						new LDataSourceAdapter(&(region_stat.c_from_i)), std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("colonizations_from_colonization_" + region,
+						new LDataSourceAdapter(&(region_stat.c_from_c)), std::plus<double>()));
+
+		builder.addDataSource(
+				createSVDataSource("infected_to_colonized_count_" + region,
+						new LDataSourceAdapter(&(region_stat.i_to_c_from_na)),
+						std::plus<double>()));
+
+	}
+
+	builder.addDataSource(
+			createSVDataSource("avg_seek_care_infection_duration",
+					new DDataSourceAdapter(&yearly_seek_infection_duration), std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("avg_no_seek_care_infection_duration",
+					new DDataSourceAdapter(&yearly_no_seek_infection_duration),
+					std::plus<double>()));
+
+	builder.addDataSource(
+			createSVDataSource("avg_infection_duration",
+					new DDataSourceAdapter(&yearly_infection_duration), std::plus<double>()));
+	builder.addDataSource(
+			createSVDataSource("avg_colonization_duration",
+					new DDataSourceAdapter(&yearly_colonization_duration), std::plus<double>()));
+
+
+	place_stats[PRISON_TYPE].createDataSources("jail", builder, true);
+	place_stats[HOSPITAL_TYPE].createDataSources("hospital", builder, true);
+	place_stats[HOUSEHOLD_TYPE].createDataSources(HOUSEHOLD_TYPE, builder, true);
+	place_stats[OTHER_HOUSEHOLD_TYPE].createDataSources(OTHER_HOUSEHOLD_TYPE, builder, true);
+	place_stats[SCHOOL_TYPE].createDataSources(SCHOOL_TYPE, builder, true);
+	place_stats[WORKPLACE_TYPE].createDataSources(WORKPLACE_TYPE, builder, true);
+	place_stats[GYM_TYPE].createDataSources("sports_facilities", builder, true);
+	place_stats[NURSING_HOME_TYPE].createDataSources(NURSING_HOME_TYPE, builder, true);
+	place_stats[DORM_TYPE].createDataSources(DORM_TYPE, builder, true);
 }
 
-double LDataSourceAdapter::getData() {
-	return (double) (*stat_);
-}
+/**
+	 * Increments the hospital stay count.
+	 */
+	void Statistics:: incrementHospitalStayCount(unsigned int zip_code) {
+		place_stats[HOSPITAL_TYPE].incrementStayCount(zip_code);
+	}
 
-DDataSourceAdapter::DDataSourceAdapter(double* stat) :
-		repast::TDataSource<double>(), stat_(stat) {
-}
+	/**
+	 * Increments the hospital stay duration count by the specified amount.
+	 */
+	void Statistics:: incrementHospitalDurationCount(double hours, unsigned int zip_code) {
+		place_stats[HOSPITAL_TYPE].incrementDuration(hours, zip_code);
+	}
 
-DDataSourceAdapter::~DDataSourceAdapter() {
-}
+	/**
+	 * Increments the prison stay count.
+	 */
+	void Statistics:: incrementPrisonStayCount(unsigned int zip_code) {
+		place_stats[PRISON_TYPE].incrementStayCount(zip_code);
+	}
 
-double DDataSourceAdapter::getData() {
-	return *stat_;
-}
+	/**
+	 * Increments the prison stay duration count by the specified amount.
+	 */
+void Statistics:: incrementPrisonDurationCount(double hours, unsigned int zip_code) {
+		place_stats[PRISON_TYPE].incrementDuration(hours, zip_code);
+	}
 
 TotalSum::TotalSum(Statistics* stats) :
 		repast::TDataSource<double>(), stats_(stats) {
@@ -407,20 +654,6 @@ TotalSum::~TotalSum() {
  */
 double TotalSum::getData() {
 	return stats_->hourly_uncolonized + stats_->hourly_colonized + stats_->hourly_infected;
-}
-
-PlaceCount::PlaceCount(std::map<std::string, double>* place_map, const std::string& place_name) :
-		repast::TDataSource<double>(), place_map_(place_map), place_name_(place_name) {
-}
-
-PlaceCount::~PlaceCount() {
-}
-
-double PlaceCount::getData() {
-	std::map<std::string, double>::iterator iter = place_map_->find(place_name_);
-	if (iter == place_map_->end())
-		return 0;
-	return iter->second;
 }
 
 } /* namespace mrsa */

@@ -1,4 +1,37 @@
 /*
+*MRSA Model
+*
+*Copyright (c) 2013 University of Chicago and Argonne National Laboratory
+*   All rights reserved.
+*  
+*   Redistribution and use in source and binary forms, with 
+*   or without modification, are permitted provided that the following 
+*   conditions are met:
+*  
+*  	 Redistributions of source code must retain the above copyright notice,
+*  	 this list of conditions and the following disclaimer.
+*  
+*  	 Redistributions in binary form must reproduce the above copyright notice,
+*  	 this list of conditions and the following disclaimer in the documentation
+*  	 and/or other materials provided with the distribution.
+*  
+*  	 Neither the name of the Argonne National Laboratory nor the names of its
+*     contributors may be used to endorse or promote products derived from
+*     this software without specific prior written permission.
+*  
+*   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+*   ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+*   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+*   PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE TRUSTEES OR
+*   CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+*   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+*   PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+*   PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+*   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+*   NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+*   EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+/*
  * School.h
  *
  *  Created on: Apr 25, 2012
@@ -8,66 +41,21 @@
 #ifndef SCHOOL_H_
 #define SCHOOL_H_
 
-#include <map>
-
 #include "Person.h"
-#include "Place.h"
-#include "AbstractPlace.h"
-#include "TransmissionAlgorithm.h"
+#include "CompositePlace.h"
 
 namespace mrsa {
-
-/**
- * A group of persons of the same age in a school. Transmission
- * occurs between members of an AgeGroup.
- */
-class AgeGroup : public AbstractPlace {
-
-public:
-	AgeGroup(std::string id, std::string type, Risk risk);
-	virtual ~AgeGroup();
-
-	/**
-	 * Runs the transmission algorithm on the members of this age group.
-	 */
-	virtual void runTransmission();
-
-private:
-	AgeGroup(const AgeGroup& other);
-};
-
 
 /**
  * A School place. Transmission in a School is via
  * persons in the same grade (i.e. of the same age here),
  * with a risk of 1.0.
  */
-class School: public Place {
+class School: public CompositePlace {
 public:
 	School(std::vector<std::string>& vec, Risk risk);
+
 	virtual ~School();
-
-	/**
-	 * Adds a person to this school.
-	 *
-	 * @param person the person to add.
-	 */
-	virtual void addPerson(Person* person, int activity_type);
-
-	/**
-	 * Runs school mrsa transmission algorithm.
-	 */
-	virtual void runTransmission();
-
-	/**
-	 * Resets this school for the next iteration of the model.
-	 */
-	virtual void reset();
-
-private:
-
-	typedef std::map<int, AgeGroup* >::iterator AgeGroupMapIter;
-	std::map<int, AgeGroup*> person_map;
 
 };
 
